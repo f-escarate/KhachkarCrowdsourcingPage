@@ -5,6 +5,7 @@
     export let token;
     export let http_method = 'POST';
     export let endpoint_url = '/post_khachkar/';
+    export let videoVisibility = 'hidden';
     export let entry = {
         location: '',
         latLong: '',
@@ -56,9 +57,8 @@
         document.getElementById('previewImage').src = '';
         document.getElementById('previewVideo').src = '';
         videoElement.load();
-        videoVisibility = 'invisible';
+        videoVisibility = 'hidden';
     }
-    let videoVisibility = 'hidden';
     const validation = () => {
         let msg = '';
         if (entry.image == null)

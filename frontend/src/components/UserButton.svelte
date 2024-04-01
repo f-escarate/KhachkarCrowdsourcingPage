@@ -4,6 +4,7 @@
     import Cookies from 'js-cookie';
     import { onMount } from 'svelte';
     import { HOST } from '$lib/constants';
+    import { base } from "$app/paths";
     export let authenticated;
 
     let data = {
@@ -35,7 +36,7 @@
     const handleLogOut = () => {
         Cookies.remove('token');
         data.authenticated = false;
-        window.location.href = '/';
+        window.location.href = {base};
     }
 
 </script>
@@ -50,14 +51,14 @@
             <span class="block text-sm">{data.name}</span>
             <span class="block truncate text-sm font-medium">{data.email}</span>
         </DropdownHeader>
-        <DropdownItem href='/myKhachkars/'>My Khachkars</DropdownItem>
-        <DropdownItem href='/account/'>Account Settings</DropdownItem>
+        <DropdownItem href={`${base}/myKhachkars/`}>My Khachkars</DropdownItem>
+        <DropdownItem href={`${base}/account/`}>Account Settings</DropdownItem>
         <DropdownDivider />
         <DropdownItem on:click={handleLogOut}>Log out</DropdownItem>
     </Dropdown>
 {:else}
     <div class="flex md:order-2 gap-2">
-        <Button size="sm" href="/login" class="bg-amber-500 text-black">
+        <Button size="sm" href={`${base}/login`} class="bg-amber-500 text-black">
             <UserIcon sx='m-0 text-black'/>
             Log In
         </Button>

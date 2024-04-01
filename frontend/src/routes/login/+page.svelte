@@ -1,5 +1,6 @@
 <script>
     import { Tabs, TabItem, FloatingLabelInput , Button} from 'flowbite-svelte';
+    import { base } from "$app/paths";
     import Cookies from 'js-cookie';
     import { HOST } from '$lib/constants';
     let name = '';
@@ -19,7 +20,7 @@
         if (json.status == 'success') {
             Cookies.set('token', json.access_token, { sameSite:'strict', secure:true });
             alert('Successfully logged in');
-            window.location.href = '/';
+            window.location.href = base;
             return;
         }
         alert('Username or password incorrect');
@@ -42,7 +43,7 @@
         const json = await response.json();
         if (json.status == 'success') {
             alert('Successfully registered');
-            window.location.href = '/login';
+            window.location.href = `${base}/login`;
         }
         else if (json.status == 'error') {
             alert(json.msg);

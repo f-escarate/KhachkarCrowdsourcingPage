@@ -4,7 +4,7 @@
     import { Modal, Button, Table, TableBody, TableHead, TableBodyCell, TableHeadCell, TableBodyRow } from 'flowbite-svelte';
     export let entry_data;
     const FIELDS = Object.getOwnPropertyNames(TEXT_FIELDS);
-    let image, video;
+    let image;
 
     onMount(async () => {
         const response = await fetch(`${HOST}/get_image/${entry_data.id}`, {

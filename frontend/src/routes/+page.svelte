@@ -1,6 +1,7 @@
 <script>
     import { onMount } from 'svelte';
     import data from '$lib/home.json';
+    import { base } from "$app/paths";
 
     const text_style = (idx) => {
         let margins = ['md:mt-[-2%]', 'md:mb-[-2%]'];
@@ -53,8 +54,8 @@
             </div>
             <img
                 class={img_style(i)}
-                src={element.photo}
-                alt={element.photo}
+                src={`${base}${element.photo}`}
+                alt={`${base}${element.photo}`}
             />
         </div>
     {/each}

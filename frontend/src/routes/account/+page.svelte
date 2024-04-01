@@ -1,5 +1,6 @@
 <script>
     import { HOST } from '$lib/constants';
+    import { base } from "$app/paths";
     import Cookies from 'js-cookie';
     import { onMount } from 'svelte';
     import { Button } from 'flowbite-svelte';
@@ -12,7 +13,7 @@
     onMount(async () => {
         if(Cookies.get('token') === undefined) {
             alert("You have to be logged in to access this page");
-            window.location.href = '/login';
+            window.location.href = `${base}/login`;
             return;
         }
         const response = 
@@ -42,5 +43,5 @@
         <h2><b class='text-2xl font-semibold'>Name:</b> {data.name}</h2>
         <h2><b class='text-2xl font-semibold'>Email:</b> {data.email}</h2>
     </div>
-    <Button href='/account/changePassword'>Change password</Button>
+    <Button href={`${base}/account/changePassword`}>Change password</Button>
 </div>

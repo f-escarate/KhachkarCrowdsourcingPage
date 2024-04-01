@@ -7,7 +7,7 @@
         token = Cookies.get('token');
         if (token===undefined) {
             if(!alert("You have to be logged in to access this page")) {
-                window.location.href = "/login";
+                window.location.href = `${base}/login`;
             }
         }
     });

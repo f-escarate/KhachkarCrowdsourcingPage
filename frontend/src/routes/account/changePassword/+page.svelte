@@ -24,7 +24,7 @@
         .then(json => {
             if (json.status == 'success') {
                 alert("Password changed successfully");
-                window.location.href = '/account/';
+                window.location.href = `${base}/account/`;
             } else {
                 alert(json.msg);
             }
