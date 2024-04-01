@@ -82,4 +82,30 @@ def create_khachkar(db: Session, khachkar: Khachkar, user_id: int):
     db.commit()
     db.refresh(db_khachkar)
     return db_khachkar
+
+def edit_khachkar(db: Session, db_khachkar: models.Khachkar, khachkar: Khachkar, img_file_extension: str, vid_file_extension: str):
+    """
+        Edits a Khackkar in the database.
+    """
+    db_khachkar.date = datetime.now()
+    db_khachkar.image = img_file_extension
+    db_khachkar.video = vid_file_extension
+    db_khachkar.location = khachkar.location
+    db_khachkar.latLong = khachkar.latLong
+    db_khachkar.scenario = khachkar.scenario
+    db_khachkar.setting = khachkar.setting
+    db_khachkar.landscape = khachkar.landscape
+    db_khachkar.accessibility = khachkar.accessibility
+    db_khachkar.masters_name = khachkar.masters_name
+    db_khachkar.category = khachkar.category
+    db_khachkar.production_period = khachkar.production_period
+    db_khachkar.motive = khachkar.motive
+    db_khachkar.condition_of_preservation = khachkar.condition_of_preservation
+    db_khachkar.inscription = khachkar.inscription
+    db_khachkar.important_features = khachkar.important_features
+    db_khachkar.backside = khachkar.backside
+    db_khachkar.history_ownership = khachkar.history_ownership
+    db_khachkar.commemorative_activities = khachkar.commemorative_activities
+    db_khachkar.references = khachkar.references
+    db.commit()
     

@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from schemas import ChangePassword, Khachkar, UserRegister
 from authentication import authenticate_user, create_access_token, get_password_hash, SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, get_user_by_name, unauthorized_exception, verify_password
-from utils import save_image, save_video, create_khachkar, read_image, read_video, img_validation, video_validation
+from utils import save_image, save_video, create_khachkar, edit_khachkar, read_image, read_video, img_validation, video_validation
 from database import get_db, Base, engine
 import models
 import uvicorn
@@ -86,27 +86,7 @@ async def update_khachkar(token: Annotated[str, Depends(oauth2_scheme)], khachka
     vid_file_extension = video_validation(khachkar.video)
     if vid_file_extension is None:
         return {"status": "error", "msg": "invalid video"}
-    db_khachkar.date = khachkar.date
-    db_khachkar.image = img_file_extension
-    db_khachkar.video = vid_file_extension
-    db_khachkar.location = khachkar.location
-    db_khachkar.latLong = khachkar.latLong
-    db_khachkar.scenario = khachkar.scenario
-    db_khachkar.setting = khachkar.setting
-    db_khachkar.landscape = khachkar.landscape
-    db_khachkar.accessibility = khachkar.accessibility
-    db_khachkar.masters_name = khachkar.masters_name
-    db_khachkar.category = khachkar.category
-    db_khachkar.production_period = khachkar.production_period
-    db_khachkar.motive = khachkar.motive
-    db_khachkar.condition_of_preservation = khachkar.condition_of_preservation
-    db_khachkar.inscription = khachkar.inscription
-    db_khachkar.important_features = khachkar.important_features
-    db_khachkar.backside = khachkar.backside
-    db_khachkar.history_ownership = khachkar.history_ownership
-    db_khachkar.commemorative_activities = khachkar.commemorative_activities
-    db_khachkar.references = khachkar.references
-    db.commit()
+    edit_khachkar(db, db_khachkar, khachkar, img_file_extension, vid_file_extension)
     save_image(khachkar.image, khachkar_id, img_file_extension)
     save_video(khachkar.video, khachkar_id, vid_file_extension)
     return {"status": "success"}
