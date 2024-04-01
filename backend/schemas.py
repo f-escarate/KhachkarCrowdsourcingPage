@@ -1,15 +1,15 @@
-import datetime
 from fastapi import Form, UploadFile
 from pydantic import BaseModel
-
+from typing import Optional
 
 def form_body(cls):
     cls.__signature__ = cls.__signature__.replace(
         parameters=[
-            arg.replace(default=Form(...))
+            arg.replace(default=Form(...) if arg.default is arg.empty else Form(arg.default))
             for arg in cls.__signature__.parameters.values()
         ]
     )
+    print(cls.__signature__)
     return cls
 
 # ================ Users schemas ================ #
@@ -34,22 +34,22 @@ class ChangePassword(BaseModel):
     
 @form_body
 class Khachkar(BaseModel):
-    location: str
-    latLong: str
-    scenario: str
-    setting: str
-    landscape: str
-    accessibility: str
-    masters_name: str
-    category: str
-    production_period: str
-    motive: str
-    condition_of_preservation: str
-    inscription: str
-    important_features: str
-    backside: str
-    history_ownership: str
-    commemorative_activities: str
-    references: str
-    image: UploadFile
+    location: Optional[str] = 'Unknown location'
+    latLong: Optional[str] = None
+    scenario: Optional[str] = None
+    setting: Optional[str] = None
+    landscape: Optional[str] = None
+    accessibility: Optional[str] = None
+    masters_name: Optional[str] = None
+    category: Optional[str] = None
+    production_period: Optional[str] = None
+    motive: Optional[str] = None
+    condition_of_preservation: Optional[str] = None
+    inscription: Optional[str] = None
+    important_features: Optional[str] = None
+    backside: Optional[str] = None
+    history_ownership: Optional[str] = None
+    commemorative_activities: Optional[str] = None
+    references: Optional[str] = None
+    image: Optional[UploadFile] = None
     video: UploadFile

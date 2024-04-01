@@ -54,6 +54,7 @@
         entry.commemorative_activities = '';
         entry.references = '';
         entry.image = null;
+        entry.video = null;
         document.getElementById('previewImage').src = '';
         document.getElementById('previewVideo').src = '';
         videoElement.load();
@@ -62,7 +63,7 @@
     const validation = () => {
         let msg = '';
         if (entry.image == null)
-            msg += 'Image cannot be empty\n';
+            entry.image = new File([''], 'default.jpg', {type: 'image/jpeg'});
         if (entry.video == null)
             msg += 'Video cannot be empty\n';
         
