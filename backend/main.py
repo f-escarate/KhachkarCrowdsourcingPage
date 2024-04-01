@@ -3,7 +3,6 @@ from typing import Annotated
 from fastapi import Depends, FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
-from fastapi.staticfiles import StaticFiles
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
 
@@ -12,17 +11,14 @@ from authentication import authenticate_user, create_access_token, get_password_
 from utils import save_image, save_video, create_khachkar, read_image, read_video, img_validation, video_validation
 from database import get_db, Base, engine
 import models
+import uvicorn
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://localhost:8000",
-        "http://localhost:8080",
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -190,4 +186,5 @@ async def change_password(token: Annotated[str, Depends(oauth2_scheme)], change:
     db.commit()
     return {"status": "success"}
 
-app.mount("/", StaticFiles(directory="static",html = True), name="static")
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000, root_path='/crowdsourcing_backend')
