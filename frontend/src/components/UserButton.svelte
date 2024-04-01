@@ -53,6 +53,7 @@
         </DropdownHeader>
         <DropdownItem href={`${base}/myKhachkars/`}>My Khachkars</DropdownItem>
         <DropdownItem href={`${base}/account/`}>Account Settings</DropdownItem>
+        <DropdownItem href={`${base}/compileAssetBundles/`}>Compile Asset Bundles</DropdownItem>
         <DropdownDivider />
         <DropdownItem on:click={handleLogOut}>Log out</DropdownItem>
     </Dropdown>

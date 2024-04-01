@@ -63,6 +63,12 @@ async def get_my_khachkars(token: Annotated[str, Depends(oauth2_scheme)], db: Se
     khachkars = db.query(models.Khachkar).filter(models.Khachkar.owner_id == user.id).all()
     return khachkars
 
+@app.get("/get_khachkars/mesh/")
+async def get_my_khachkars(db: Session = Depends(get_db)):
+    # TODO: Filter khachkars by the ones that have mesh data
+    khachkars = db.query(models.Khachkar).all()
+    return khachkars
+
 @app.get("/get_khachkar/{khachkar_id}/")
 async def get_khachkar(khachkar_id: int, db: Session = Depends(get_db)):
     khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == khachkar_id).first()
@@ -164,6 +170,11 @@ async def change_password(token: Annotated[str, Depends(oauth2_scheme)], change:
         return {"status": "error", "msg": "Incorrect old password"}
     user.hashed_password = get_password_hash(change.new_pass)
     db.commit()
+    return {"status": "success"}
+
+@app.get("/compile_asset_bundles/")
+async def compile_asset_bundles(token: Annotated[str, Depends(oauth2_scheme)]):
+    print("Compiling asset bundles...")
     return {"status": "success"}
 
 if __name__ == "__main__":
