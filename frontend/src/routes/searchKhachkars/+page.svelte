@@ -17,7 +17,7 @@
 
 </script>
 
-<h1 class='text-4xl font-bold'>Search Khachkars</h1>
+<h1 class='m-4 text-4xl font-bold'>Search Khachkars</h1>
 <div class='flex flex-col'>
     {#each entries as entry}
         <Entry entry_data={entry} />

@@ -12,7 +12,7 @@
     const div_style = (idx) => {
         let paddings = ['pb-[2%]', 'pt-[2%]'];
         let directions = ['flex-row', 'flex-row-reverse']
-        return `animated-div opacity-0 flex m-10 relative h-full ${paddings[idx%2]} ${directions[idx%2]}`;
+        return `animated-div opacity-0 flex mx-2 md:m-10 relative h-full ${paddings[idx%2]} ${directions[idx%2]}`;
     }
     const img_style = (idx) => {
         let positions = ['right-10', 'left-10'];
@@ -46,7 +46,7 @@
     });
 </script>
 
-<main class='flex flex-col h-full relative m-10'>
+<div class='flex flex-col h-full relative md:m-10'>
     {#each data as element, i}
         <div class={div_style(i)}>
             <div class={text_style(i)}>
@@ -59,4 +59,4 @@
             />
         </div>
     {/each}
-</main>
+</div>

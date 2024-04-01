@@ -13,7 +13,7 @@
 <Navbar class="md:px-10">
     <NavBrand href={base}>
         <img src={`${base}/favicon.png`} class="me-3 h-6 sm:h-9" alt="Logo" />
-        <span class="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">Crowdsourcing app</span>
+        <span class="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">UpKhachkar</span>
     </NavBrand>
     <UserButton bind:authenticated/>
     <NavUl {activeUrl} {activeClass} {nonActiveClass}>

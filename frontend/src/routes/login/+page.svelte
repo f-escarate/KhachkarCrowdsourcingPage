@@ -58,7 +58,7 @@
 
 </script>
 
-<div class='mx-auto max-w-[50%] my-5 h-full p-4 space-y-4'>
+<div class='md:mx-auto md:max-w-[50%] my-5 h-full md:p-4 space-y-4'>
     <Tabs style="underline">
         <TabItem open>
             <span slot="title">Log In</span>

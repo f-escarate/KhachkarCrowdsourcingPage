@@ -8,7 +8,7 @@
     const card_style = 'w-full min-h-full p-10 text-white animate-fade-down animate-ease-out animate-duration-300';
 </script>
 
-<div class='flex mx-20 my-5 gap-4'>
+<div class='flex flex-col lg:flex-row mx-2 my-5 gap-4'>
     {#each data as element, i}
         <div class={card_style.concat(" ", styles[i])}>
             <h1 class='text-4xl font-bold mb-8'>{element.name}</h1>

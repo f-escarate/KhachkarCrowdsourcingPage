@@ -62,5 +62,6 @@
             <UserIcon sx='m-0 text-black'/>
             Log In
         </Button>
+        <NavHamburger class1="w-full md:flex md:w-auto md:order-1" />
     </div>
 {/if}

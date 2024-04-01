@@ -37,14 +37,15 @@
     }
 </script>
 
-<div class='m-4 p-8 bg-amber-300 flex justify-between max-h-[300px] md:w-[85%]'>
-    <div class='flex flex-col justify-between'>
+<div class='m-4 p-4 md:p-8 bg-amber-300 md:flex md:justify-between md:max-h-[300px] md:w-[85%]'>
+    <div class='flex flex-col justify-between items-center'>
         <h1 class='text-4xl font-semibold'>{entry_data.location} {entry_data.id}</h1>
+        <img class='md:hidden w-full m-4 object-contain' src={image} alt={entry_data.id} />
         <p class='m-2'>{entry_data.inscription}</p>
-        <Button on:click={previewData} class='bg-amber-500'>Preview</Button>
+        <Button on:click={previewData} size="xs" class='m-2 bg-amber-500'>Preview</Button>
         <p class="text-xs font-bold">Upload date {entry_data.date}</p>
     </div>
-    <img class='w-1/2 object-contain' src={image} alt={entry_data.id} />
+    <img class='hidden md:block w-1/2 object-contain' src={image} alt={entry_data.id} />
     <Modal title="Khachkar information" bind:open={clickOutsideModal} autoclose outsideclose>
         <video id="videoElement" controls class="w-full h-auto">
             <source type="video/mp4" id='previewVideo'>
