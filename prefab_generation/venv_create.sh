@@ -10,5 +10,6 @@ pip install -e .
 cd ../simple-knn/
 pip install -e .
 cd ../../../
-pip install rembg
 pip install opencv-python
+pip install rembg
+pip install python-dotenv
