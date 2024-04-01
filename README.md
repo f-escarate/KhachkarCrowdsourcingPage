@@ -6,13 +6,11 @@ https://github.com/AzcarGabriel/jachkar-museum
 ## Backend
 
 ### Instalation
+Using python 3.11.5, in the backend folder run
 ```
-    pip install "fastapi[all]"
-    pip install sqlalchemy
-    pip install "python-jose[cryptography]"
-    pip install bcrypt==4.0.1
-    pip install "passlib[bcrypt]"
-    pip install python-dotenv
+    python -m venv .venv
+    .venv\Scripts\activate
+    pip install -r requirements.txt
 ```
 ### Deploy
 ```
@@ -21,7 +19,7 @@ https://github.com/AzcarGabriel/jachkar-museum
 
 ## Frontend
 ### Instalation:
-Correr en la carpeta frontend
+In the frontend folder, run:
 ```
     npm install
 ```
@@ -31,7 +29,7 @@ Correr en la carpeta frontend
 ```
 
 ### Prod
-Correr
+run
 ```
     npm run build
 ```
