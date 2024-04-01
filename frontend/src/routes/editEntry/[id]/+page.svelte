@@ -2,6 +2,7 @@
     import Form from '../../../components/Form.svelte';
     import Cookies from 'js-cookie';
     import { HOST } from '$lib/constants';
+    import { base } from "$app/paths";
     import { onMount } from 'svelte';
 
     /** @type {import('./$types').PageData} */
