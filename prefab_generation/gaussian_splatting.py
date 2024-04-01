@@ -26,8 +26,8 @@ class gSplatModel():
             print("Error al entrenar")
             return 2
         # Transform the gaussian splatting to mesh using sugar
-        self.gen_obj(name)
+        self.gen_obj(name, colmap_path)
         return 0
     
-    def gen_obj(self, name, frames = 15):
-        os.system(f'python ./gaussian-splatting/gen_obj.py -s ./output/{name} -o ./output/{name}.obj')
+    def gen_obj(self, name, colmap_path):
+        os.system(f'python train.py -s {colmap_path}/{name} -c {self.gs_path}/{name} -r "density"')
