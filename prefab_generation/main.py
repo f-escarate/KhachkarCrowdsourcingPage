@@ -1,5 +1,5 @@
-from prefab_generation.media import video_to_photos, try_to_create_dir
-from prefab_generation.gaussian_splatting import gSplatModel
+from media import video_to_photos, try_to_create_dir
+from gaussian_splatting import gSplatModel
 from unity import call_method
 from dotenv import load_dotenv
 import os
@@ -24,7 +24,7 @@ def video_to_asset(index, n_frames = 15):
     # Get images from video
     video_to_photos(index, n_frames, VIDEOS_PATH, images_path)
     # Generate OBJ using Gaussian Splatting and SuGaR
-    run_res = g_splat.run(name, colmap_path, remove_backgrounds=True)
+    run_res = g_splat.run(name, colmap_path, remove_backgrounds=False)
     # Import the mesh to Unity
     #if run_res == 0:
     #    call_method("CallableMethods.ImportMesh", index)
@@ -32,3 +32,7 @@ def video_to_asset(index, n_frames = 15):
     #if run_res == 0:
     #    call_method("CallableMethods.GenerateAsset", index)
     #return
+
+if __name__ == "__main__":
+    video_to_asset(1, 15)
+    print("Done!")

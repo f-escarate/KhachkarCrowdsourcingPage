@@ -1,7 +1,7 @@
 import os
 import cv2
 from sys import argv
-from prefab_generation.gaussian_splatting import gSplatModel
+from gaussian_splatting import gSplatModel
 
 def try_to_create_dir(path):
     try:
