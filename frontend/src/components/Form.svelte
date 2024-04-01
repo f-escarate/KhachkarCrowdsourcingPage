@@ -6,8 +6,6 @@
     export let http_method = 'POST';
     export let endpoint_url = '/post_khachkar/';
     export let entry = {
-        title : '',
-        description : '',
         location: '',
         latLong: '',
         scenario: '',
@@ -27,19 +25,17 @@
         references: '',
         date : null,
         image : null,
+        video: null,
     };
-    export const previewImage = () => {
-        console.log(entry.image);
-        var preview = document.getElementById('preview');
-        preview.src = URL.createObjectURL(entry.image);
+    export const previewFile = (elementID, file) => {
+        let preview = document.getElementById(elementID);
+        preview.src = URL.createObjectURL(file);
         preview.onload = () => {
             URL.revokeObjectURL(preview.src) // free memory
         }
     }
 
     const restartForm = () => {
-        entry.title = '';
-        entry.description = '';
         entry.location = '';
         entry.latLong = '';
         entry.scenario = '';
@@ -59,19 +55,17 @@
         entry.references = '';
         entry.date = null;
         entry.image = null;
-        var preview = document.getElementById('preview');
-        preview.src = '';
+        document.getElementById('previewImage').src = '';
+        document.getElementById('previewVideo').src = '';
     }
-
+    let videoVisibility = 'hidden';
     const validation = () => {
         let msg = '';
-        if (entry.title == '')
-            msg += 'Title cannot be empty\n';
-        if (entry.description == '')
-            msg += 'Description cannot be empty\n';
         if (entry.date == null)
             msg +=  'Date cannot be empty\n';
         if (entry.image == null)
+            msg += 'Image cannot be empty\n';
+        if (entry.video == null)
             msg += 'Image cannot be empty\n';
         
         if (msg !== '') {
@@ -104,18 +98,21 @@
             alert('Failed to add');
         }
     }
-    const loadFile = (event) => {
+    const loadImage = (event) => {
         entry.image = event.target.files[0];
-        previewImage();
+        previewFile('previewImage', entry.image);
+    };
+    const loadVideo = (event) => {
+        entry.video = event.target.files[0];
+        previewFile('previewVideo', entry.video);
+        let videoElement = document.getElementById('videoElement');
+        videoElement.load();
+        videoVisibility = 'visible';
     };
 
 </script>
 <div class='border-4 border-amber-300 p-5'>
     <div class='grid gap-6 items-end w-full md:grid-cols-2'>
-        <div class='md:col-span-2'>
-            <Label for="title" class="mb-2">Title</Label>
-            <FloatingLabelInput style="filled" name="title" id="title" type="text" label="Title" bind:value={entry.title}/>
-        </div>
         <div class='md:col-span-1 h-full flex flex-col justify-between'>
             <div class="flex flex-col gap-1">
                 <FloatingLabelInput style="filled" name="location" id="location" type="text" label="Location" bind:value={entry.location}/>
@@ -142,16 +139,26 @@
         </div>
 
         <div class="h-full">
-            <Label for="description" class="mb-2">Description</Label>
-            <Textarea class="h-full" id="description" placeholder="Enter description" rows="5" name="description" bind:value={entry.description}/>
         </div>
 
         <div class="my-2 flex-row align-center">
             <Label for="image" class="mb-2">
             Upload image
             <div class="my-4 p-1 flex bg-amber-300 hover:bg-amber-500 text-center hover:text-white transition-colors duration-400 ease-in-out">
-                <img id="preview" class="md:w-1/2 m-auto p-2" alt="Data">
-                <input type="file" id="image" name="image" class="w-0 invisible" on:change={loadFile}>
+                <img id="previewImage" class="md:w-1/2 m-auto p-2" alt="Thumbnail">
+                <input type="file" id="image" name="image" class="w-0 invisible" on:change={loadImage}>
+            </div>
+            </Label>
+
+            <Label for="video" class="mb-2">
+            Upload video
+            <div class="my-4 p-1 flex bg-amber-300 hover:bg-amber-500 text-center hover:text-white transition-colors duration-400 ease-in-out">
+                <video width="400" class={`md:w-1/2 m-auto p-2 ${videoVisibility}`} id='videoElement' controls>
+                <source id="previewVideo">
+                    <track kind="captions"/>
+                    Your browser does not support HTML5 video.
+                </video>
+                <input type="file" id="video" name="video" class="w-0 invisible" on:change={loadVideo}>
             </div>
             </Label>
         </div>

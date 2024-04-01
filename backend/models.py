@@ -19,8 +19,6 @@ class Khachkar(Base):
 
     id = Column(Integer, primary_key=True)
 
-    title = Column(String, index=True)
-    description = Column(String, index=True)
     location = Column(String)
     latLong = Column(String)
     scenario = Column(String)
@@ -40,6 +38,7 @@ class Khachkar(Base):
     references = Column(String)
     date = Column(Date, primary_key=False)
     image = Column(String, primary_key=False)
+    video = Column(String, primary_key=False)
     owner_id = Column(Integer, ForeignKey("users.id"))
 
     owner = relationship("User", back_populates="khachkars")

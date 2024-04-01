@@ -5,34 +5,71 @@ from schemas import Khachkar
 import models
 
 IMG_PATH = "./data/images"
+VID_PATH = "./data/videos"
+
+def file_validation(file, extensions) -> str | None:
+    """
+        Returns the file extension, (if the file is valid).
+    """
+    parts = file.filename.split('.')
+    extension =  parts[-1].lower()
+    if extension in extensions:
+        return extension
+    return None
 
 def img_validation(img) -> str | None:
     """
         Returns the image extension, (if the image is valid).
     """
-    parts = img.filename.split('.')
-    extension =  parts[-1].lower()
-    if extension in ['jpeg', 'jpg', 'bmp', 'png', 'webp']:
-        return extension
-    return None
+    return file_validation(img, ['jpeg', 'jpg', 'bmp', 'png', 'webp'])
 
-def save_image(img, id, extension):
+def video_validation(video) -> str | None:
     """
-        Saves the image in the photo's path.
+        Returns the video extension, (if the video is valid).
+    """
+    return file_validation(video, ['mp4', 'mov', 'avi', 'mkv', 'wmv'])
+
+def save_file(file, path, id, extension):
+    """
+        Saves the file in its path.
     """
     # Remove the old image (if it exist)
     for file in glob.glob(str(id) + '.*'):
         os.remove(file)
     # Saves the image
-    with open(f"{IMG_PATH}/{id}.{extension}", "wb+") as file_object:
-        file_object.write(img.file.read())
+    with open(f"{path}/{id}.{extension}", "wb+") as file_object:
+        file_object.write(file.file.read())
+
+def save_image(img, id, extension):
+    """
+        Saves the image in the photo's path.
+    """
+    save_file(img, IMG_PATH, id, extension)
+
+def save_video(video, id, extension):
+    """
+        Saves the video in the video's path.
+    """
+    save_file(video, VID_PATH, id, extension)
+
+def read_file(id, path, extension):
+    """
+        Reads the file of the given id and path.
+    """
+    with open(f"{path}/{id}.{extension}", "rb") as file_object:
+        return file_object.read()
 
 def read_image(id, extension):
     """
         Reads the image of the given id.
     """
-    with open(f"{IMG_PATH}/{id}.{extension}", "rb") as file_object:
-        return file_object.read()
+    return read_file(id, IMG_PATH, extension)
+
+def read_video(id, extension):
+    """
+        Reads the video of the given id.
+    """
+    return read_file(id, VID_PATH, extension)
 
 def create_khachkar(db: Session, khachkar: Khachkar, user_id: int):
     """

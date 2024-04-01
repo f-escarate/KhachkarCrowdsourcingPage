@@ -8,12 +8,7 @@
 	export let data;
     let id = data.id
     let token = null;
-    let entry = {
-        title: '',
-        description: '',
-        date: null,
-        image: null
-    };
+    let entry = {};
     let form;
     onMount(async () => {
         token = Cookies.get('token');

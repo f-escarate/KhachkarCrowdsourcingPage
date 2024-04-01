@@ -17,7 +17,7 @@
 
 <div class='m-4 p-8 bg-amber-300 flex justify-between max-h-[300px] md:w-[85%]'>
     <div class='flex flex-col justify-between'>
-        <h1 class='text-4xl font-semibold'>{entry_data.title}</h1>
+        <h1 class='text-4xl font-semibold'>{entry_data.location}</h1>
         <p class='m-2'>{entry_data.description}</p>
         <p class="text-xs font-bold">Fecha {entry_data.date}</p>
     </div>

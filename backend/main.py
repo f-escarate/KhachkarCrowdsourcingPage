@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from schemas import ChangePassword, Khachkar, UserRegister
 from authentication import authenticate_user, create_access_token, get_password_hash, SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, get_user_by_name, unauthorized_exception, verify_password
-from utils import save_image, create_khachkar, read_image, img_validation
+from utils import save_image, save_video, create_khachkar, read_image, img_validation, video_validation
 from database import get_db, Base, engine
 import models
 
@@ -36,14 +36,20 @@ async def post_khachkar(token: Annotated[str, Depends(oauth2_scheme)], khachkar:
     user = get_user_by_name(jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM]).get("sub"), db)
     if user is None:
         return {"status": "error", "msg": "problem with user authentication"}
-    file_extension = img_validation(khachkar.image)
-    if file_extension is None:
+    img_file_extension = img_validation(khachkar.image)
+    if img_file_extension is None:
         return {"status": "error", "msg": "invalid image"}
+    vid_file_extension = video_validation(khachkar.video)
+    if vid_file_extension is None:
+        return {"status": "error", "msg": "invalid video"}
         
     image = khachkar.image
-    khachkar.image = file_extension
+    video = khachkar.video
+    khachkar.image = img_file_extension
+    khachkar.video = vid_file_extension
     created_khachkar = create_khachkar(db=db, khachkar=khachkar, user_id=user.id)
-    save_image(image, created_khachkar.id, file_extension)
+    save_image(image, created_khachkar.id, img_file_extension)
+    save_video(video, created_khachkar.id, vid_file_extension)
     return {"status": "success"}
 
 @app.get("/get_khachkars/")
@@ -78,15 +84,15 @@ async def update_khachkar(token: Annotated[str, Depends(oauth2_scheme)], khachka
         return {"status": "error", "msg": "khachkar does not exist"}
     if db_khachkar.owner_id != user.id:
         return {"status": "error", "msg": "you are not the owner of this khachkar"}
-    file_extension = img_validation(khachkar.image)
-    if file_extension is None:
+    img_file_extension = img_validation(khachkar.image)
+    if img_file_extension is None:
         return {"status": "error", "msg": "invalid image"}
-    image = khachkar.image
-    khachkar.image = file_extension
-    db_khachkar.title = khachkar.title
-    db_khachkar.description = khachkar.description
+    vid_file_extension = video_validation(khachkar.video)
+    if vid_file_extension is None:
+        return {"status": "error", "msg": "invalid video"}
     db_khachkar.date = khachkar.date
-    db_khachkar.image = file_extension
+    db_khachkar.image = img_file_extension
+    db_khachkar.video = vid_file_extension
     db_khachkar.location = khachkar.location
     db_khachkar.latLong = khachkar.latLong
     db_khachkar.scenario = khachkar.scenario
@@ -105,7 +111,8 @@ async def update_khachkar(token: Annotated[str, Depends(oauth2_scheme)], khachka
     db_khachkar.commemorative_activities = khachkar.commemorative_activities
     db_khachkar.references = khachkar.references
     db.commit()
-    save_image(image, khachkar_id, file_extension)
+    save_image(khachkar.image, khachkar_id, img_file_extension)
+    save_video(khachkar.video, khachkar_id, vid_file_extension)
     return {"status": "success"}
 
 @app.get("/get_image/{khachkar_id}")

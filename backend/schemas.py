@@ -34,8 +34,6 @@ class ChangePassword(BaseModel):
     
 @form_body
 class Khachkar(BaseModel):
-    title: str
-    description: str
     location: str
     latLong: str
     scenario: str
@@ -55,3 +53,4 @@ class Khachkar(BaseModel):
     references: str
     date: datetime.date
     image: UploadFile
+    video: UploadFile
