@@ -14,18 +14,26 @@
             }
         });
         image = URL.createObjectURL(await response.blob());
-        console.log(entry_data.video);
-        const vid_response = await fetch(`${HOST}/get_video/${entry_data.id}`, {
+    });
+    const loadVideo = async () => {
+        const response = await fetch(`${HOST}/get_video/${entry_data.id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': `video/${entry_data.video}`
             }
         });
-        video = URL.createObjectURL(await vid_response.blob());
-    });
+        let preview = document.getElementById('previewVideo');
+        preview.src = URL.createObjectURL(await response.blob());
+        preview.onload = () => {
+            URL.revokeObjectURL(preview.src) // free memory
+        }
+        let videoElement = document.getElementById('videoElement');
+        videoElement.load();
+    }
     let clickOutsideModal = false;
-    const previewData = () => {
+    const previewData = async () => {
         clickOutsideModal = true;
+        await loadVideo();
     }
 </script>
 
@@ -38,8 +46,8 @@
     </div>
     <img class='w-1/2 object-contain' src={image} alt={entry_data.id} />
     <Modal title="Khachkar information" bind:open={clickOutsideModal} autoclose outsideclose>
-        <video id="previewVideo" controls class="w-full h-auto">
-            <source src={video} type="video/mp4">
+        <video id="videoElement" controls class="w-full h-auto">
+            <source type="video/mp4" id='previewVideo'>
             <track kind="captions">
             Your browser does not support the video tag.
         </video>
