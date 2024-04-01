@@ -1,9 +1,9 @@
 <script>
     import { onMount } from 'svelte';
-    import { HOST } from '$lib/constants';
+    import { HOST, TEXT_FIELDS } from '$lib/constants';
     import { Modal, Button, Table, TableBody, TableHead, TableBodyCell, TableHeadCell, TableBodyRow } from 'flowbite-svelte';
     export let entry_data;
-    const text_fields = ['location', 'latLong', 'scenario', 'setting', 'landscape', 'accessibility', 'masters_name', 'category', 'production_period', 'motive', 'condition_of_preservation', 'inscription', 'important_features', 'backside', 'history_ownership', 'commemorative_activities', 'references', 'date']
+    const FIELDS = Object.getOwnPropertyNames(TEXT_FIELDS);
     let image, video;
 
     onMount(async () => {
@@ -57,9 +57,9 @@
                 <TableHeadCell>Value</TableHeadCell>
             </TableHead>
             <TableBody tableBodyClass="divide-y">
-                {#each text_fields as key}
+                {#each FIELDS as key}
                     <TableBodyRow>
-                        <TableBodyCell>{key}</TableBodyCell>
+                        <TableBodyCell>{TEXT_FIELDS[key]}</TableBodyCell>
                         <TableBodyCell>{entry_data[key]}</TableBodyCell>
                     </TableBodyRow>
                 {/each}
