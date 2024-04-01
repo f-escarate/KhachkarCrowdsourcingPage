@@ -4,3 +4,5 @@ __pycache__
 .env
 /backend/.venv
 !/backend/static/PUT_STATIC_FILES_HERE
+
+Miniconda3-latest-Linux-x86_64.sh
