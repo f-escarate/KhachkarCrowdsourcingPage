@@ -1,5 +1,5 @@
 import glob, os
-
+from datetime import datetime
 from requests import Session
 from schemas import Khachkar
 import models
@@ -75,7 +75,9 @@ def create_khachkar(db: Session, khachkar: Khachkar, user_id: int):
     """
         Creates a Khackkar in the database.
     """
-    db_khachkar = models.Khachkar(**khachkar.dict(), owner_id=user_id)
+    khachkar_dict = khachkar.dict()
+    khachkar_dict['date'] = datetime.now()
+    db_khachkar = models.Khachkar(**khachkar_dict, owner_id=user_id)
     db.add(db_khachkar)
     db.commit()
     db.refresh(db_khachkar)

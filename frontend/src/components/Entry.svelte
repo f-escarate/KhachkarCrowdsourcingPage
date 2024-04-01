@@ -34,7 +34,7 @@
         <h1 class='text-4xl font-semibold'>{entry_data.location} {entry_data.id}</h1>
         <p class='m-2'>{entry_data.inscription}</p>
         <Button on:click={previewData} class='bg-amber-500'>Preview</Button>
-        <p class="text-xs font-bold">Fecha {entry_data.date}</p>
+        <p class="text-xs font-bold">Upload date {entry_data.date}</p>
     </div>
     <img class='w-1/2 object-contain' src={image} alt={entry_data.id} />
     <Modal title="Khachkar information" bind:open={clickOutsideModal} autoclose outsideclose>

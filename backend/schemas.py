@@ -51,6 +51,5 @@ class Khachkar(BaseModel):
     history_ownership: str
     commemorative_activities: str
     references: str
-    date: datetime.date
     image: UploadFile
     video: UploadFile

@@ -23,7 +23,6 @@
         history_ownership: '',
         commemorative_activities: '',
         references: '',
-        date : null,
         image : null,
         video: null,
     };
@@ -53,20 +52,19 @@
         entry.history_ownership = '';
         entry.commemorative_activities = '';
         entry.references = '';
-        entry.date = null;
         entry.image = null;
         document.getElementById('previewImage').src = '';
         document.getElementById('previewVideo').src = '';
+        videoElement.load();
+        videoVisibility = 'invisible';
     }
     let videoVisibility = 'hidden';
     const validation = () => {
         let msg = '';
-        if (entry.date == null)
-            msg +=  'Date cannot be empty\n';
         if (entry.image == null)
             msg += 'Image cannot be empty\n';
         if (entry.video == null)
-            msg += 'Image cannot be empty\n';
+            msg += 'Video cannot be empty\n';
         
         if (msg !== '') {
             alert(msg);
@@ -111,57 +109,53 @@
     };
 
 </script>
-<div class='border-4 border-amber-300 p-5'>
-    <div class='grid gap-6 items-end w-full md:grid-cols-2'>
-        <div class='md:col-span-1 h-full flex flex-col justify-between'>
-            <div class="flex flex-col gap-1">
-                <FloatingLabelInput style="filled" name="location" id="location" type="text" label="Location" bind:value={entry.location}/>
-                <FloatingLabelInput style="filled" name="latLong" id="latLong" type="text" label="Latitude Longitude" bind:value={entry.latLong}/>
-                <FloatingLabelInput style="filled" name="scenario" id="scenario" type="text" label="Scenario" bind:value={entry.scenario}/>
-                <FloatingLabelInput style="filled" name="setting" id="setting" type="text" label="Setting" bind:value={entry.setting}/>
-                <FloatingLabelInput style="filled" name="landscape" id="landscape" type="text" label="Landscape" bind:value={entry.landscape}/>
-                <FloatingLabelInput style="filled" name="accessibility" id="accessibility" type="text" label="Accessibility" bind:value={entry.accessibility}/>
-                <FloatingLabelInput style="filled" name="masters_name" id="masters_name" type="text" label="Master's name" bind:value={entry.masters_name}/>
-                <FloatingLabelInput style="filled" name="category" id="category" type="text" label="Category" bind:value={entry.category}/>
-                <FloatingLabelInput style="filled" name="production_period" id="production_period" type="text" label="Production Period" bind:value={entry.production_period}/>
-                <FloatingLabelInput style="filled" name="motive" id="motive" type="text" label="Motive" bind:value={entry.motive}/>
-                <FloatingLabelInput style="filled" name="condition_of_preservation" id="condition_of_preservation" type="text" label="Condition of Preservation" bind:value={entry.condition_of_preservation}/>
-                <FloatingLabelInput style="filled" name="inscription" id="inscription" type="text" label="Inscription" bind:value={entry.inscription}/>
-                <FloatingLabelInput style="filled" name="important_features" id="important_features" type="text" label="Important features" bind:value={entry.important_features}/>
-                <FloatingLabelInput style="filled" name="backside" id="backside" type="text" label="Backside" bind:value={entry.backside}/>
-                <FloatingLabelInput style="filled" name="history_ownership" id="history_ownership" type="text" label="History ownership" bind:value={entry.history_ownership}/>
-                <FloatingLabelInput style="filled" name="commemorative_activities" id="commemorative_activities" type="text" label="Commemorative Activities" bind:value={entry.commemorative_activities}/>
-                <FloatingLabelInput style="filled" name="references" id="references" type="text" label="References" bind:value={entry.references}/>
 
-                <Label for="date" class="mb-1">Date</Label>
-                <input type="date" id="date" name="date" class="p-2" bind:value={entry.date}>
-            </div>
-        </div>
-
-        <div class="h-full">
-        </div>
-
-        <div class="my-2 flex-row align-center">
-            <Label for="image" class="mb-2">
-            Upload image
-            <div class="my-4 p-1 flex bg-amber-300 hover:bg-amber-500 text-center hover:text-white transition-colors duration-400 ease-in-out">
-                <img id="previewImage" class="md:w-1/2 m-auto p-2" alt="Thumbnail">
-                <input type="file" id="image" name="image" class="w-0 invisible" on:change={loadImage}>
-            </div>
-            </Label>
-
-            <Label for="video" class="mb-2">
-            Upload video
-            <div class="my-4 p-1 flex bg-amber-300 hover:bg-amber-500 text-center hover:text-white transition-colors duration-400 ease-in-out">
-                <video width="400" class={`md:w-1/2 m-auto p-2 ${videoVisibility}`} id='videoElement' controls>
-                <source id="previewVideo">
-                    <track kind="captions"/>
-                    Your browser does not support HTML5 video.
-                </video>
-                <input type="file" id="video" name="video" class="w-0 invisible" on:change={loadVideo}>
-            </div>
-            </Label>
-        </div>
-        <Button class='md:col-span-2 w-[50%] mx-auto h-full text-black bg-amber-500' on:click={handleSubmit} pill>Add</Button>
+<div class='pt-5 grid gap-6 items-end w-full md:grid-cols-2'>
+    <div class='md:col-span-1 h-full flex flex-col gap-2'>
+        <FloatingLabelInput style="filled" name="location" id="location" type="text" label="Location" bind:value={entry.location}/>
+        <FloatingLabelInput style="filled" name="latLong" id="latLong" type="text" label="Latitude Longitude" bind:value={entry.latLong}/>
+        <FloatingLabelInput style="filled" name="scenario" id="scenario" type="text" label="Scenario" bind:value={entry.scenario}/>
+        <FloatingLabelInput style="filled" name="setting" id="setting" type="text" label="Setting" bind:value={entry.setting}/>
+        <FloatingLabelInput style="filled" name="landscape" id="landscape" type="text" label="Landscape" bind:value={entry.landscape}/>
+        <FloatingLabelInput style="filled" name="accessibility" id="accessibility" type="text" label="Accessibility" bind:value={entry.accessibility}/>
+        <FloatingLabelInput style="filled" name="masters_name" id="masters_name" type="text" label="Master's name" bind:value={entry.masters_name}/>
+        <FloatingLabelInput style="filled" name="category" id="category" type="text" label="Category" bind:value={entry.category}/>
+        <FloatingLabelInput style="filled" name="production_period" id="production_period" type="text" label="Production Period" bind:value={entry.production_period}/>
     </div>
+
+    <div class='md:col-span-1 h-full flex flex-col gap-2'>
+        <FloatingLabelInput style="filled" name="motive" id="motive" type="text" label="Motive" bind:value={entry.motive}/>
+        <FloatingLabelInput style="filled" name="condition_of_preservation" id="condition_of_preservation" type="text" label="Condition of Preservation" bind:value={entry.condition_of_preservation}/>
+        <FloatingLabelInput style="filled" name="inscription" id="inscription" type="text" label="Inscription" bind:value={entry.inscription}/>
+        <FloatingLabelInput style="filled" name="important_features" id="important_features" type="text" label="Important features" bind:value={entry.important_features}/>
+        <FloatingLabelInput style="filled" name="backside" id="backside" type="text" label="Backside" bind:value={entry.backside}/>
+        <FloatingLabelInput style="filled" name="history_ownership" id="history_ownership" type="text" label="History ownership" bind:value={entry.history_ownership}/>
+        <FloatingLabelInput style="filled" name="commemorative_activities" id="commemorative_activities" type="text" label="Commemorative Activities" bind:value={entry.commemorative_activities}/>
+        <FloatingLabelInput style="filled" name="references" id="references" type="text" label="References" bind:value={entry.references}/>
+
+    </div>
+
+    <div class="my-2 flex-row align-center">
+        <Label for="image" class="mb-2">
+        Upload image
+        <div class="my-4 p-1 flex bg-amber-300 hover:bg-amber-500 text-center hover:text-white transition-colors duration-400 ease-in-out">
+            <img id="previewImage" class="md:w-1/2 m-auto p-2" alt="Thumbnail">
+            <input type="file" id="image" name="image" class="w-0 invisible" on:change={loadImage}>
+        </div>
+        </Label>
+    </div>
+    <div class="my-2 flex-row align-center">
+        <Label for="video" class="mb-2">
+        Upload video
+        <div class="my-4 p-1 flex bg-amber-300 hover:bg-amber-500 text-center hover:text-white transition-colors duration-400 ease-in-out">
+            <video class={`md:w-1/2 m-auto p-2 ${videoVisibility}`} id='videoElement' controls>
+            <source id="previewVideo">
+                <track kind="captions"/>
+                Your browser does not support HTML5 video.
+            </video>
+            <input type="file" id="video" name="video" class="w-0 invisible" on:change={loadVideo}>
+        </div>
+        </Label>
+    </div>
+    <Button class='md:col-span-2 w-[50%] mx-auto h-full text-black bg-amber-500' on:click={handleSubmit} pill>Add</Button>
 </div>
