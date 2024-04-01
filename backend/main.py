@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from schemas import ChangePassword, Khachkar, UserRegister
 from authentication import authenticate_user, create_access_token, get_password_hash, SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, get_user_by_name, unauthorized_exception, verify_password
-from utils import save_image, save_video, create_khachkar, read_image, img_validation, video_validation
+from utils import save_image, save_video, create_khachkar, read_image, read_video, img_validation, video_validation
 from database import get_db, Base, engine
 import models
 
@@ -120,6 +120,12 @@ async def get_image(khachkar_id: int, db: Session = Depends(get_db)):
     khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == khachkar_id).first()
     img = read_image(khachkar_id, khachkar.image)
     return Response(content=img, media_type=f"image/{khachkar.image}")
+
+@app.get("/get_video/{khachkar_id}")
+async def get_video(khachkar_id: int, db: Session = Depends(get_db)):
+    khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == khachkar_id).first()
+    video = read_video(khachkar_id, khachkar.video)
+    return Response(content=video, media_type=f"video/{khachkar.video}")
 
 @app.get("/me/")
 async def get_user(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
