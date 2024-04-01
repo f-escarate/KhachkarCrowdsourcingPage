@@ -36,7 +36,7 @@
     const handleLogOut = () => {
         Cookies.remove('token');
         data.authenticated = false;
-        window.location.href = {base};
+        window.location.href = base;
     }
 
 </script>
