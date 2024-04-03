@@ -1,4 +1,4 @@
-import glob, os
+import glob, os, shutil
 from datetime import datetime
 from requests import Session
 from schemas import Khachkar
@@ -6,6 +6,7 @@ import models
 
 IMG_PATH = "./data/images"
 VID_PATH = "./data/videos"
+FRAMES_PATH = "./data/temp_frames"
 
 def file_validation(file, extensions) -> str | None:
     """
@@ -46,11 +47,12 @@ def save_image(img, id, extension):
     """
     save_file(img, IMG_PATH, id, extension)
 
-def save_video(video, id, extension):
+def save_video(video, index, extension):
     """
         Saves the video in the video's path.
     """
-    save_file(video, VID_PATH, id, extension)
+    save_file(video, VID_PATH, f"{index}_temp", extension)
+    preprocess_video(video, index, extension)
 
 def read_file(id, path, extension):
     """
@@ -70,6 +72,23 @@ def read_video(id, extension):
         Reads the video of the given id.
     """
     return read_file(id, VID_PATH, extension)
+
+def preprocess_video(video, index, extension, n_frames=300):
+    """
+        Preprocesses the video in order to remove audio and keep 300 frames only.
+        It uses ffmpeg
+    """
+    id = f"{index}_temp"
+    # Get video duration
+    dur = os.system('ffprobe -i {VID_PATH}/{id}.{extension} -show_entries format=duration -v quiet -of csv="p=0"')
+    fps = n_frames // dur + 1
+    os.mkdir(f"{FRAMES_PATH}/{id}") # Create folder for frames
+    # Generate images from video
+    os.system(f"ffmpeg -i {VID_PATH}/{id}.{extension} -vf fps={fps} {FRAMES_PATH}/{id}/%06d.jpg")
+    # Generate video from images
+    os.system(f"ffmpeg -r {n_frames//4} -i {FRAMES_PATH}/{id}/%06d.jpg {VID_PATH}/{index}.mp4")
+    shutil.rmtree(f"{FRAMES_PATH}/{id}")    # Remove the temporary frames
+    os.remove(f"{VID_PATH}/{id}.{extension}")   # Remove the temporary video
 
 def create_khachkar(db: Session, khachkar: Khachkar, user_id: int):
     """
