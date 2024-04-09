@@ -52,7 +52,10 @@ def save_video(video, index, extension):
         Saves the video in the video's path.
     """
     save_file(video, VID_PATH, f"{index}_temp", extension)
-    preprocess_video(video, index, extension)
+
+def save_mesh(mesh, khachkar: models.Khachkar, db: Session):
+    # TODO: Save the mesh
+    update_khachkar_status(db, khachkar, "meshed")
 
 def read_file(id, path, extension):
     """
@@ -73,11 +76,13 @@ def read_video(id, extension):
     """
     return read_file(id, VID_PATH, extension)
 
-def preprocess_video(video, index, extension, n_frames=300):
+def preprocess_video(index, extension: str, db: Session, n_frames: int = 300):
     """
         Preprocesses the video in order to remove audio and keep 300 frames only.
         It uses ffmpeg
     """
+    khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == index).first()
+    update_khachkar_status(db, khachkar, "processing_video")
     id = f"{index}_temp"
     # Get video duration
     dur = os.system('ffprobe -i {VID_PATH}/{id}.{extension} -show_entries format=duration -v quiet -of csv="p=0"')
@@ -86,9 +91,10 @@ def preprocess_video(video, index, extension, n_frames=300):
     # Generate images from video
     os.system(f"ffmpeg -i {VID_PATH}/{id}.{extension} -vf fps={fps} {FRAMES_PATH}/{id}/%06d.jpg")
     # Generate video from images
-    os.system(f"ffmpeg -r {n_frames//4} -i {FRAMES_PATH}/{id}/%06d.jpg {VID_PATH}/{index}.mp4")
+    os.system(f"ffmpeg -r {fps} -i {FRAMES_PATH}/{id}/%06d.jpg {VID_PATH}/{index}.mp4")
     shutil.rmtree(f"{FRAMES_PATH}/{id}")    # Remove the temporary frames
     os.remove(f"{VID_PATH}/{id}.{extension}")   # Remove the temporary video
+    update_khachkar_status(db, khachkar, "not_meshed")
 
 def create_khachkar(db: Session, khachkar: Khachkar, user_id: int):
     """
@@ -127,4 +133,12 @@ def edit_khachkar(db: Session, db_khachkar: models.Khachkar, khachkar: Khachkar,
     db_khachkar.commemorative_activities = khachkar.commemorative_activities
     db_khachkar.references = khachkar.references
     db.commit()
-    
+
+
+
+def update_khachkar_status(db: Session, db_khachkar: models.Khachkar, status: str):
+    """
+        Updates the status of the Khackkar in the database.
+    """
+    db_khachkar.state = status
+    db.commit()

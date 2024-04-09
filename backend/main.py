@@ -1,6 +1,6 @@
 from datetime import timedelta
 from typing import Annotated
-from fastapi import Depends, FastAPI, Response
+from fastapi import Depends, FastAPI, Response, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jose import jwt, JWTError
@@ -8,8 +8,9 @@ from sqlalchemy.orm import Session
 
 from schemas import ChangePassword, Khachkar, UserRegister
 from authentication import authenticate_user, create_access_token, get_password_hash, SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, get_user_by_name, unauthorized_exception, verify_password
-from utils import save_image, save_video, create_khachkar, edit_khachkar, read_image, read_video, img_validation, video_validation
+from utils import save_image, save_video, save_mesh, create_khachkar, edit_khachkar, read_image, read_video, img_validation, video_validation, preprocess_video
 from database import get_db, Base, engine
+from mesh_handling import get_mesh_from_video, call_method
 import models
 import uvicorn
 
@@ -25,8 +26,8 @@ app.add_middleware(
 )
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-@app.post("/post_khachkar/")
-async def post_khachkar(token: Annotated[str, Depends(oauth2_scheme)], khachkar: Khachkar = Depends(Khachkar), db: Session = Depends(get_db)):
+@app.post("/post_khachkar/{with_mesh}/")
+async def post_khachkar(with_mesh: int, background_tasks: BackgroundTasks, token: Annotated[str, Depends(oauth2_scheme)], khachkar: Khachkar = Depends(Khachkar), db: Session = Depends(get_db)):
     if not token:
         return unauthorized_exception("Invalid token")
     user = get_user_by_name(jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM]).get("sub"), db)
@@ -35,17 +36,23 @@ async def post_khachkar(token: Annotated[str, Depends(oauth2_scheme)], khachkar:
     img_file_extension = img_validation(khachkar.image)
     if img_file_extension is None:
         return {"status": "error", "msg": "invalid image"}
-    vid_file_extension = video_validation(khachkar.video)
-    if vid_file_extension is None:
-        return {"status": "error", "msg": "invalid video"}
-        
     image = khachkar.image
-    video = khachkar.video
     khachkar.image = img_file_extension
-    khachkar.video = vid_file_extension
-    created_khachkar = create_khachkar(db=db, khachkar=khachkar, user_id=user.id)
-    save_image(image, created_khachkar.id, img_file_extension)
-    save_video(video, created_khachkar.id, vid_file_extension)
+    if with_mesh:
+        # TODO manage mesh file(s)
+        created_khachkar = create_khachkar(db=db, khachkar=khachkar, user_id=user.id)
+        save_image(image, created_khachkar.id, img_file_extension)
+        background_tasks.add_task(save_mesh, video, created_khachkar, db)
+    else:
+        vid_file_extension = video_validation(khachkar.video)
+        if vid_file_extension is None:
+            return {"status": "error", "msg": "invalid video"}
+        video = khachkar.video
+        khachkar.video = vid_file_extension
+        created_khachkar = create_khachkar(db=db, khachkar=khachkar, user_id=user.id)
+        save_image(image, created_khachkar.id, img_file_extension)
+        save_video(video, created_khachkar.id, vid_file_extension)
+        background_tasks.add_task(preprocess_video, created_khachkar.id, vid_file_extension, db, n_frames=300)
     return {"status": "success"}
 
 @app.get("/get_khachkars/")
@@ -94,6 +101,7 @@ async def update_khachkar(token: Annotated[str, Depends(oauth2_scheme)], khachka
         return {"status": "error", "msg": "invalid video"}
     edit_khachkar(db, db_khachkar, khachkar, img_file_extension, vid_file_extension)
     save_image(khachkar.image, khachkar_id, img_file_extension)
+    # TODO: Save mesh file(s)
     save_video(khachkar.video, khachkar_id, vid_file_extension)
     return {"status": "success"}
 
@@ -138,7 +146,7 @@ async def register(user: UserRegister = Depends(UserRegister), db: Session = Dep
         return {"status": "error", "msg": "an account with this email already exists"}
     if user.password != user.password2:
         return {"status": "error", "msg": "passwords do not match"}
-    new_user = models.User(username=user.username, email=user.email, hashed_password=get_password_hash(user.password))
+    new_user = models.User(username=user.username, email=user.email, hashed_password=get_password_hash(user.password), is_admin=False)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -173,9 +181,32 @@ async def change_password(token: Annotated[str, Depends(oauth2_scheme)], change:
     return {"status": "success"}
 
 @app.get("/compile_asset_bundles/")
-async def compile_asset_bundles(token: Annotated[str, Depends(oauth2_scheme)]):
+async def compile_asset_bundles(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
     print("Compiling asset bundles...")
+    if not token:
+        return unauthorized_exception("Invalid token")
+    user = get_user_by_name(jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM]).get("sub"), db)
+    if user is None or not user.is_admin:
+        return {"status": "error", "msg": "You are not authorized to perform this action"}
+    call_method("CallableMethods.GenerateAsset", "PLACEHOLDER")
     return {"status": "success"}
+
+@app.get("/mesh_khachkar/{khachkar_id}/")
+async def mesh_khachkar(token: Annotated[str, Depends(oauth2_scheme)], khachkar_id: int, db: Session = Depends(get_db)):
+    print(f"Meshing khachkar {khachkar_id}")
+    if not token:
+        return unauthorized_exception("Invalid token")
+    user = get_user_by_name(jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM]).get("sub"), db)
+    if user is None:
+        return {"status": "error", "msg": "problem with user authentication"}
+    khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == khachkar_id).first()
+    if khachkar is None:
+        return {"status": "error", "msg": "khachkar does not exist"}
+    if khachkar.owner_id != user.id or not user.is_admin:
+        return {"status": "error", "msg": "you are not the owner of this khachkar"}
+    response = get_mesh_from_video(khachkar, db)
+    return response
+    
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000, root_path='/crowdsourcing_backend')

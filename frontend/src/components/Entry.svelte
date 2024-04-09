@@ -16,19 +16,21 @@
         image = URL.createObjectURL(await response.blob());
     });
     const loadVideo = async () => {
-        const response = await fetch(`${HOST}/get_video/${entry_data.id}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': `video/${entry_data.video}`
+        if (entry_data.state === 'not_meshed' || entry_data.state === 'creating_mesh'){
+            const response = await fetch(`${HOST}/get_video/${entry_data.id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': `video/${entry_data.video}`
+                }
+            });
+            let preview = document.getElementById('previewVideo');
+            preview.src = URL.createObjectURL(await response.blob());
+            preview.onload = () => {
+                URL.revokeObjectURL(preview.src) // free memory
             }
-        });
-        let preview = document.getElementById('previewVideo');
-        preview.src = URL.createObjectURL(await response.blob());
-        preview.onload = () => {
-            URL.revokeObjectURL(preview.src) // free memory
+            let videoElement = document.getElementById('videoElement');
+            videoElement.load();
         }
-        let videoElement = document.getElementById('videoElement');
-        videoElement.load();
     }
     let clickOutsideModal = false;
     const previewData = async () => {
@@ -47,11 +49,17 @@
     </div>
     <img class='hidden md:block w-1/2 object-contain' src={image} alt={entry_data.id} />
     <Modal title="Khachkar information" bind:open={clickOutsideModal} autoclose outsideclose>
-        <video id="videoElement" controls class="w-full h-auto">
-            <source type="video/mp4" id='previewVideo'>
-            <track kind="captions">
-            Your browser does not support the video tag.
-        </video>
+        {#if entry_data.state === 'processing_video'}
+            <h3>Khachkar video is being processed</h3>
+        {:else if entry_data.state === 'meshed'}
+            <h3>This Khachkar has been meshed</h3>
+        {:else}
+            <video id="videoElement" controls class="w-full h-auto">
+                <source type="video/mp4" id='previewVideo'>
+                <track kind="captions">
+                Your browser does not support the video tag.
+            </video>
+        {/if}
         <Table striped={true}>
             <TableHead>
                 <TableHeadCell>Field</TableHeadCell>

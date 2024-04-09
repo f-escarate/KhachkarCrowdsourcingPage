@@ -36,7 +36,7 @@
         if (msg.status === 'success') {
             alert("Asset bundles have been compiled successfully");
         } else {
-            alert("An error occurred while compiling asset bundles");
+            alert(msg.msg);
         }
     }
     const handleSelectAll = (e) => {
