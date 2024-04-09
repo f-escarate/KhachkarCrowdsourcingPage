@@ -1,6 +1,6 @@
 # Conda env
-conda create -n gaustudio python=3.8
-conda activate gaustudio
+conda create -n venv python=3.8
+conda activate venv
 # Install gaustudio and libraries
 cd ~
 git clone https://github.com/GAP-LAB-CUHK-SZ/gaustudio.git
