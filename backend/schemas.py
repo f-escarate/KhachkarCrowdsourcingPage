@@ -9,7 +9,6 @@ def form_body(cls):
             for arg in cls.__signature__.parameters.values()
         ]
     )
-    print(cls.__signature__)
     return cls
 
 # ================ Users schemas ================ #
