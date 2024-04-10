@@ -1,3 +1,5 @@
+#!/bin/bash
+
 sudo apt install libpng-dev libjpeg-dev libtiff-dev libtbb-dev
 cd ~
 git clone https://github.com/nmoehrle/mvs-texturing.git
