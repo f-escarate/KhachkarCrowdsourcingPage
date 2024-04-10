@@ -220,6 +220,17 @@ async def post_khachkar_mesh(khachkar_id: int, mesh_files: KhachkarMeshFiles = D
         return {"status": "error", "msg": "invalid mesh files"}
     save_mesh(mesh_files, db_khachkar, db)
     return {"status": "success"}
+
+@app.get("/creating_mesh_error/{khachkar_id}/")
+def creating_mesh_error(khachkar_id: int, db: Session = Depends(get_db)):
+    db_khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == khachkar_id).first()
+    if db_khachkar is None:
+        return {"status": "error", "msg": "khachkar does not exist"}
+    if db_khachkar.state != models.KhachkarState.creating_mesh:
+        return {"status": "error", "msg": "khachkar is not in the meshing process"}
+    db_khachkar.state = models.KhachkarState.not_meshed
+    db.commit()
+    return {"status": "success"}
     
 
 if __name__ == "__main__":
