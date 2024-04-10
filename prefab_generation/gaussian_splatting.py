@@ -7,7 +7,7 @@ GAUSSIAN_SPLATTING_PATH = os.environ['GAUSSIAN_SPLATTING_PATH']
 GAUSSIANS_PATH = os.environ['GAUSSIANS_PATH']
 MESHES_PATH = os.environ['MESHES_PATH']
 
-def remove_backgrounds(index, colmap_path):
+def remove_images_backgrounds(index, colmap_path):
     try:
         photos = os.listdir(os.path.join(colmap_path, "input"))
         cleaned_path = os.path.join(colmap_path, "images")
@@ -25,7 +25,7 @@ def generate_mesh(index: int, colmap_path: str, remove_backgrounds: bool = True)
         handle_error_in_mesh_creation(index)
         return
     if remove_backgrounds:
-        remove_backgrounds(index, colmap_path)
+        remove_images_backgrounds(index, colmap_path)
     train_res = os.system(f'python {GAUSSIAN_SPLATTING_PATH}/train.py -s {colmap_path} --iterations 7000 --model_path {GAUSSIANS_PATH}/{index}')
     if train_res != 0:
         print("Training Gaussians Error")
