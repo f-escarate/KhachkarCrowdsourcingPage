@@ -203,7 +203,7 @@ async def mesh_khachkar(token: Annotated[str, Depends(oauth2_scheme)], khachkar_
     khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == khachkar_id).first()
     if khachkar is None:
         return {"status": "error", "msg": "khachkar does not exist"}
-    if khachkar.owner_id != user.id or not user.is_admin:
+    if khachkar.owner_id != user.id and not user.is_admin:
         return {"status": "error", "msg": "you are not the owner of this khachkar"}
     response = get_mesh_from_video(khachkar, db)
     return response
