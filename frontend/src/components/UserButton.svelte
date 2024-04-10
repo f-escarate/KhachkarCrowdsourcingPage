@@ -11,6 +11,7 @@
         name: '',
         email: '',
         image: '',
+        is_admin: false,
     };
     onMount(async () => {
         if(Cookies.get('token') === undefined) return;
@@ -27,6 +28,7 @@
             data.name = json.username;
             data.email = json.email;
             data.image = '';
+            data.is_admin = json.is_admin;
             authenticated = true;
         } else {
             authenticated = false;
@@ -53,7 +55,9 @@
         </DropdownHeader>
         <DropdownItem href={`${base}/myKhachkars/`}>My Khachkars</DropdownItem>
         <DropdownItem href={`${base}/account/`}>Account Settings</DropdownItem>
-        <DropdownItem href={`${base}/compileAssetBundles/`}>Compile Asset Bundles</DropdownItem>
+        {#if data.is_admin}
+            <DropdownItem href={`${base}/compileAssetBundles/`}>Compile Asset Bundles</DropdownItem>
+        {/if}
         <DropdownDivider />
         <DropdownItem on:click={handleLogOut}>Log out</DropdownItem>
     </Dropdown>

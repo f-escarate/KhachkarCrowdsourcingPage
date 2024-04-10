@@ -133,7 +133,8 @@ async def get_user(token: Annotated[str, Depends(oauth2_scheme)], db: Session = 
     return {
         "status": "success",
         "username": user.username,
-        "email": user.email
+        "email": user.email,
+        "is_admin": user.is_admin,
     }
 
 @app.post("/register/")
