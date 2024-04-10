@@ -1,6 +1,6 @@
 from fastapi import Form, UploadFile
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 
 def form_body(cls):
     cls.__signature__ = cls.__signature__.replace(
@@ -52,3 +52,9 @@ class Khachkar(BaseModel):
     references: Optional[str] = None
     image: Optional[UploadFile] = None
     video: UploadFile
+
+
+class KhachkarMeshFiles(BaseModel):
+    obj: UploadFile
+    mtl: UploadFile
+    images: List[UploadFile]

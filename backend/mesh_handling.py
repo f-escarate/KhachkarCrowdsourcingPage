@@ -18,23 +18,12 @@ def get_mesh_from_video(khachkar: Khachkar, db: Session):
     try:
         index = khachkar.id
         video_path = open(f"data/videos/{index}.mp4", "rb")
-        response = requests.post(MESH_TO_VIDEO_ENDPOINT, files={"video": video_path})
+        response = requests.post(f"{MESH_TO_VIDEO_ENDPOINT}{index}/", files={"video": video_path})
         
         if response.status_code == 200:
             res = response.json()
-            if "mesh" in res and "material" in res and "textures" in res:
-                # Save mesh
-                mesh = res["mesh"]
-                save_file(mesh, MESHES_PATH, index, "obj")
-                # Save material
-                material = res["material"]
-                save_file(material, MESHES_PATH, index, "mtl")
-                # Save textures
-                for i, texture in enumerate(res["textures"]):
-                    save_file(texture, MESHES_PATH, f"{index}_i", "png")
-                update_khachkar_status(db, khachkar, "creating_mesh")
-                return {"status": "success"}
-            return {"status": "error", "msg": "Error in mesh creation"}
+            update_khachkar_status(db, khachkar, "creating_mesh")
+            return res
         return {"status": "error", "msg": "Gaussian Splatting's server error"}
     except requests.exceptions.ConnectionError as e:
         return {"status": "error", "msg": "Error connecting to Gaussian Splatting server"}

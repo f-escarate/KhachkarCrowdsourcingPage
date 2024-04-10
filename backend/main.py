@@ -6,9 +6,9 @@ from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
 
-from schemas import ChangePassword, Khachkar, UserRegister
+from schemas import ChangePassword, Khachkar, UserRegister, KhachkarMeshFiles
 from authentication import authenticate_user, create_access_token, get_password_hash, SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, get_user_by_name, unauthorized_exception, verify_password
-from utils import save_image, save_video, save_mesh, create_khachkar, edit_khachkar, read_image, read_video, img_validation, video_validation, preprocess_video
+from utils import save_image, save_video, save_mesh, create_khachkar, edit_khachkar, read_image, read_video, img_validation, video_validation, mesh_files_validation, preprocess_video
 from database import get_db, Base, engine
 from mesh_handling import get_mesh_from_video, call_method
 import models
@@ -206,6 +206,20 @@ async def mesh_khachkar(token: Annotated[str, Depends(oauth2_scheme)], khachkar_
         return {"status": "error", "msg": "you are not the owner of this khachkar"}
     response = get_mesh_from_video(khachkar, db)
     return response
+
+@app.post("/mesh_khachkar/{khachkar_id}/")
+async def post_khachkar_mesh(khachkar_id: int, mesh_files: KhachkarMeshFiles = Depends(KhachkarMeshFiles), db: Session = Depends(get_db)):
+    db_khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == khachkar_id).first()
+    if db_khachkar is None:
+        return {"status": "error", "msg": "khachkar does not exist"}
+    if db_khachkar.state != models.KhachkarState.creating_mesh:
+        return {"status": "error", "msg": "khachkar is not in the meshing process"}
+    if not mesh_files.obj or not mesh_files.mtl or not mesh_files.images or len(mesh_files.images) == 0:
+        return {"status": "error", "msg": "missing mesh files"}
+    if not mesh_files_validation(mesh_files):
+        return {"status": "error", "msg": "invalid mesh files"}
+    save_mesh(mesh_files, db_khachkar, db)
+    return {"status": "success"}
     
 
 if __name__ == "__main__":

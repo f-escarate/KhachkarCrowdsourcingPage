@@ -1,12 +1,13 @@
 import glob, os, shutil
 from datetime import datetime
 from requests import Session
-from schemas import Khachkar
+from schemas import Khachkar, KhachkarMeshFiles
 import models
 
 IMG_PATH = "./data/images"
 VID_PATH = "./data/videos"
 FRAMES_PATH = "./data/temp_frames"
+MESHES_PATH = "./data/meshes"
 
 def file_validation(file, extensions) -> str | None:
     """
@@ -29,6 +30,15 @@ def video_validation(video) -> str | None:
         Returns the video extension, (if the video is valid).
     """
     return file_validation(video, ['mp4', 'mov', 'avi', 'mkv', 'wmv'])
+
+def mesh_files_validation(mesh_files: KhachkarMeshFiles) -> bool:
+    """
+        Returns True if the mesh files are valid.
+    """
+    ret = file_validation(mesh_files.obj, ['obj']) and file_validation(mesh_files.mtl, ['mtl'])
+    for img in mesh_files.images:
+        ret = ret and img_validation(img)
+    return ret
 
 def save_file(file, path, id, extension):
     """
@@ -53,8 +63,14 @@ def save_video(video, index, extension):
     """
     save_file(video, VID_PATH, f"{index}_temp", extension)
 
-def save_mesh(mesh, khachkar: models.Khachkar, db: Session):
-    # TODO: Save the mesh
+def save_mesh(mesh_files: KhachkarMeshFiles, khachkar: models.Khachkar, db: Session):
+    path = f"{MESHES_PATH}/{khachkar.id}"
+    os.mkdir(path) # Create folder for mesh
+    save_file(mesh_files.obj, path, khachkar.id, 'obj')
+    save_file(mesh_files.mtl, path, mesh_files.mtl.filename.split(".")[0], 'mtl')
+    for img in mesh_files.images:
+        name, extension = img.filename.split(".")
+        save_file(img, path, name, extension)
     update_khachkar_status(db, khachkar, "meshed")
 
 def read_file(id, path, extension):
