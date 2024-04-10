@@ -1,33 +1,38 @@
 import os
 from utils import remove_background
+from dotenv import load_dotenv
+load_dotenv()
 
-class gSplatModel():
-    def __init__(self, gaussians_path, meshes_path):
-        self.gaussians_path = gaussians_path
-        self.meshes_path = meshes_path
-        self.gs_path = "./SuGaR/gaussian_splatting"
-    
-    def remove_backgrounds(self, colmap_path):
-        photos = os.listdir(os.path.join(colmap_path, "input"))
-        cleaned_path = os.path.join(colmap_path, "images")
-        os.mkdir(cleaned_path)
-        for photo in photos:
-            remove_background(photo, colmap_path, cleaned_path)
+GAUSSIAN_SPLATTING_PATH = os.environ['GAUSSIAN_SPLATTING_PATH']
+GAUSSIANS_PATH = os.environ['GAUSSIANS_PATH']
+MESHES_PATH = os.environ['MESHES_PATH']
 
-    def run(self, name, colmap_path, remove_backgrounds = False):
-        convert_res = os.system(f'python {self.gs_path}/convert.py -s {colmap_path}')
-        if convert_res != 0:
-            print("Error al usar COLMAP")
-            return 1
-        if remove_backgrounds:
-            self.remove_backgrounds(colmap_path)
-        train_res = os.system(f'python {self.gs_path}/train.py -s {colmap_path} --iterations 7000 --model_path {self.gaussians_path}/{name}')
-        if train_res != 0:
-            print("Error al entrenar")
-            return 2
-        # Transform the gaussian splatting to mesh using sugar
-        self.gen_obj(name, colmap_path)
-        return 0
-    
-    def gen_obj(self, name, colmap_path):
-        os.system(f'python train.py -s {colmap_path}/{name} -c {self.gs_path}/{name} -r "density"')
+def remove_backgrounds(colmap_path):
+    photos = os.listdir(os.path.join(colmap_path, "input"))
+    cleaned_path = os.path.join(colmap_path, "images")
+    os.mkdir(cleaned_path)
+    for photo in photos:
+        remove_background(photo, colmap_path, cleaned_path)
+
+def generate_mesh(index: int, name: str, colmap_path: str, remove_backgrounds: bool = True):
+    convert_res = os.system(f'python {GAUSSIAN_SPLATTING_PATH}/convert.py -s {colmap_path}')
+    if convert_res != 0:
+        print("COLMAP Error")
+        return 1
+    if remove_backgrounds:
+        remove_backgrounds(colmap_path)
+    train_res = os.system(f'python {GAUSSIAN_SPLATTING_PATH}/train.py -s {colmap_path} --iterations 7000 --model_path {GAUSSIANS_PATH}/{name}')
+    if train_res != 0:
+        print("Training Gaussians Error")
+        return 2
+    # Generate the mesh using gaustudio
+    gaustudio_res = os.system(f'gs-extract-mesh -m {GAUSSIANS_PATH}/{name} -o {MESHES_PATH}/{name}')
+    if gaustudio_res != 0:
+        print("Gaustudio Error")
+        return 3
+    # Bind the texture using mvs-texturing
+    mvs_res = os.system(f'cd {MESHES_PATH}/{name} && texrecon ./images ./fused_mesh.ply ./textured_mesh --outlier_removal=gauss_clamping --data_term=area --no_intermediate_results')
+    if mvs_res != 0:
+        print("MVS Texturing Error")
+        return 4
+    return 0
