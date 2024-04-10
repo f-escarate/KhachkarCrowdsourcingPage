@@ -1,5 +1,6 @@
 #!/bin/bash
 
+conda init
 conda activate venv
 pip install opencv-python
 pip install rembg

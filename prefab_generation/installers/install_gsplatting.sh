@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Conda env
+conda init
 conda activate venv
 # Clone Gaussian Splatting and install requirements
 cd ~

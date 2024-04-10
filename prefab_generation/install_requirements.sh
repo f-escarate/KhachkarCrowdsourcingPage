@@ -20,9 +20,10 @@ bash Miniconda3-latest-Linux-x86_64.sh
 sudo apt-get install ffmpeg libsm6 libxext6  -y
 
 # Reload bashrc for the nexts scripts
-eval "$(cat ~/.bashrc | tail -n +$((BASH_RC_LINES+1)))"
+LAST_BASH_RC_LINES=$(cat ~/.bashrc | tail -n +$((BASH_RC_LINES+1)))
+eval "$LAST_BASH_RC_LINES"
 
-cd ./installers
+cd ~/prefab_generation/installers
 bash ./install_colmap.sh
 bash ./install_gaustudio.sh
 bash ./install_mvs_texturing.sh
