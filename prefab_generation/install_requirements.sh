@@ -24,10 +24,10 @@ LAST_BASH_RC_LINES=$(cat ~/.bashrc | tail -n +$((BASH_RC_LINES+1)))
 eval "$LAST_BASH_RC_LINES"
 
 cd ~/prefab_generation/installers
-bash ./install_colmap.sh
-bash ./install_gaustudio.sh
-bash ./install_mvs_texturing.sh
-bash ./install_gsplatting.sh
-bash ./install_libraries.sh
+chmod 777 *
+./install_colmap.sh
+./install_gsplatting.sh
+./install_mvs_texturing.sh
+./install_libraries.sh
 
 exit 0
