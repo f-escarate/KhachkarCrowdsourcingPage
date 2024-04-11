@@ -1,4 +1,4 @@
-import glob, os, shutil
+import glob, os
 from datetime import datetime
 from requests import Session
 from schemas import Khachkar, KhachkarMeshFiles
@@ -92,24 +92,21 @@ def read_video(id, extension):
     """
     return read_file(id, VID_PATH, extension)
 
-def preprocess_video(index, extension: str, db: Session, n_frames: int = 300):
+def preprocess_video(index, extension: str, db: Session, n_frames: int = 300, out_secs: int = 3):
     """
-        Preprocesses the video in order to remove audio and keep 300 frames only.
+        Preprocesses the video in order to remove audio and keep 'n_frames' frames only.
         It uses ffmpeg
     """
     khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == index).first()
     update_khachkar_status(db, khachkar, "processing_video")
-    id = f"{index}_temp"
-    # Get video duration
-    dur = os.system('ffprobe -i {VID_PATH}/{id}.{extension} -show_entries format=duration -v quiet -of csv="p=0"')
-    fps = n_frames // dur + 1
-    os.mkdir(f"{FRAMES_PATH}/{id}") # Create folder for frames
-    # Generate images from video
-    os.system(f"ffmpeg -i {VID_PATH}/{id}.{extension} -vf fps={fps} {FRAMES_PATH}/{id}/%06d.jpg")
-    # Generate video from images
-    os.system(f"ffmpeg -r {fps} -i {FRAMES_PATH}/{id}/%06d.jpg {VID_PATH}/{index}.mp4")
-    shutil.rmtree(f"{FRAMES_PATH}/{id}")    # Remove the temporary frames
-    os.remove(f"{VID_PATH}/{id}.{extension}")   # Remove the temporary video
+    temp_video = f'{VID_PATH}/{index}_temp.{extension}'
+    # get video duration in seconds to get the scale factor
+    dur = float(os.popen(f'ffprobe -i {temp_video} -show_entries format=duration -v quiet -of csv="p=0"').read())
+    out_secs_factor: float = out_secs / dur
+    # Generate smaller video
+    fps: int = n_frames // out_secs
+    os.system(f'ffmpeg -i {temp_video} -an -hide_banner -loglevel error -vf "setpts={out_secs_factor}*PTS, fps={fps}" {VID_PATH}/{index}.mp4')
+    os.remove(f"{temp_video}")   # Remove the temporary video
     update_khachkar_status(db, khachkar, "not_meshed")
 
 def create_khachkar(db: Session, khachkar: Khachkar, user_id: int):
