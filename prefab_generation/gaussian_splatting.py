@@ -1,6 +1,7 @@
 import os
 from utils import remove_background, handle_error_in_mesh_creation
 from dotenv import load_dotenv
+from media import try_to_create_dir
 load_dotenv()
 
 GAUSSIAN_SPLATTING_PATH = os.environ['GAUSSIAN_SPLATTING_PATH']
@@ -11,7 +12,7 @@ def remove_images_backgrounds(index, colmap_path):
     try:
         photos = os.listdir(os.path.join(colmap_path, "input"))
         cleaned_path = os.path.join(colmap_path, "images")
-        os.mkdir(cleaned_path)
+        try_to_create_dir(cleaned_path)
         for photo in photos:
             remove_background(photo, colmap_path, cleaned_path)
     except Exception as e:
