@@ -112,10 +112,9 @@ async def get_image(khachkar_id: int, db: Session = Depends(get_db)):
     return Response(content=img, media_type=f"image/{khachkar.image}")
 
 @app.get("/get_video/{khachkar_id}")
-async def get_video(khachkar_id: int, db: Session = Depends(get_db)):
-    khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == khachkar_id).first()
-    video = read_video(khachkar_id, khachkar.video)
-    return Response(content=video, media_type=f"video/{khachkar.video}")
+async def get_video(khachkar_id: int):
+    video = read_video(khachkar_id, "mp4")
+    return Response(content=video, media_type=f"video/mp4")
 
 @app.get("/me/")
 async def get_user(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
