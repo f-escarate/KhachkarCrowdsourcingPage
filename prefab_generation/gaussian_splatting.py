@@ -10,14 +10,19 @@ MESHES_PATH = os.environ['MESHES_PATH']
 
 def remove_images_backgrounds(index, colmap_path):
     try:
-        photos = os.listdir(os.path.join(colmap_path, "input"))
+        input_path = os.path.join(colmap_path, "input")
         cleaned_path = os.path.join(colmap_path, "images")
+        photos = os.listdir(input_path)
         try_to_create_dir(cleaned_path)
         for photo in photos:
-            remove_background(photo, colmap_path, cleaned_path)
+            in_path = os.path.join(input_path, photo)
+            out_path = os.path.join(cleaned_path, photo)
+            remove_background(in_path, out_path)
+        print("Images backgrounds has been removed")
     except Exception as e:
         print(f"Error removing background: {e}")
         handle_error_in_mesh_creation(index)
+
 
 def generate_mesh(index: int, colmap_path: str, remove_backgrounds: bool = True):
     convert_res = os.system(f'python {GAUSSIAN_SPLATTING_PATH}/convert.py -s {colmap_path}')

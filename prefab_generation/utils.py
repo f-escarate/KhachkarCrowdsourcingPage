@@ -7,11 +7,8 @@ MESHES_PATH = os.environ['MESHES_PATH']
 HANDLE_ERROR_ENDPOINT = os.environ['HANDLE_ERROR_ENDPOINT']
 HANDLE_SUCCESS_ENDPOINT = os.environ['HANDLE_SUCCESS_ENDPOINT']
 
-def remove_background(photo, in_path, out_path):
-    photo_path = os.path.join(in_path, photo)
-    output_path = os.path.join(out_path, photo)
-    
-    with open(photo_path, 'rb') as i:
+def remove_background(in_path, output_path):
+    with open(in_path, 'rb') as i:
         with open(output_path, 'wb') as o:
             input = i.read()
             output = remove(input)
