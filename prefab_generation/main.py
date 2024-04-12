@@ -11,6 +11,9 @@ COLMAPS_PATH = os.environ['COLMAPS_PATH']
 
 app = FastAPI()
 
+queue = []
+meshing = False
+
 @app.post("/get_mesh_from_video/{index}/")
 async def get_mesh_from_video(index: int, background_tasks: BackgroundTasks, video: UploadFile = File(...)):
     # Create name
@@ -20,7 +23,7 @@ async def get_mesh_from_video(index: int, background_tasks: BackgroundTasks, vid
     with open(video_path, "wb") as f:
         f.write(video.file.read())
     background_tasks.add_task(video_to_mesh, index, video_path)
-    return {"status": "success", "message": "Mesh generation started in background"}
+    return {"status": "success", "message": "Queued for mesh generation"}
 
 def video_to_mesh(index: int, video_path: str):
     try:
@@ -34,7 +37,14 @@ def video_to_mesh(index: int, video_path: str):
     except Exception as e:
         print(f"Error extracting images from video: {e}")
         handle_error_in_mesh_creation(index)
-        return {"status": "error", "message": f"Error extracting images from video: {e}"}
+        return
+    if meshing:
+        queue.append((index, colmap_path))
+        return
     # Generate OBJ using Gaussian Splatting and Gaustudio
+    meshing = True
     generate_mesh(index, colmap_path)
-    return {"status": "success", "message": "Mesh generation started in background"}
+    while len(queue) > 0:
+        next_index, next_colmap_path = queue.pop(0)
+        generate_mesh(next_index, next_colmap_path)
+    meshing = False
