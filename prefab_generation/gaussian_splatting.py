@@ -1,5 +1,5 @@
 import os
-from utils import remove_background, handle_error_in_mesh_creation
+from utils import remove_background, handle_error_in_mesh_creation, handle_successful_mesh_creation
 from dotenv import load_dotenv
 from media import try_to_create_dir
 load_dotenv()
@@ -44,4 +44,5 @@ def generate_mesh(index: int, colmap_path: str, remove_backgrounds: bool = True)
         print("MVS Texturing Error")
         handle_error_in_mesh_creation(index)
         return
+    handle_successful_mesh_creation(index)
     return 0
