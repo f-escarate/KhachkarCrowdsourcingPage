@@ -96,6 +96,7 @@ def preprocess_video(index, extension: str, db: Session, n_frames: int = 300, ou
     """
         Preprocesses the video in order to remove audio and keep 'n_frames' frames only.
         It uses ffmpeg
+        out_secs: the duration of the output video in seconds
     """
     khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == index).first()
     update_khachkar_status(db, khachkar, "processing_video")
@@ -105,7 +106,7 @@ def preprocess_video(index, extension: str, db: Session, n_frames: int = 300, ou
     out_secs_factor: float = out_secs / dur
     # Generate smaller video
     fps: int = n_frames // out_secs
-    os.system(f'ffmpeg -i {temp_video} -an -hide_banner -loglevel error -vf "setpts={out_secs_factor}*PTS, fps={fps}" {VID_PATH}/{index}.mp4')
+    os.system(f'ffmpeg -i {temp_video} -an -hide_banner -loglevel error -vf "setpts={out_secs_factor}*PTS, fps={fps}" -t {out_secs} {VID_PATH}/{index}.mp4')
     os.remove(f"{temp_video}")   # Remove the temporary video
     update_khachkar_status(db, khachkar, "not_meshed")
 
