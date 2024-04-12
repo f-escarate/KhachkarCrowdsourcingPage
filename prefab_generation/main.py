@@ -26,6 +26,7 @@ async def get_mesh_from_video(index: int, background_tasks: BackgroundTasks, vid
     return {"status": "success", "message": "Queued for mesh generation"}
 
 def video_to_mesh(index: int, video_path: str):
+    global meshing
     try:
         print("Creating directories...")
         colmap_path = os.path.join(COLMAPS_PATH, str(index))
