@@ -1,6 +1,6 @@
 from datetime import timedelta
-from typing import Annotated
-from fastapi import Depends, FastAPI, Response, BackgroundTasks
+from typing import Annotated, List
+from fastapi import Depends, FastAPI, Response, BackgroundTasks, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jose import jwt, JWTError
@@ -52,7 +52,7 @@ async def post_khachkar(with_mesh: int, background_tasks: BackgroundTasks, token
         created_khachkar = create_khachkar(db=db, khachkar=khachkar, user_id=user.id)
         save_image(image, created_khachkar.id, img_file_extension)
         save_video(video, created_khachkar.id, vid_file_extension)
-        background_tasks.add_task(preprocess_video, created_khachkar.id, vid_file_extension, db, n_frames=300)
+        background_tasks.add_task(preprocess_video, created_khachkar.id, vid_file_extension, db, n_frames=100)
     return {"status": "success"}
 
 @app.get("/get_khachkars/")
@@ -208,17 +208,18 @@ async def mesh_khachkar(token: Annotated[str, Depends(oauth2_scheme)], khachkar_
     return response
 
 @app.post("/mesh_khachkar/{khachkar_id}/")
-async def post_khachkar_mesh(khachkar_id: int, mesh_files: KhachkarMeshFiles = Depends(KhachkarMeshFiles), db: Session = Depends(get_db)):
+async def post_khachkar_mesh(khachkar_id: int, mesh_files: List[UploadFile] = File(...), db: Session = Depends(get_db)):
     db_khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == khachkar_id).first()
     if db_khachkar is None:
         return {"status": "error", "msg": "khachkar does not exist"}
     if db_khachkar.state != models.KhachkarState.creating_mesh:
         return {"status": "error", "msg": "khachkar is not in the meshing process"}
-    if not mesh_files.obj or not mesh_files.mtl or not mesh_files.images or len(mesh_files.images) == 0:
-        return {"status": "error", "msg": "missing mesh files"}
-    if not mesh_files_validation(mesh_files):
+    if len(mesh_files) <= 3:
+        return {"status": "error", "msg": "not enough mesh files"}
+    khachkar_mesh_files = KhachkarMeshFiles(obj = mesh_files.pop(0), mtl = mesh_files.pop(0), images = mesh_files)
+    if not mesh_files_validation(khachkar_mesh_files):
         return {"status": "error", "msg": "invalid mesh files"}
-    save_mesh(mesh_files, db_khachkar, db)
+    save_mesh(khachkar_mesh_files, db_khachkar, db)
     return {"status": "success"}
 
 @app.get("/creating_mesh_error/{khachkar_id}/")

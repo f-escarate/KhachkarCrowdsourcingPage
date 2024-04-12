@@ -23,15 +23,21 @@ def handle_error_in_mesh_creation(index: int):
 
 def handle_successful_mesh_creation(index: int):
     files_in_dir = os.listdir(f"{MESHES_PATH}/{index}")
-    textures = filter(lambda img: img.endswith(('.png')), files_in_dir)
-    files = {
-        'obj': open(f"{MESHES_PATH}/{index}/textured_mesh.obj", 'rb'),
-        'mtl': open(f"{MESHES_PATH}/{index}/textured_mesh.mtl", 'rb'),
-        'images': [
-            open(f"{MESHES_PATH}/{index}/{img}", 'rb') for img in textures
-        ]
-    }
+    textures = list(filter(lambda img: img.endswith(('.png')), files_in_dir))
+    files = [
+        ('mesh_files', open(f"{MESHES_PATH}/{index}/textured_mesh.obj", 'rb')),
+        ('mesh_files', open(f"{MESHES_PATH}/{index}/textured_mesh.mtl", 'rb'))
+    ]
+    for img in textures:
+        files.append(('mesh_files', open(f"{MESHES_PATH}/{index}/{img}", 'rb')))
+
     response = requests.post(f"{HANDLE_SUCCESS_ENDPOINT}{index}/", files=files)
     if response.status_code != 200:
         print(f"Error handling successful mesh creation for index {index}")
-    # TODO: Remove the files and folders created for this index
+    if response.status == "success":
+        print(f"Successfully handled mesh creation for Khachkar #{index}")
+        # TODO: Remove the files and folders created for this index
+    else:
+        print(f"Error handling mesh creation for Khachkar #{index}")
+        print(" error:", response.text)
+        handle_error_in_mesh_creation(index)
