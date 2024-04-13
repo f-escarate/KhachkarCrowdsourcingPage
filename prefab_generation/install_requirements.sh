@@ -26,8 +26,7 @@ eval "$LAST_BASH_RC_LINES"
 cd ~/prefab_generation/installers
 chmod 777 *
 ./install_colmap.sh
-./install_gsplatting.sh
 ./install_mvs_texturing.sh
-./install_libraries.sh
+./install_conda_env.sh
 
 exit 0
