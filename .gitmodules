@@ -1,0 +1,12 @@
+[submodule "mesh_generation/submodules/mvs-texturing"]
+	path = mesh_generation/submodules/mvs-texturing
+	url = https://github.com/nmoehrle/mvs-texturing.git
+[submodule "mesh_generation/submodules/gaussian-splatting"]
+	path = mesh_generation/submodules/gaussian-splatting
+	url = https://github.com/graphdeco-inria/gaussian-splatting.git
+[submodule "mesh_generation/submodules/colmap"]
+	path = mesh_generation/submodules/colmap
+	url = https://github.com/colmap/colmap.git
+[submodule "mesh_generation/submodules/gaustudio"]
+	path = mesh_generation/submodules/gaustudio
+	url = https://github.com/GAP-LAB-CUHK-SZ/gaustudio.git
