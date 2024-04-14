@@ -92,7 +92,7 @@ def read_video(id, extension):
     """
     return read_file(id, VID_PATH, extension)
 
-def preprocess_video(index, extension: str, db: Session, n_frames: int = 300, out_secs: int = 3):
+def preprocess_video(index, extension: str, db: Session, n_frames: int = 300, out_secs: int = 3, vid_width: int = 1080):
     """
         Preprocesses the video in order to remove audio and keep 'n_frames' frames only.
         It uses ffmpeg
@@ -106,7 +106,8 @@ def preprocess_video(index, extension: str, db: Session, n_frames: int = 300, ou
     out_secs_factor: float = out_secs / dur
     # Generate smaller video
     fps: int = n_frames // out_secs
-    os.system(f'ffmpeg -i {temp_video} -an -hide_banner -loglevel error -vf "setpts={out_secs_factor}*PTS, fps={fps}" -t {out_secs} {VID_PATH}/{index}.mp4')
+    video_filter = f'"setpts={out_secs_factor}*PTS, fps={fps}, scale={vid_width}:-1"'
+    os.system(f'ffmpeg -y -i {temp_video} -an -hide_banner -loglevel error -vf {video_filter} -t {out_secs} {VID_PATH}/{index}.mp4')
     os.remove(f"{temp_video}")   # Remove the temporary video
     update_khachkar_status(db, khachkar, "not_meshed")
 
