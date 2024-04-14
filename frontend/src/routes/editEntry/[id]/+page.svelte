@@ -8,6 +8,7 @@
     /** @type {import('./$types').PageData} */
 	export let data;
     let id = data.id
+    let with_mesh = 0;
     let token = null;
     let entry = {};
     let form;
@@ -50,4 +51,4 @@
 
 </script>
 
-<Form bind:this={form} token={token} entry={entry} videoVisibility='visible' endpoint_url={`/update_khachkar/${id}/`} http_method='PATCH'/>
+<Form bind:this={form} token={token} entry={entry} videoVisibility='visible' endpoint_url={`/update_khachkar/${id}/${with_mesh}/`} http_method='PATCH'/>

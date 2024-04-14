@@ -80,8 +80,8 @@ async def get_khachkar(khachkar_id: int, db: Session = Depends(get_db)):
     khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == khachkar_id).first()
     return khachkar
 
-@app.patch("/update_khachkar/{khachkar_id}/")
-async def update_khachkar(token: Annotated[str, Depends(oauth2_scheme)], khachkar_id: int, khachkar: Khachkar = Depends(Khachkar), db: Session = Depends(get_db)):
+@app.patch("/update_khachkar/{khachkar_id}/{with_mesh}/")
+async def update_khachkar(token: Annotated[str, Depends(oauth2_scheme)], khachkar_id: int, with_mesh: int, background_tasks: BackgroundTasks, khachkar: Khachkar = Depends(Khachkar), db: Session = Depends(get_db)):
     if not token:
         return unauthorized_exception("Invalid token")
     user = get_user_by_name(get_name_by_token(token), db)
@@ -98,10 +98,23 @@ async def update_khachkar(token: Annotated[str, Depends(oauth2_scheme)], khachka
     vid_file_extension = video_validation(khachkar.video)
     if vid_file_extension is None:
         return {"status": "error", "msg": "invalid video"}
-    edit_khachkar(db, db_khachkar, khachkar, img_file_extension, vid_file_extension)
-    save_image(khachkar.image, khachkar_id, img_file_extension)
-    # TODO: Save mesh file(s)
-    save_video(khachkar.video, khachkar_id, vid_file_extension)
+    image = khachkar.image
+    
+    if with_mesh:
+        # TODO manage mesh file(s)
+        edit_khachkar(db, db_khachkar, khachkar, img_file_extension, vid_file_extension)
+        save_image(image, db_khachkar.id, img_file_extension)
+        background_tasks.add_task(save_mesh, video, db_khachkar, db)
+    else:
+        vid_file_extension = video_validation(khachkar.video)
+        if vid_file_extension is None:
+            return {"status": "error", "msg": "invalid video"}
+        video = khachkar.video
+        khachkar.video = vid_file_extension
+        edit_khachkar(db, db_khachkar, khachkar, img_file_extension, vid_file_extension)
+        save_image(image, db_khachkar.id, img_file_extension)
+        save_video(video, db_khachkar.id, vid_file_extension)
+        background_tasks.add_task(preprocess_video, db_khachkar.id, vid_file_extension, db, n_frames=100)
     return {"status": "success"}
 
 @app.get("/get_image/{khachkar_id}")
