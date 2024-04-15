@@ -1,6 +1,7 @@
 <script>
     import { FloatingLabelInput, Label, Button } from 'flowbite-svelte';
     import { HOST, TEXT_FIELDS_WO_DATE } from '$lib/constants';
+    import VideoOrMesh from './FormComponents/VideoOrMesh.svelte';
     
     export let token;
     export let http_method = 'POST';
@@ -26,6 +27,12 @@
         references: '',
         image : null,
         video: null,
+    };
+    let meshData = {
+        withMesh: false,
+        mesh: null,
+        material: null,
+        images: []
     };
     export const previewFile = (elementID, file) => {
         let preview = document.getElementById(elementID);
@@ -55,6 +62,9 @@
         entry.references = '';
         entry.image = null;
         entry.video = null;
+        meshData.mesh = null;
+        meshData.material = null;
+        meshData.images = [];
         document.getElementById('previewImage').src = '';
         document.getElementById('previewVideo').src = '';
         videoElement.load();
@@ -64,8 +74,10 @@
         let msg = '';
         if (entry.image == null)
             entry.image = new File([''], 'default.jpg', {type: 'image/jpeg'});
-        if (entry.video == null)
+        if (entry.video == null && !meshData.withMesh)
             msg += 'Video cannot be empty\n';
+        if (meshData.withMesh && (meshData.images.length == 0 || meshData.mesh == null || meshData.material == null))
+            msg += 'Mesh files cannot be empty\n';
         
         if (msg !== '') {
             alert(msg);
@@ -79,10 +91,16 @@
             return;
         }
 		const data = new FormData();
-        for ( var key in entry ) {
+        for ( var key in entry ) 
             data.append(key, entry[key]);
+        if (meshData.withMesh) {
+            data.append('mesh_files', meshData.mesh);
+            data.append('mesh_files', meshData.material);
+            for (let i = 0; i < meshData.images.length; i++) {
+                data.append('mesh_files', meshData.images[i]);
+            }
         }
-        const response = await fetch(`${HOST}${endpoint_url}`, {
+        const response = await fetch(`${HOST}${endpoint_url}/${+ meshData.withMesh}/`, {
             method: http_method,
             headers: {
                 Authorization: `Bearer ${token}`
@@ -93,20 +111,15 @@
         if (json.status == 'success') {
             alert('Successfully added');
             restartForm();
+        } else if (json.status == 'error'){
+            alert('Failed to add: ' + json.msg);
         } else {
-            alert('Failed to add');
+            alert('Failed to add (unknown reason)');
         }
     }
     const loadImage = (event) => {
         entry.image = event.target.files[0];
         previewFile('previewImage', entry.image);
-    };
-    const loadVideo = (event) => {
-        entry.video = event.target.files[0];
-        previewFile('previewVideo', entry.video);
-        let videoElement = document.getElementById('videoElement');
-        videoElement.load();
-        videoVisibility = 'visible';
     };
 
 </script>
@@ -125,17 +138,7 @@
         </div>
         </Label>
 
-        <Label for="video" class="mb-2 w-full">
-        Upload video
-        <div class="my-4 p-1 flex bg-amber-300 hover:bg-amber-500 text-center hover:text-white transition-colors duration-400 ease-in-out">
-            <video class={`md:w-1/2 m-auto p-2 ${videoVisibility}`} id='videoElement' controls>
-            <source id="previewVideo">
-                <track kind="captions"/>
-                Your browser does not support HTML5 video.
-            </video>
-            <input type="file" id="video" name="video" class="w-0 invisible" on:change={loadVideo}>
-        </div>
-        </Label>
+        <VideoOrMesh {videoVisibility} {previewFile} {entry} {meshData} />
     </div>
     <Button class='md:col-span-2 w-[50%] mx-auto h-full text-black bg-amber-500' on:click={handleSubmit} pill>Add</Button>
 </div>

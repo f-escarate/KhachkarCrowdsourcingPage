@@ -1,4 +1,4 @@
-from fastapi import Form, UploadFile
+from fastapi import Form, UploadFile, File
 from pydantic import BaseModel
 from typing import Optional, List
 
@@ -51,7 +51,8 @@ class Khachkar(BaseModel):
     commemorative_activities: Optional[str] = None
     references: Optional[str] = None
     image: Optional[UploadFile] = None
-    video: UploadFile
+    video: Optional[UploadFile] = None
+    mesh_files: Optional[List[UploadFile]] = File(None)
 
 
 class KhachkarMeshFiles(BaseModel):

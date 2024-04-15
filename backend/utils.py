@@ -65,7 +65,10 @@ def save_video(video, index, extension):
 
 def save_mesh(mesh_files: KhachkarMeshFiles, khachkar: models.Khachkar, db: Session):
     path = f"{MESHES_PATH}/{khachkar.id}"
-    os.mkdir(path) # Create folder for mesh
+    try:
+        os.mkdir(path) # Create folder for mesh
+    except FileExistsError:
+        print(f"Folder {path} already exists")
     save_file(mesh_files.obj, path, khachkar.id, 'obj')
     save_file(mesh_files.mtl, path, mesh_files.mtl.filename.split(".")[0], 'mtl')
     for img in mesh_files.images:
@@ -125,6 +128,16 @@ def create_khachkar(db: Session, khachkar: Khachkar, user_id: int):
     db.commit()
     db.refresh(db_khachkar)
     return db_khachkar
+
+def create_mesh_transformations(db: Session, khachkar_id: int):
+    """
+        Creates a MeshTransformation in the database.
+    """
+    mesh_transformations = models.MeshTransformations(khachkar_id=khachkar_id)
+    db.add(mesh_transformations)
+    db.commit()
+    db.refresh(mesh_transformations)
+    return mesh_transformations
 
 def edit_khachkar(db: Session, db_khachkar: models.Khachkar, khachkar: Khachkar, img_file_extension: str, vid_file_extension: str):
     """
