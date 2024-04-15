@@ -92,12 +92,15 @@ def read_video(id, extension):
     """
     return read_file(id, VID_PATH, extension)
 
-def preprocess_video(index, extension: str, db: Session, n_frames: int = 300, out_secs: int = 3, vid_width: int = 1080):
+def preprocess_video(index, extension: str, db: Session, n_frames: int = 300, out_secs: int = 3, vid_width: int = 1080, get_thumbnail: bool = False):
     """
         Preprocesses the video in order to remove audio and keep 'n_frames' frames only.
         It uses ffmpeg
         out_secs: the duration of the output video in seconds
     """
+    if get_thumbnail:
+        quality = 31 # From 1 to 31, 1 being the best quality
+        os.system(f'ffmpeg -y -i {VID_PATH}/{index}_temp.{extension} -hide_banner -loglevel error -vf "select=eq(n\,0)" -q:v {quality} {IMG_PATH}/{index}.jpg')
     khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == index).first()
     update_khachkar_status(db, khachkar, "processing_video")
     temp_video = f'{VID_PATH}/{index}_temp.{extension}'

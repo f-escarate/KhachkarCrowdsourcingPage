@@ -49,9 +49,10 @@ async def post_khachkar(with_mesh: int, background_tasks: BackgroundTasks, token
         video = khachkar.video
         khachkar.video = vid_file_extension
         created_khachkar = create_khachkar(db=db, khachkar=khachkar, user_id=user.id)
-        save_image(image, created_khachkar.id, img_file_extension)
+        if image.size == 0:
+            save_image(image, created_khachkar.id, img_file_extension)
         save_video(video, created_khachkar.id, vid_file_extension)
-        background_tasks.add_task(preprocess_video, created_khachkar.id, vid_file_extension, db, n_frames=100)
+        background_tasks.add_task(preprocess_video, created_khachkar.id, vid_file_extension, db, n_frames=100, get_thumbnail=image.size == 0)
     return {"status": "success"}
 
 @app.get("/get_khachkars/")
@@ -112,9 +113,10 @@ async def update_khachkar(token: Annotated[str, Depends(oauth2_scheme)], khachka
         video = khachkar.video
         khachkar.video = vid_file_extension
         edit_khachkar(db, db_khachkar, khachkar, img_file_extension, vid_file_extension)
-        save_image(image, db_khachkar.id, img_file_extension)
+        if image.size == 0:
+            save_image(image, db_khachkar.id, img_file_extension)
         save_video(video, db_khachkar.id, vid_file_extension)
-        background_tasks.add_task(preprocess_video, db_khachkar.id, vid_file_extension, db, n_frames=100)
+        background_tasks.add_task(preprocess_video, db_khachkar.id, vid_file_extension, db, n_frames=100, get_thumbnail=image.size == 0)
     return {"status": "success"}
 
 @app.get("/get_image/{khachkar_id}")
