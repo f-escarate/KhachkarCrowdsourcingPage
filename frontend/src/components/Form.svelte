@@ -1,6 +1,6 @@
 <script>
     import { createEventDispatcher } from 'svelte';
-    import { FloatingLabelInput, Label, Button } from 'flowbite-svelte';
+    import { FloatingLabelInput, Label, Button, Spinner } from 'flowbite-svelte';
     import { HOST, TEXT_FIELDS_WO_DATE, BASE_ENTRY, BASE_MESH_DATA } from '$lib/constants';
     import VideoOrMesh from './FormComponents/VideoOrMesh.svelte';
     
@@ -10,7 +10,8 @@
     export let videoVisibility = 'hidden';
     export let entry = {... BASE_ENTRY};
     let meshData = {... BASE_MESH_DATA};
-    export const previewFile = (elementID, file) => {
+    let isLoading = false;
+    const previewFile = (elementID, file) => {
         let preview = document.getElementById(elementID);
         preview.src = URL.createObjectURL(file);
         preview.onload = () => {
@@ -59,7 +60,9 @@
     }
     
     const handleSubmit = async (e) => {
+        isLoading = true;
         if (!validation()) {
+            isLoading = false;
             return;
         }
 		const data = new FormData();
@@ -82,6 +85,7 @@
             body: data
         });
         const json = await response.json();
+        isLoading = false;
         if (json.status == 'success') {
             restartForm();
             post_data_signal();
@@ -114,5 +118,12 @@
 
         <VideoOrMesh {videoVisibility} {entry} {meshData} {previewFile} />
     </div>
-    <Button class='md:col-span-2 w-[50%] mx-auto h-full text-black bg-amber-500' on:click={handleSubmit} pill>Add</Button>
+    {#if isLoading}
+        <Button class='md:col-span-2 w-[50%] mx-auto h-full text-black bg-amber-500'>
+            <Spinner class="mr-2" size="4"/>
+            Loading...
+        </Button>
+    {:else}
+        <Button class='md:col-span-2 w-[50%] mx-auto h-full text-black bg-amber-500' on:click={handleSubmit}>Add</Button>
+    {/if}
 </div>

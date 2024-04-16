@@ -1,12 +1,12 @@
 <script>
     import Entry from '../../components/Entry.svelte';
-    import { Button } from 'flowbite-svelte'
+    import { Button, Spinner } from 'flowbite-svelte'
     import { onMount } from 'svelte';
     import { HOST } from '$lib/constants';
     import { base } from "$app/paths";
     import Cookies from 'js-cookie';
     let entries = [];
-
+    let isLoading = false;
     onMount(async () => {
         let token = await Cookies.get('token');
         if (token===undefined) {
@@ -24,7 +24,9 @@
         entries = await response.json();
         
     });
-    const handleProcessMesh = async (e, id) => {
+    const handleProcessMesh = async (e, entry) => {
+        let id = entry.id;
+        isLoading = true;
         const response = await fetch(`${HOST}/mesh_khachkar/${id}/`, {
             method: 'GET',
             headers: {
@@ -33,10 +35,16 @@
             }
         });
         const json = await response.json();
+        isLoading = false;
         if (json.status === 'success') {
+            entry.state = 'creating_mesh';
             alert("Meshing process started");
-        } else {
+        } else if (json.status === 'error') {
+            entry.state = 'not_meshed';
             alert(json.msg);
+        } else {
+            entry.state = 'not_meshed';
+            alert('Failed to mesh (unknown reason)');
         }
     }
 
@@ -54,9 +62,16 @@
                 {:else if entry.state === 'creating_mesh'}
                     <h3>Khachkar mesh in progress...</h3>
                 {:else if entry.state === 'not_meshed'}
-                    <Button class='md:col-span-2 w-full md:w-[50%] mx-auto h-full' color="blue" on:click={e => handleProcessMesh(e, entry.id)}>
-                        Process mesh
-                    </Button>
+                    {#if isLoading}
+                        <Button class='md:col-span-2 w-full md:w-[50%] mx-auto h-full' color="blue">
+                            <Spinner class="mr-2" size="4"/>
+                            Processing mesh
+                        </Button>
+                    {:else}
+                        <Button class='md:col-span-2 w-full md:w-[50%] mx-auto h-full' color="blue" on:click={e => handleProcessMesh(e, entry)}>
+                            Process mesh
+                        </Button>
+                    {/if}
                 {/if}
             </div>
         {/each}
