@@ -14,7 +14,7 @@
     });
     const handlePost = () => {
         if (confirm("Khachkar added successfully, do you want to add another one?")) {
-            window.location.href = `${base}/add/`;
+            document.getElementById('add_khach_title').scrollIntoView();
         } else {
             window.location.href = `${base}/myKhachkars/`;
         }
@@ -22,6 +22,6 @@
 </script>
 
 {#if token}
-    <h1 class='text-4xl font-bold'>Add Khachkar</h1>
+    <h1 id='add_khach_title' class='text-4xl font-bold'>Add Khachkar</h1>
     <Form token={token} on:post_data={handlePost}/>
 {/if}
