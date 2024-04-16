@@ -1,5 +1,6 @@
 <script>
     import Form from '../../components/Form.svelte';
+    import { base } from "$app/paths";
     import Cookies from 'js-cookie';
     import { onMount } from 'svelte';
     let token;
