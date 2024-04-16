@@ -53,7 +53,7 @@
 <div class='flex flex-col'>
     {#if entries.length > 0}
         <h1 class='text-4xl font-bold'>Your Khachkars</h1>
-        {#each entries as entry}
+        {#each entries.reverse() as entry}
             <Entry entry_data={entry} />
             <div class='m-4 flex flex-col md:flex-row md:justify-between md:max-h-[300px] md:w-[85%] gap-4'>
                 <Button class='md:col-span-2 w-full md:w-[50%] mx-auto h-full' color="blue" href={`${base}/editEntry/${entry.id}/`}>Edit entry</Button>
