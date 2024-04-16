@@ -8,6 +8,12 @@
     let entries = [];
 
     onMount(async () => {
+        let token = await Cookies.get('token');
+        if (token===undefined) {
+            if(!alert("You have to be logged in to access this page")) {
+                window.location.href = `${base}/login`;
+            }
+        }
         const response = await fetch(`${HOST}/get_khachkars/own/`, {
             method: 'GET',
             headers: {
