@@ -1,40 +1,15 @@
 <script>
     import { createEventDispatcher } from 'svelte';
     import { FloatingLabelInput, Label, Button } from 'flowbite-svelte';
-    import { HOST, TEXT_FIELDS_WO_DATE } from '$lib/constants';
+    import { HOST, TEXT_FIELDS_WO_DATE, BASE_ENTRY, BASE_MESH_DATA } from '$lib/constants';
     import VideoOrMesh from './FormComponents/VideoOrMesh.svelte';
     
     export let token;
     export let http_method = 'POST';
     export let endpoint_url = '/post_khachkar';
     export let videoVisibility = 'hidden';
-    export let entry = {
-        location: '',
-        latLong: '',
-        scenario: '',
-        setting: '',
-        landscape: '',
-        accessibility: '',
-        masters_name: '',
-        category: '',
-        production_period: '',
-        motive: '',
-        condition_of_preservation: '',
-        inscription: '',
-        important_features: '',
-        backside: '',
-        history_ownership: '',
-        commemorative_activities: '',
-        references: '',
-        image : null,
-        video: null,
-    };
-    let meshData = {
-        withMesh: false,
-        mesh: null,
-        material: null,
-        images: []
-    };
+    export let entry = {... BASE_ENTRY};
+    let meshData = {... BASE_MESH_DATA};
     export const previewFile = (elementID, file) => {
         let preview = document.getElementById(elementID);
         preview.src = URL.createObjectURL(file);
@@ -49,28 +24,10 @@
 
     const FIELDS = Object.getOwnPropertyNames(TEXT_FIELDS_WO_DATE);
     const restartForm = () => {
-        entry.location = '';
-        entry.latLong = '';
-        entry.scenario = '';
-        entry.setting = '';
-        entry.landscape = '';
-        entry.accessibility = '';
-        entry.masters_name = '';
-        entry.category = '';
-        entry.production_period = '';
-        entry.motive = '';
-        entry.condition_of_preservation = '';
-        entry.inscription = '';
-        entry.important_features = '';
-        entry.backside = '';
-        entry.history_ownership = '';
-        entry.commemorative_activities = '';
-        entry.references = '';
-        entry.image = null;
-        entry.video = null;
-        meshData.mesh = null;
-        meshData.material = null;
-        meshData.images = [];
+        for (var key in entry)
+            entry[key] = BASE_ENTRY[key];
+        for (var key in meshData)
+            meshData[key] = BASE_MESH_DATA[key];
         document.getElementById('previewImage').src = '';
         if (!meshData.withMesh){
             let videoElement = document.getElementById('videoElement');

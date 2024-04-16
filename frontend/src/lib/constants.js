@@ -22,3 +22,15 @@ export const TEXT_FIELDS_WO_DATE = {
     'references': 'References',
 }
 export const TEXT_FIELDS = {...TEXT_FIELDS_WO_DATE, 'date': 'Upload Date'}
+const TEXT_FIELDS_LIST = Object.keys(TEXT_FIELDS);
+export const BASE_ENTRY = TEXT_FIELDS_LIST.reduce((acc, key) => {
+    acc[key] = '';
+    return acc;
+}
+, {video: null, image: null});
+export const BASE_MESH_DATA = {
+    withMesh: false,
+    mesh: null,
+    material: null,
+    images: []
+}
