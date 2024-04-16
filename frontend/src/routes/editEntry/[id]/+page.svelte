@@ -47,7 +47,10 @@
         let videoElement = document.getElementById('videoElement');
         videoElement.load();
     });
-
+    const handlePost = () => {
+        alert("Khachkar added successfully, do you want to add another one?");
+        window.location.href = `${base}/myKhachkars/`;
+    }
 </script>
 
-<Form bind:this={form} token={token} entry={entry} videoVisibility='visible' endpoint_url={`/update_khachkar/${id}`} http_method='PATCH'/>
+<Form bind:this={form} on:post_data={handlePost} token={token} entry={entry} videoVisibility='visible' endpoint_url={`/update_khachkar/${id}`} http_method='PATCH'/>

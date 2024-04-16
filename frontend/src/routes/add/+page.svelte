@@ -12,9 +12,16 @@
             }
         }
     });
+    const handlePost = () => {
+        if (confirm("Khachkar added successfully, do you want to add another one?")) {
+            window.location.href = `${base}/add/`;
+        } else {
+            window.location.href = `${base}/myKhachkars/`;
+        }
+    }
 </script>
 
 {#if token}
     <h1 class='text-4xl font-bold'>Add Khachkar</h1>
-    <Form token={token}/>
+    <Form token={token} on:post_data={handlePost}/>
 {/if}

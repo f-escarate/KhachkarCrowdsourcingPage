@@ -1,4 +1,5 @@
 <script>
+    import { createEventDispatcher } from 'svelte';
     import { FloatingLabelInput, Label, Button } from 'flowbite-svelte';
     import { HOST, TEXT_FIELDS_WO_DATE } from '$lib/constants';
     import VideoOrMesh from './FormComponents/VideoOrMesh.svelte';
@@ -41,6 +42,11 @@
             URL.revokeObjectURL(preview.src) // free memory
         }
     }
+    const dispatch = createEventDispatcher();
+    function post_data_signal(){
+        dispatch('post_data');
+    }
+
     const FIELDS = Object.getOwnPropertyNames(TEXT_FIELDS_WO_DATE);
     const restartForm = () => {
         entry.location = '';
@@ -120,8 +126,8 @@
         });
         const json = await response.json();
         if (json.status == 'success') {
-            alert('Successfully added');
             restartForm();
+            post_data_signal();
         } else if (json.status == 'error'){
             alert('Failed to add: ' + json.msg);
         } else {
