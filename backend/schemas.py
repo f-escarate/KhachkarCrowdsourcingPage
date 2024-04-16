@@ -52,7 +52,7 @@ class Khachkar(BaseModel):
     references: Optional[str] = None
     image: Optional[UploadFile] = None
     video: Optional[UploadFile] = None
-    mesh_files: Optional[List[UploadFile]] = File(None)
+    mesh_files: List[UploadFile] = File(...)
 
 
 class KhachkarMeshFiles(BaseModel):

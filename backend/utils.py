@@ -122,6 +122,7 @@ def create_khachkar(db: Session, khachkar: Khachkar, user_id: int):
         Creates a Khackkar in the database.
     """
     khachkar_dict = khachkar.dict()
+    del khachkar_dict['mesh_files']
     khachkar_dict['date'] = datetime.now()
     db_khachkar = models.Khachkar(**khachkar_dict, owner_id=user_id)
     db.add(db_khachkar)

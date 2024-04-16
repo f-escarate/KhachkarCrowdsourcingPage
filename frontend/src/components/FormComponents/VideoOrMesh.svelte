@@ -47,7 +47,7 @@
             Add mesh files (obj, mtl and images)
             <input type="file" on:change={loadMesh} id="mesh" name="mesh" class="w-full" accept=".obj">
             <input type="file" on:change={loadMaterial} id="material" name="material" class="w-full" accept=".mtl">
-            <input type="file" on:change={loadImages} id="images" name="images" class="w-full" accept="image/*" multiple>
+            <input type="file" on:change={loadImages} id="mesh_images" name="mesh_images" class="w-full" accept="image/*" multiple>
         </Label>
     {:else}
         <Label for="video" class="mb-2 w-full">
@@ -58,7 +58,7 @@
                     <track kind="captions"/>
                     Your browser does not support HTML5 video.
                 </video>
-                <input type="file" id="video" name="video" class="w-0 invisible" on:change={loadVideo} accept=".mp4, .mov, .avi, .mkv, .wmv">
+                <input type="file" id="video" name="video" class="w-0 invisible" on:change={loadVideo} accept="video/*">
             </div>
         </Label>
     {/if}

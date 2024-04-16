@@ -5,7 +5,7 @@
     
     export let token;
     export let http_method = 'POST';
-    export let endpoint_url = '/post_khachkar/';
+    export let endpoint_url = '/post_khachkar';
     export let videoVisibility = 'hidden';
     export let entry = {
         location: '',
@@ -66,8 +66,15 @@
         meshData.material = null;
         meshData.images = [];
         document.getElementById('previewImage').src = '';
-        document.getElementById('previewVideo').src = '';
-        videoElement.load();
+        if (!meshData.withMesh){
+            let videoElement = document.getElementById('videoElement');
+            videoElement.src = '';
+            videoElement.load();
+        } else {
+            document.getElementById('mesh').value = '';
+            document.getElementById('material').value = '';
+            document.getElementById('mesh_images').value = '';
+        }
         videoVisibility = 'hidden';
     }
     const validation = () => {
@@ -76,6 +83,8 @@
             entry.image = new File([''], 'default.jpg', {type: 'image/jpeg'});
         if (entry.video == null && !meshData.withMesh)
             msg += 'Video cannot be empty\n';
+        else if (entry.video == null)
+            entry.video = new File([''], 'default.mp4', {type: 'video/mp4'});
         if (meshData.withMesh && (meshData.images.length == 0 || meshData.mesh == null || meshData.material == null))
             msg += 'Mesh files cannot be empty\n';
         
@@ -99,6 +108,8 @@
             for (let i = 0; i < meshData.images.length; i++) {
                 data.append('mesh_files', meshData.images[i]);
             }
+        } else {
+            data.append('mesh_files', new File([''], 'fake.jpg', {type: 'image/jpeg'}));
         }
         const response = await fetch(`${HOST}${endpoint_url}/${+ meshData.withMesh}/`, {
             method: http_method,
@@ -138,7 +149,7 @@
         </div>
         </Label>
 
-        <VideoOrMesh {videoVisibility} {previewFile} {entry} {meshData} />
+        <VideoOrMesh {videoVisibility} {entry} {meshData} {previewFile} />
     </div>
     <Button class='md:col-span-2 w-[50%] mx-auto h-full text-black bg-amber-500' on:click={handleSubmit} pill>Add</Button>
 </div>
