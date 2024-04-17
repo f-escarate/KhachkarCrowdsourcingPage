@@ -2,7 +2,7 @@
     import { browser } from '$app/environment'; 
     import { onMount } from 'svelte';
     import { Tabs, TabItem } from 'flowbite-svelte';
-    import { init, animate, transform_stone } from '$lib/mesh_display';
+    import { init, animate, transform_stone, transform_camera } from '$lib/mesh_display';
     import RangeInput from '../../../components/RangeInput.svelte';
     /** @type {import('./$types').PageData} */
 	export let data;
@@ -11,6 +11,11 @@
         pos: {x: 0, y: 0, z: 0},
         rot: {x: 0, y: 0, z: 0},
         scale: {value: 1}
+    }
+    let cam_props = {
+        angle: 10,
+        zoom: 10,
+        height: 1
     }
     onMount(async () => {
         if(browser) {
@@ -29,9 +34,15 @@
         transformations[property][axis] = parseFloat(value);
         transform_stone(transformations);
     }
+    const handleCamera = (e) => {
+        const { property, axis, value } = e.detail;
+        cam_props[axis] = parseFloat(value);
+        console.log(cam_props, value)
+        transform_camera(cam_props.angle, cam_props.zoom, cam_props.height);
+    }
 </script>
 
-<span id='tabs_top_limit'></span>
+<span id='tabs_top_limit' class='w-full'></span>
 <Tabs style="underline">
     <TabItem open><span slot="title">Position x</span>
         <RangeInput property='pos' axis='x' interval={[-10, transformations.pos.x, 10]} step={0.1} on:change={handleTransformations} />
@@ -58,6 +69,14 @@
     <TabItem>
         <span slot="title">Scale</span>
         <RangeInput property='scale' axis='value' interval={[0, transformations.scale.value, 180]} step={0.1} on:change={handleTransformations} />
+    </TabItem>
+    <TabItem>
+        <span slot="title">Camera control</span>
+        <div class='flex'>
+            <RangeInput property='' axis='angle' interval={[0, cam_props.angle, 360]} step={0.1} on:change={handleCamera} />
+            <RangeInput property='' axis='zoom' interval={[0, cam_props.zoom, 60]} step={0.1} on:change={handleCamera} />
+            <RangeInput property='' axis='height' interval={[-20, cam_props.height, 20]} step={0.1} on:change={handleCamera} />
+        </div>
     </TabItem>
 </Tabs>
 <div id='mesh_display' class='flex justify-center w-full'>

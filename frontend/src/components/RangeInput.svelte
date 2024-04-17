@@ -10,7 +10,6 @@
     let dispatch = createEventDispatcher();
     const handleChange = (e) => {
         value = e.target.value;
-        console.log(property, axis, value)
         dispatch('change', {
             property, axis, value
         })
