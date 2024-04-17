@@ -8,7 +8,7 @@
 
     onMount(async () => {
         if(browser) {
-            init(window, document.getElementById('mesh_display'));
+            init(window, document.getElementById('mesh_display'), id);
             animate()
 	    }
     });

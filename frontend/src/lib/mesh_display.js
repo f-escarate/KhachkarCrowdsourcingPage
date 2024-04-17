@@ -2,12 +2,13 @@ import * as THREE from "three";
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
 import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader.js';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+import { HOST } from './constants.js';
 
 let scene;
 let camera;
 let renderer;
 
-export function init(window, element) {
+export function init(window, element, id) {
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
     camera.position.z = 20;
@@ -18,6 +19,7 @@ export function init(window, element) {
     const directionalLight = new THREE.DirectionalLight(0xffffff, 10.0);
     directionalLight.position.set(0, 0, 5);
     scene.add(directionalLight);
+    scene.background = new THREE.Color(0xEEEEEE);
     renderer.setSize(window.innerWidth, window.innerHeight);
     element.appendChild(renderer.domElement);
     
@@ -28,18 +30,18 @@ export function init(window, element) {
             console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
         }
     };
-    var onError = function () { console.log("ERRROOOOR") };
+    var onError = function () { };
     
     var manager = new THREE.LoadingManager();
     manager.addHandler( /\.dds$/i, new DDSLoader() );
     new MTLLoader()
-        .setPath('http://localhost:8000/get_mtl/1/')
+        .setPath(`${HOST}/get_mtl/${id}/`)
         .load('', function (materials) {
             materials.preload();
             new OBJLoader()
                 .setMaterials(materials)
-                .setPath( 'http://localhost:8000/get_obj/' )
-                .load('1', function (object) {
+                .setPath(`${HOST}/get_obj/`)
+                .load(`${id}`, function (object) {
                     scene.add(object);
                 }, onProgress, onError);
     });
