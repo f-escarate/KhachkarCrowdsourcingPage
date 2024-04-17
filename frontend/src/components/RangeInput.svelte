@@ -1,6 +1,5 @@
 <script>
     import { createEventDispatcher } from "svelte";
-    export let label;
     export let property;
     export let axis;
     export let interval;
@@ -18,14 +17,29 @@
     }
 </script>
 
-<input 
-    type="range"
-    id={name}
-    name={name}
-    min={interval[0]}
-    max={interval[2]}
-    value={interval[1]}
-    step={step}
-    on:input={handleChange}
-/>
-<label for="pos_x">{label} {axis}: {value}</label>
+<div class='flex gap-4 w-full'>
+    <label for={`${name}_range_input`}>{axis}</label>
+    <input 
+        class='w-full'
+        type="range"
+        id={name}
+        name={`${name}_range_input`}
+        min={interval[0]}
+        max={interval[2]}
+        value={value}
+        step={step}
+        on:input={handleChange}
+    />
+    <input
+        class='max-w-24 w-24'
+        type="number"
+        id={`${name}_number_input`}
+        name={name}
+        min={interval[0]}
+        max={interval[2]}
+        value={value}
+        step={step}
+        on:input={handleChange}
+    />
+    <label class='hidden' for={`${name}_number_input`}>{axis}</label>   
+</div>
