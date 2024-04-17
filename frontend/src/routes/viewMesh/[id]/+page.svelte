@@ -40,5 +40,5 @@
         <RangeInput label='Rotation' property='rot' axis='y' interval={[-180, 0, 180]} step={0.1} on:change={handleTransformations} />
         <RangeInput label='Rotation' property='rot' axis='z' interval={[-180, 0, 180]} step={0.1} on:change={handleTransformations} />
     </div>
-    <RangeInput label='Scale' property='scale' axis='value' interval={[0, 0, 180]} step={0.1} on:change={handleTransformations} />
+    <RangeInput label='Scale' property='scale' axis='value' interval={[0, 1, 180]} step={0.1} on:change={handleTransformations} />
 </div>
