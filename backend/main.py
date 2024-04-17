@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from schemas import ChangePassword, Khachkar, UserRegister, KhachkarMeshFiles
 from authentication import authenticate_user, create_access_token, get_password_hash, get_name_by_token, ACCESS_TOKEN_EXPIRE_MINUTES, get_user_by_name, unauthorized_exception, verify_password
-from utils import save_image, save_video, save_mesh, create_khachkar, edit_khachkar, read_image, read_video, img_validation, video_validation, mesh_files_validation, preprocess_video
+from utils import save_image, save_video, save_mesh, create_khachkar, edit_khachkar, read_image, read_video, read_file, img_validation, video_validation, mesh_files_validation, preprocess_video, MESHES_PATH
 from database import get_db, Base, engine
 from mesh_handling import get_mesh_from_video, call_method
 import models
@@ -245,7 +245,32 @@ def creating_mesh_error(khachkar_id: int, db: Session = Depends(get_db)):
     db_khachkar.state = models.KhachkarState.not_meshed
     db.commit()
     return {"status": "success"}
+
+@app.get("/get_mtl/{id}/")
+def get_mtl(id: int, db: Session = Depends(get_db)):
+    khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == id).first()
+    if khachkar is None:
+        return {"status": "error", "msg": "khachkar does not exist"}
+    mtl = read_file("textured_mesh", f"{MESHES_PATH}/{id}", "mtl")
+    return Response(content=mtl)
+
+@app.get("/get_mtl/{id}/{img}")
+def get_mtl(id: int, img: str, db: Session = Depends(get_db)):
+    khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == id).first()
+    if khachkar is None:
+        return {"status": "error", "msg": "khachkar does not exist"}
+    name, extension = img.split(".")
+    image = read_file(name, f"{MESHES_PATH}/{id}", extension)
+    return Response(content=image)
     
+
+@app.get("/get_obj/{id}")
+def get_obj(id: int, db: Session = Depends(get_db)):
+    khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == id).first()
+    if khachkar is None:
+        return {"status": "error", "msg": "khachkar does not exist"}
+    obj = read_file(id, f"{MESHES_PATH}/{id}", "obj")
+    return Response(content=obj)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000, root_path='/crowdsourcing_backend')
