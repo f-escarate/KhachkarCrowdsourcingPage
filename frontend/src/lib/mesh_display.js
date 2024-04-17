@@ -64,13 +64,16 @@ export const animate = () => {
     }, 1000 / FPS );
     render()
 }
+const deg_to_rad = (deg) => {
+    return deg * Math.PI / 180;
+}
 export function transform_stone(transformations) {
     let {pos, rot, scale} = transformations;
     try {
         let stone = scene.getObjectByProperty('type', 'Group');
-        stone.rotation.x = rot.x;
-        stone.rotation.y = rot.y;
-        stone.rotation.z = rot.z;
+        stone.rotation.x = deg_to_rad(rot.x);
+        stone.rotation.y = deg_to_rad(rot.y);
+        stone.rotation.z = deg_to_rad(rot.z);
         stone.position.x = pos.x;
         stone.position.y = pos.y;
         stone.position.z = pos.z;
