@@ -3,15 +3,17 @@ import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
 import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader.js';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { HOST } from './constants.js';
+const FPS = 30;
 
 let scene;
 let camera;
 let renderer;
+let percentComplete;
 
-export function init(window, element, id) {
+export function init(width, height, element, id) {
     scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
-    camera.position.z = 20;
+    camera = new THREE.PerspectiveCamera(75, width/height, 0.1, 2000);
+    camera.position.z = 10;
     renderer = new THREE.WebGLRenderer();
     // Basic lighting
     const ambientLight = new THREE.AmbientLight(0xFFFFFF, 1.0);
@@ -20,13 +22,17 @@ export function init(window, element, id) {
     directionalLight.position.set(0, 0, 5);
     scene.add(directionalLight);
     scene.background = new THREE.Color(0xEEEEEE);
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(width, height);
     element.appendChild(renderer.domElement);
+
+    // Axes
+    const axesHelper = new THREE.AxesHelper(20);
+    scene.add( axesHelper );
     
     // model
     var onProgress = function ( xhr ) {
         if ( xhr.lengthComputable ) {
-            var percentComplete = xhr.loaded / xhr.total * 100;
+            percentComplete = xhr.loaded / xhr.total * 100;
             console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
         }
     };
@@ -44,7 +50,7 @@ export function init(window, element, id) {
                 .load(`${id}`, function (object) {
                     scene.add(object);
                 }, onProgress, onError);
-    });
+    });    
 }
 
 const render = () => {
@@ -53,6 +59,26 @@ const render = () => {
 }
 
 export const animate = () => {
-    requestAnimationFrame(animate);
+    setTimeout(function() {
+        requestAnimationFrame(animate);
+    }, 1000 / FPS );
     render()
+}
+export function transform_stone(transformations) {
+    let {pos, rot, scale} = transformations;
+    try {
+        let stone = scene.getObjectByProperty('type', 'Group');
+        stone.rotation.x = rot.x;
+        stone.rotation.y = rot.y;
+        stone.rotation.z = rot.z;
+        stone.position.x = pos.x;
+        stone.position.y = pos.y;
+        stone.position.z = pos.z;
+        stone.scale.x = scale.value;
+        stone.scale.y = scale.value;
+        stone.scale.z = scale.value;
+    }
+    catch (e) {
+        alert("Stone isn't loaded yet");
+    }
 }
