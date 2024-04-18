@@ -1,5 +1,5 @@
-import os, json
-import requests
+import os, json, requests, trimesh, shutil
+import numpy as np
 from utils import save_file, update_khachkar_status
 from models import Khachkar, MeshTransformations
 from sqlalchemy.orm import Session
@@ -12,7 +12,7 @@ PROJECT_PATH = os.getenv("PROJECT_PATH")
 UNITY_USER = os.getenv("UNITY_USER")
 UNITY_PASSWORD = os.getenv("UNITY_PASSWORD")
 MESH_TO_VIDEO_ENDPOINT = os.getenv("MESH_TO_VIDEO_ENDPOINT")
-MESHES_PATH = "./data/meshes"
+MESHES_PATH = os.getenv("MESHES_PATH")
 
 def get_mesh_from_video(khachkar: Khachkar, db: Session):
     try:
@@ -42,6 +42,45 @@ def call_method(method, args):
     return_code = os.system(command)
     if return_code != 0:
         return {"status": "error", "msg": "Error in Unity method call"}
+    return {"status": "success"}
+
+def transform_mesh(id:int, position: list, rotation: list, scale: float):
+    try:
+        # Move old mesh to a backup folder
+        source_dir = f"{MESHES_PATH}/{id}"
+        file_names = os.listdir(source_dir)
+        backup_dir = f"{MESHES_PATH}/{id}/backup"
+        os.makedirs(backup_dir, exist_ok=True)
+
+        for file_name in file_names:
+            shutil.move(os.path.join(source_dir, file_name), backup_dir)
+        # Load the mesh
+        mesh = trimesh.load_mesh(f"{backup_dir}/{id}.obj")
+
+        # Translate the mesh
+        translation = np.array(position) - mesh.centroid
+        mesh.apply_translation(translation)
+
+        # Scale the mesh
+        mesh.apply_scale(scale)
+
+        # Rotate the mesh
+        rotation_matrix = trimesh.transformations.rotation_matrix(np.radians(rotation[0]), [1, 0, 0], mesh.centroid)
+        mesh.apply_transform(rotation_matrix)
+        rotation_matrix = trimesh.transformations.rotation_matrix(np.radians(rotation[1]), [0, 1, 0], mesh.centroid)
+        mesh.apply_transform(rotation_matrix)
+        rotation_matrix = trimesh.transformations.rotation_matrix(np.radians(rotation[2]), [0, 0, 1], mesh.centroid)
+        mesh.apply_transform(rotation_matrix)
+
+        # Save the rotated mesh
+        mesh.export(f"{source_dir}/{id}.obj")
+        # Remove the backup folder
+        shutil.rmtree(backup_dir)
+    except Exception as e:
+        # Move the old mesh back
+        for file_name in file_names:
+            shutil.move(os.path.join(backup_dir, file_name), source_dir)
+        return {"status": "error", "msg": str(e)}
     return {"status": "success"}
 
 if __name__ == "__main__":

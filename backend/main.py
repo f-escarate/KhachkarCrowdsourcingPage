@@ -5,13 +5,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
-from schemas import ChangePassword, Khachkar, UserRegister, KhachkarMeshFiles
+from schemas import ChangePassword, Khachkar, UserRegister, KhachkarMeshFiles, KhachkarMeshTransformations
 from authentication import authenticate_user, create_access_token, get_password_hash, get_name_by_token, ACCESS_TOKEN_EXPIRE_MINUTES, get_user_by_name, unauthorized_exception, verify_password
 from utils import save_image, save_video, save_mesh, create_khachkar, edit_khachkar, read_image, read_video, read_file, img_validation, video_validation, mesh_files_validation, preprocess_video, MESHES_PATH
 from database import get_db, Base, engine
-from mesh_handling import get_mesh_from_video, call_method
-import models
-import uvicorn
+from mesh_handling import get_mesh_from_video, call_method, transform_mesh
+import models, os
 
 Base.metadata.create_all(bind=engine)
 
@@ -251,15 +250,23 @@ def get_mtl(id: int, db: Session = Depends(get_db)):
     khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == id).first()
     if khachkar is None:
         return {"status": "error", "msg": "khachkar does not exist"}
-    mtl = read_file("textured_mesh", f"{MESHES_PATH}/{id}", "mtl")
-    return Response(content=mtl)
+    # Search for the mtl file
+    file_names = os.listdir(f"{MESHES_PATH}/{id}")
+    for file_name in file_names:
+        if file_name.endswith(".mtl"):
+            splitted_name = file_name.split(".")
+            name, extension = "".join(splitted_name[:-1]), splitted_name[-1]
+            mtl = read_file(name, f"{MESHES_PATH}/{id}", extension)
+            return Response(content=mtl)
+    return {"status": "error", "msg": "mtl file not found"}
 
 @app.get("/get_mtl/{id}/{img}")
 def get_mtl(id: int, img: str, db: Session = Depends(get_db)):
     khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == id).first()
     if khachkar is None:
         return {"status": "error", "msg": "khachkar does not exist"}
-    name, extension = img.split(".")
+    splitted_name = img.split(".")
+    name, extension = "".join(splitted_name[:-1]), splitted_name[-1]
     image = read_file(name, f"{MESHES_PATH}/{id}", extension)
     return Response(content=image)
     
@@ -272,5 +279,12 @@ def get_obj(id: int, db: Session = Depends(get_db)):
     obj = read_file(id, f"{MESHES_PATH}/{id}", "obj")
     return Response(content=obj)
 
+@app.post("/set_mesh_transformations/{khachkar_id}/")
+def set_mesh_transformations(khachkar_id: int, transformations: KhachkarMeshTransformations):
+    print("Setting mesh transformations...")
+    return transform_mesh(khachkar_id, transformations.pos, transformations.rot, transformations.scale)
+
+
 if __name__ == "__main__":
+    import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000, root_path='/crowdsourcing_backend')

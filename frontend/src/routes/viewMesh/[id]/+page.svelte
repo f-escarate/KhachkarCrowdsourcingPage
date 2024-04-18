@@ -1,12 +1,14 @@
 <script>
     import { browser } from '$app/environment'; 
     import { onMount } from 'svelte';
-    import { Tabs, TabItem } from 'flowbite-svelte';
+    import { Tabs, TabItem, Button, Spinner } from 'flowbite-svelte';
     import { init, animate, transform_stone, transform_camera } from '$lib/mesh_display';
+    import { HOST } from '$lib/constants';
     import RangeInput from '../../../components/RangeInput.svelte';
     /** @type {import('./$types').PageData} */
 	export let data;
     let id = data.id
+    let isLoading = false;
     let transformations = {
         pos: {x: 0, y: 0, z: 0},
         rot: {x: 0, y: 0, z: 0},
@@ -37,9 +39,33 @@
     const handleCamera = (e) => {
         const { property, axis, value } = e.detail;
         cam_props[axis] = parseFloat(value);
-        console.log(cam_props, value)
         transform_camera(cam_props.angle, cam_props.zoom, cam_props.height);
     }
+    const export_stone = async () => {
+        isLoading = true;
+        let data = JSON.stringify({
+            pos: Object.values(transformations.pos),
+            rot: Object.values(transformations.rot),
+            scale: transformations.scale.value
+        })
+        const response = await fetch(`${HOST}/set_mesh_transformations/${id}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: data
+        });
+        const res = await response.json();
+        isLoading = false;
+        if(res.status == 'success') {
+            alert('Stone exported');
+        } else if (res.status == 'error') {
+            alert('Error exporting stone', res.msg);
+        } else {
+            alert('Unknown error exporting stone');
+        }
+    }
+
 </script>
 
 <span id='tabs_top_limit' class='w-full'></span>
@@ -83,3 +109,12 @@
     <!-- Here goes the Three js display -->
 </div>
 <span id='tabs_bot_limit'></span>
+{#if isLoading}
+    <Button disabled>
+        <Spinner class="mr-2" size="4"/>
+        Loading...
+    </Button>
+{:else}
+    <Button on:click={export_stone}>Save stone transformations</Button>
+{/if}
+

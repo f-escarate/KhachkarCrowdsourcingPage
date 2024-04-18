@@ -59,3 +59,8 @@ class KhachkarMeshFiles(BaseModel):
     obj: UploadFile
     mtl: UploadFile
     images: List[UploadFile]
+
+class KhachkarMeshTransformations(BaseModel):
+    pos: List[float]
+    rot: List[float]
+    scale: float
