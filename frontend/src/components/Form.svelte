@@ -25,10 +25,6 @@
 
     const FIELDS = Object.getOwnPropertyNames(TEXT_FIELDS_WO_DATE);
     const restartForm = () => {
-        for (var key in entry)
-            entry[key] = BASE_ENTRY[key];
-        for (var key in meshData)
-            meshData[key] = BASE_MESH_DATA[key];
         document.getElementById('previewImage').src = '';
         if (!meshData.withMesh){
             let videoElement = document.getElementById('videoElement');
@@ -39,6 +35,10 @@
             document.getElementById('material').value = '';
             document.getElementById('mesh_images').value = '';
         }
+        for (var key in entry)
+            entry[key] = BASE_ENTRY[key];
+        for (var key in meshData)
+            meshData[key] = BASE_MESH_DATA[key];
         videoVisibility = 'hidden';
     }
     const validation = () => {
