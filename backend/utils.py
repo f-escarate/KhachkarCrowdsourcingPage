@@ -72,7 +72,8 @@ def save_mesh(mesh_files: KhachkarMeshFiles, khachkar: models.Khachkar, db: Sess
     save_file(mesh_files.obj, path, khachkar.id, 'obj')
     save_file(mesh_files.mtl, path, mesh_files.mtl.filename.split(".")[0], 'mtl')
     for img in mesh_files.images:
-        name, extension = img.filename.split(".")
+        splitted_name = img.filename.split(".")
+        name, extension = "".join(splitted_name[:-1]), splitted_name[-1]
         save_file(img, path, name, extension)
     update_khachkar_status(db, khachkar, "meshed")
 
