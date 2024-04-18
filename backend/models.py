@@ -1,5 +1,5 @@
 from enum import Enum as ENUM
-from sqlalchemy import Column, Date, ForeignKey, Integer, String, Boolean, Enum
+from sqlalchemy import Column, Date, ForeignKey, Integer, String, Boolean, Enum, Float
 from sqlalchemy.orm import relationship
 
 from database import Base
@@ -51,3 +51,51 @@ class Khachkar(Base):
     owner_id = Column(Integer, ForeignKey("users.id"))
 
     owner = relationship("User", back_populates="khachkars")
+    mesh_transformations = relationship("MeshTransformations", back_populates="khachkar")
+
+    def as_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "location": self.location,
+            "latLong": self.latLong,
+            "scenario": self.scenario,
+            "setting": self.setting,
+            "landscape": self.landscape,
+            "accessibility": self.accessibility,
+            "mastersName": self.masters_name,
+            "category": self.category,
+            "productionPeriod": self.production_period,
+            "motive": self.motive,
+            "conditionOfPreservation": self.condition_of_preservation,
+            "inscription": self.inscription,
+            "importantFeatures": self.important_features,
+            "backside": self.backside,
+            "historyOwnership": self.history_ownership,
+            "commemorativeActivities": self.commemorative_activities,
+            "references": self.references
+        }
+    
+class MeshTransformations(Base):
+    __tablename__ = "mesh_transformations"
+
+    scale = Column(Float, default=1.0)
+    rotation_x = Column(Float, default=0.0)
+    rotation_y = Column(Float, default=0.0)
+    rotation_z = Column(Float, default=0.0)
+    offset_x = Column(Float, default=0.0)
+    offset_y = Column(Float, default=0.0)
+    offset_z = Column(Float, default=0.0)
+
+    khachkar_id = Column(Integer, ForeignKey("khachkar.id"), primary_key=True)
+    khachkar = relationship("Khachkar", back_populates="mesh_transformations")
+    
+    def as_dict(self) -> dict:
+        return {
+            "scale": self.scale,
+            "rotationX": self.rotation_x,
+            "rotationY": self.rotation_y,
+            "rotationZ": self.rotation_z,
+            "offsetX": self.offset_x,
+            "offsetY": self.offset_y,
+            "offsetZ": self.offset_z
+        }

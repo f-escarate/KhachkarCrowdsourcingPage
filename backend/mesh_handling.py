@@ -1,7 +1,7 @@
-import os
+import os, json
 import requests
 from utils import save_file, update_khachkar_status
-from models import Khachkar
+from models import Khachkar, MeshTransformations
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 
@@ -27,6 +27,14 @@ def get_mesh_from_video(khachkar: Khachkar, db: Session):
         return {"status": "error", "msg": "Gaussian Splatting's server error"}
     except requests.exceptions.ConnectionError as e:
         return {"status": "error", "msg": "Error connecting to Gaussian Splatting server"}
+
+def generate_text_asset(khachkar: Khachkar, db: Session):
+    data = khachkar.as_dict()
+    # Get the mesh transformations
+    mesh_transformations = db.query(MeshTransformations).filter(MeshTransformations.khachkar_id == khachkar.id).first()
+    data["assetProps"] = mesh_transformations.as_dict()
+    json_data = json.dumps(data)
+    save_file(json_data, f"{PROJECT_PATH}/Assets/StonesMetadata", khachkar.id, "json")
 
 def call_method(method, args):
     command = '{0} -quit -batchmode -username "{1}" -password "{2}" -logFile {3} -projectPath {4} -executeMethod {5} {6}'
