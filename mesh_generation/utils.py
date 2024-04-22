@@ -34,7 +34,7 @@ def handle_successful_mesh_creation(index: int):
     response = requests.post(f"{HANDLE_SUCCESS_ENDPOINT}{index}/", files=files)
     if response.status_code != 200:
         print(f"Error handling successful mesh creation for index {index}")
-    if response.status == "success":
+    if response.json()["status"] == "success":
         print(f"Successfully handled mesh creation for Khachkar #{index}")
         # TODO: Remove the files and folders created for this index
     else:
