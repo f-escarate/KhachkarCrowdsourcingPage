@@ -49,3 +49,7 @@ def video_to_mesh(index: int, video_path: str):
         next_index, next_colmap_path = queue.pop(0)
         generate_mesh(next_index, next_colmap_path)
     meshing = False
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=7000)
