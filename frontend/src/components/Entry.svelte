@@ -23,7 +23,7 @@
                     'Content-Type': `video/${entry_data.video}`
                 }
             });
-            let preview = document.getElementById('previewVideo');
+            let preview = document.getElementById('videoDiv');
             preview.src = URL.createObjectURL(await response.blob());
             preview.onload = () => {
                 URL.revokeObjectURL(preview.src) // free memory
@@ -35,6 +35,10 @@
     let clickOutsideModal = false;
     const previewData = async () => {
         clickOutsideModal = true;
+    }
+    let clickOutsideVideoModal = false;
+    const previewVideo = async () => {
+        clickOutsideVideoModal = true;
         await loadVideo();
     }
 </script>
@@ -44,22 +48,28 @@
         <h1 class='text-4xl font-semibold'>{entry_data.location} {entry_data.id}</h1>
         <img class='md:hidden w-full m-4 object-contain' src={image} alt={entry_data.id} />
         <p class='m-2'>{entry_data.inscription}</p>
-        <Button on:click={previewData} size="xs" class='m-2 bg-amber-500'>Preview</Button>
+        <div class='flex'>
+            <Button on:click={previewData} size="xs" class='m-2 bg-amber-500'>Preview</Button>
+            {#if entry_data.state === 'processing_video'}
+                <h3>Khachkar video is being processed</h3>
+            {:else if entry_data.state === 'meshed'}
+                <h3>This Khachkar has been meshed</h3>
+            {:else}
+                <Button on:click={previewVideo} size="xs" class='m-2 bg-amber-500'>Video</Button>
+                <Modal title="video" bind:open={clickOutsideVideoModal} autoclose outsideclose>
+                    <video id="videoElement" controls class="w-full max-h-[100%]">
+                        <source type="video/mp4" id='videoDiv'>
+                        <track kind="captions">
+                        Your browser does not support the video tag.
+                    </video>
+                </Modal>
+            {/if}
+        </div>
+        
         <p class="text-xs font-bold">Upload date {entry_data.date}</p>
     </div>
     <img class='hidden md:block w-1/2 object-contain' src={image} alt={entry_data.id} />
     <Modal title="Khachkar information" bind:open={clickOutsideModal} autoclose outsideclose>
-        {#if entry_data.state === 'processing_video'}
-            <h3>Khachkar video is being processed</h3>
-        {:else if entry_data.state === 'meshed'}
-            <h3>This Khachkar has been meshed</h3>
-        {:else}
-            <video id="videoElement" controls class="w-full h-auto">
-                <source type="video/mp4" id='previewVideo'>
-                <track kind="captions">
-                Your browser does not support the video tag.
-            </video>
-        {/if}
         <Table striped={true}>
             <TableHead>
                 <TableHeadCell>Field</TableHeadCell>
