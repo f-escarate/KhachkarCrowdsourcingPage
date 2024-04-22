@@ -13,7 +13,7 @@ let percentComplete;
 export function init(width, height, element, id) {
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, width/height, 0.1, 2000);
-    transform_camera(10, 10, 1);
+    transform_camera(10, 75, 1);
     renderer = new THREE.WebGLRenderer();
     // Basic lighting
     const ambientLight = new THREE.AmbientLight(0xFFFFFF, 1.0);
@@ -85,7 +85,10 @@ export function transform_stone(transformations) {
         alert("Stone isn't loaded yet");
     }
 }
-export function transform_camera(angle, zoom, height) {
+var max_distance = 60;
+var min_distance = 0;
+export function transform_camera(angle, norm_zoom, height) {
+    let zoom = max_distance -(max_distance-min_distance)*norm_zoom/100;
     camera.position.x = Math.sin(deg_to_rad(angle)) * zoom;
     camera.position.z = Math.cos(deg_to_rad(angle)) * zoom;
     camera.position.y = height;

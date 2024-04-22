@@ -16,7 +16,7 @@
     }
     let cam_props = {
         angle: 10,
-        zoom: 10,
+        zoom: 75,
         height: 1
     }
     onMount(async () => {
@@ -100,7 +100,7 @@
         <span slot="title">Camera control</span>
         <div class='flex'>
             <RangeInput property='' axis='angle' interval={[0, cam_props.angle, 360]} step={0.1} on:change={handleCamera} />
-            <RangeInput property='' axis='zoom' interval={[0, cam_props.zoom, 60]} step={0.1} on:change={handleCamera} />
+            <RangeInput property='' axis='zoom' interval={[0, cam_props.zoom, 100]} step={0.1} on:change={handleCamera} />
             <RangeInput property='' axis='height' interval={[-20, cam_props.height, 20]} step={0.1} on:change={handleCamera} />
         </div>
     </TabItem>
