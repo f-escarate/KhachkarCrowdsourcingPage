@@ -11,7 +11,7 @@
     export let entry = {... BASE_ENTRY};
     let meshData = {... BASE_MESH_DATA};
     let isLoading = false;
-    const previewFile = (elementID, file) => {
+    export const previewFile = (elementID, file) => {
         let preview = document.getElementById(elementID);
         preview.src = URL.createObjectURL(file);
         preview.onload = () => {
