@@ -1,5 +1,6 @@
 <script>
     import { onMount } from 'svelte';
+    import { base } from '$app/paths';
     import { HOST, TEXT_FIELDS } from '$lib/constants';
     import { Modal, Button, Table, TableBody, TableHead, TableBodyCell, TableHeadCell, TableBodyRow } from 'flowbite-svelte';
     export let entry_data;
@@ -53,7 +54,7 @@
             {#if entry_data.state === 'processing_video'}
                 <h3>Khachkar video is being processed</h3>
             {:else if entry_data.state === 'meshed'}
-                <h3>This Khachkar has been meshed</h3>
+                <Button on:click={window.open(`${base}/viewMesh/${entry_data.id}`,'_blank','noopener')} size="xs" class='m-2 bg-amber-500'>Mesh</Button>
             {:else}
                 <Button on:click={previewVideo} size="xs" class='m-2 bg-amber-500'>Video</Button>
                 <Modal title="video" bind:open={clickOutsideVideoModal} autoclose outsideclose>
