@@ -23,7 +23,7 @@ sudo apt-get install ffmpeg libsm6 libxext6  -y
 LAST_BASH_RC_LINES=$(cat ~/.bashrc | tail -n +$((BASH_RC_LINES+1)))
 eval "$LAST_BASH_RC_LINES"
 
-cd ~/prefab_generation/installers
+cd ~/mesh_generation/installers
 chmod 777 *
 ./install_colmap.sh
 ./install_mvs_texturing.sh

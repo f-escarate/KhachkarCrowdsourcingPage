@@ -5,14 +5,9 @@ source ~/miniconda3/etc/profile.d/conda.sh
 conda activate venv
 python --version
 
-# clone repositories
-cd ~
-git clone https://github.com/GAP-LAB-CUHK-SZ/gaustudio.git
-git clone https://github.com/graphdeco-inria/gaussian-splatting --recursive
-
 # Install gaustudio and libraries
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
-cd ~/gaustudio
+cd ~/mesh_generation/submodules/gaustudio
 pip install -r requirements.txt
 cd submodules/gaustudio-diff-gaussian-rasterization
 python setup.py install
@@ -20,9 +15,9 @@ cd ../../
 python setup.py develop
 
 # Install Gaussian Splatting libraries
-cd ~/gaussian-splatting/submodules/diff-gaussian-rasterization/
+cd ~/mesh_generation/submodules/gaussian-splatting/submodules/diff-gaussian-rasterization/
 pip install -e .
-cd ~/gaussian-splatting/submodules/simple-knn/
+cd ~/mesh_generation/submodules/gaussian-splatting/submodules/simple-knn/
 pip install -e .
 
 # Install remaining libraries
