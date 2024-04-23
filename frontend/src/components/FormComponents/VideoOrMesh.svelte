@@ -29,9 +29,6 @@
         videoVisibility = 1;
     };
 
-    const loadMeshData = (event, field) => {
-        meshData[field] = event.target.files[0];
-    };
     const handleToggle = (event) => {
         if (!event.target.checked) 
             previewFile('previewVideo', entry.video);
@@ -50,9 +47,9 @@
     {#if meshData.withMesh}
         <Label for="mesh" class="mb-2 w-full flex flex-col gap-2">
             Add mesh files (obj, mtl and images)
-            <input type="file" on:change={e => loadMeshData(e, 'mesh')} id="mesh" name="mesh" class="w-full" accept=".obj">
-            <input type="file" on:change={e => loadMeshData(e, 'material')} id="material" name="material" class="w-full" accept=".mtl">
-            <input type="file" on:change={e => loadMeshData(e, 'images')} id="mesh_images" name="mesh_images" class="w-full" accept="image/*" multiple>
+            <input type="file" class="w-full" on:change={e => meshData.mesh=e.target.files[0]} id="mesh" name="mesh" accept=".obj">
+            <input type="file" class="w-full" on:change={e => meshData.material=e.target.files[0]} id="material" name="material" accept=".mtl">
+            <input type="file" class="w-full" on:change={e => meshData.images=e.target.files} id="mesh_images" name="mesh_images" accept="image/*" multiple>
         </Label>
     {:else}
         <Label for="video" class="mb-2 w-full">
