@@ -26,7 +26,6 @@
     const FIELDS = Object.getOwnPropertyNames(TEXT_FIELDS_WO_DATE);
     const restartForm = () => {
         videoVisibility = 0;
-        document.getElementById('previewImage').src = '';
         if (!meshData.withMesh){
             previewFile('previewVideo', new File([''], 'default.mp4', {type: 'video/mp4'}));
             let videoElement = document.getElementById('videoElement');
@@ -43,12 +42,8 @@
     }
     const validation = () => {
         let msg = '';
-        if (entry.image == null)
-            entry.image = new File([''], 'default.jpg', {type: 'image/jpeg'});
         if (entry.video == null && !meshData.withMesh)
             msg += 'Video cannot be empty\n';
-        else if (entry.video == null)
-            entry.video = new File([''], 'default.mp4', {type: 'video/mp4'});
         if (meshData.withMesh && (meshData.images.length == 0 || meshData.mesh == null || meshData.material == null))
             msg += 'Mesh files cannot be empty\n';
         
@@ -68,12 +63,14 @@
 		const data = new FormData();
         for ( var key in entry ) 
             data.append(key, entry[key]);
+        if (data.get('image') === "null")
+            data.set('image', new File([''], 'fake.jpg', {type: 'image/jpeg'}));
         if (meshData.withMesh) {
+            data.set('video', new File([''], 'fake.mp4', {type: 'video/mp4'}));
             data.append('mesh_files', meshData.mesh);
             data.append('mesh_files', meshData.material);
-            for (let i = 0; i < meshData.images.length; i++) {
+            for (let i = 0; i < meshData.images.length; i++)
                 data.append('mesh_files', meshData.images[i]);
-            }
         } else {
             data.append('mesh_files', new File([''], 'fake.jpg', {type: 'image/jpeg'}));
         }
@@ -106,13 +103,16 @@
     <h2 class='md:col-span-2 text-2xl font-semibold'>Media</h2>
     <div class="my-2 md:flex md:flex-row gap-4 justify-between align-center md:col-span-2">
         <VideoOrMesh bind:videoVisibility={videoVisibility} {entry} {meshData} />
-        <Label for="image" class="mb-2 w-full">
-        Upload image (optional)
-        <div class="my-4 p-1 flex bg-amber-300 hover:bg-amber-500 text-center hover:text-white transition-colors duration-400 ease-in-out">
-            <img id="previewImage" class="md:w-1/2 m-auto p-2" alt="Thumbnail">
-            <input type="file" id="image" name="image" class="w-0 invisible" on:change={loadImage}>
-        </div>
+        <div class='flex flex-col w-full'>
+            Upload image (optional)
+            <Label for="image" class="mb-2 w-full md:bottom-0">
+            <div class="my-4 p-1 flex border-4 border-amber-300 hover:bg-amber-500 text-center hover:text-white transition-colors duration-400 ease-in-out">
+                <img id="previewImage" class={(entry.image? 'visible': 'hidden') + " md:w-1/2 m-auto p-2"} alt="Thumbnail">
+                <p class={(entry.image? 'hidden': 'visible') + ' self-center mx-auto'}>Upload Thumbnail</p>
+                <input type="file" id="image" name="image" class="w-0 invisible" on:change={loadImage} accept="image/*">
+            </div>
         </Label>
+    </div>
     </div>
     <h2 class='md:col-span-2 text-2xl font-semibold'>Metadata</h2>
     {#each FIELDS as key}
