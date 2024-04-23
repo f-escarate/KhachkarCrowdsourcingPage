@@ -1,6 +1,9 @@
 <script>
     import { Label, Toggle } from 'flowbite-svelte';
-    export let videoVisibility = 'hidden';
+    import VideoIcon from '../icons/VideoIcon.svelte';
+    import SquareIcon from '../icons/SquareIcon.svelte';
+
+    export let videoVisibility = 0;
     export let entry = {
         video: null
     };
@@ -10,7 +13,7 @@
         material: null,
         images: []
     };
-    export const previewFile = (elementID, file) => {
+    const previewFile = (elementID, file) => {
         let preview = document.getElementById(elementID);
         preview.src = URL.createObjectURL(file);
         preview.onload = () => {
@@ -23,45 +26,47 @@
         previewFile('previewVideo', entry.video);
         let videoElement = document.getElementById('videoElement');
         videoElement.load();
-        videoVisibility = 'visible';
+        videoVisibility = 1;
     };
 
-    const loadMesh = (event) => {
-        meshData.mesh = event.target.files[0];
+    const loadMeshData = (event, field) => {
+        meshData[field] = event.target.files[0];
     };
-    const loadMaterial = (event) => {
-        meshData.material = event.target.files[0];
-    };
-    const loadImages = (event) => {
-        meshData.images = event.target.files;
+    const handleToggle = (event) => {
+        if (!event.target.checked) 
+            previewFile('previewVideo', entry.video);
     };
 </script>
 
 <div class='flex flex-col w-full'>
     <div class='flex justify-between'>
         Upload video or mesh
-        <Toggle bind:checked={meshData.withMesh} label="Video or Mesh" />
+        <div class='flex justify-end'>
+            <VideoIcon sx='m-0 mr-2 text-black'/>
+            <Toggle bind:checked={meshData.withMesh} on:change={handleToggle} label="Video or Mesh" />
+            <SquareIcon sx='m-0 text-black'/>
+        </div>
     </div>
     {#if meshData.withMesh}
         <Label for="mesh" class="mb-2 w-full flex flex-col gap-2">
             Add mesh files (obj, mtl and images)
-            <input type="file" on:change={loadMesh} id="mesh" name="mesh" class="w-full" accept=".obj">
-            <input type="file" on:change={loadMaterial} id="material" name="material" class="w-full" accept=".mtl">
-            <input type="file" on:change={loadImages} id="mesh_images" name="mesh_images" class="w-full" accept="image/*" multiple>
+            <input type="file" on:change={e => loadMeshData(e, 'mesh')} id="mesh" name="mesh" class="w-full" accept=".obj">
+            <input type="file" on:change={e => loadMeshData(e, 'material')} id="material" name="material" class="w-full" accept=".mtl">
+            <input type="file" on:change={e => loadMeshData(e, 'images')} id="mesh_images" name="mesh_images" class="w-full" accept="image/*" multiple>
         </Label>
     {:else}
         <Label for="video" class="mb-2 w-full">
-            Add video file
-            <div class="my-4 p-1 flex bg-amber-300 hover:bg-amber-500 text-center hover:text-white transition-colors duration-400 ease-in-out">
-                <video class={`md:w-1/2 m-auto p-2 ${videoVisibility}`} id='videoElement' controls>
+            <div class="my-4 p-1 flex border-4 border-amber-300 hover:bg-amber-500 text-center hover:text-white transition-colors duration-400 ease-in-out">
+                <video class={(videoVisibility? 'visible': 'hidden') + ' md:w-1/2 m-auto p-2'} id='videoElement' controls>
                 <source id="previewVideo">
                     <track kind="captions"/>
                     Your browser does not support HTML5 video.
                 </video>
+                <p class={(videoVisibility? 'hidden': 'visible') + ' self-center mx-auto'}>Upload Video</p>
                 <input type="file" id="video" name="video" class="w-0 invisible" on:change={loadVideo} accept="video/*">
             </div>
         </Label>
-    {/if}
+    {/if}   
 
 
 </div>

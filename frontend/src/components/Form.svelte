@@ -7,7 +7,7 @@
     export let token;
     export let http_method = 'POST';
     export let endpoint_url = '/post_khachkar';
-    export let videoVisibility = 'hidden';
+    export let videoVisibility = 0;
     export let entry = {... BASE_ENTRY};
     let meshData = {... BASE_MESH_DATA};
     let isLoading = false;
@@ -25,10 +25,11 @@
 
     const FIELDS = Object.getOwnPropertyNames(TEXT_FIELDS_WO_DATE);
     const restartForm = () => {
+        videoVisibility = 0;
         document.getElementById('previewImage').src = '';
         if (!meshData.withMesh){
+            previewFile('previewVideo', new File([''], 'default.mp4', {type: 'video/mp4'}));
             let videoElement = document.getElementById('videoElement');
-            videoElement.src = '';
             videoElement.load();
         } else {
             document.getElementById('mesh').value = '';
@@ -39,7 +40,6 @@
             entry[key] = BASE_ENTRY[key];
         for (var key in meshData)
             meshData[key] = BASE_MESH_DATA[key];
-        videoVisibility = 'hidden';
     }
     const validation = () => {
         let msg = '';
@@ -103,21 +103,22 @@
 </script>
 
 <div class='pt-5 grid gap-4 items-end w-full md:grid-cols-2'>
-    {#each FIELDS as key}
-        <FloatingLabelInput style="filled" type="text" name={key} id={key} label={TEXT_FIELDS_WO_DATE[key]} bind:value={entry[key]}/>
-    {/each}
-
+    <h2 class='md:col-span-2 text-2xl font-semibold'>Media</h2>
     <div class="my-2 md:flex md:flex-row gap-4 justify-between align-center md:col-span-2">
+        <VideoOrMesh bind:videoVisibility={videoVisibility} {entry} {meshData} />
         <Label for="image" class="mb-2 w-full">
-        Upload image
+        Upload image (optional)
         <div class="my-4 p-1 flex bg-amber-300 hover:bg-amber-500 text-center hover:text-white transition-colors duration-400 ease-in-out">
             <img id="previewImage" class="md:w-1/2 m-auto p-2" alt="Thumbnail">
             <input type="file" id="image" name="image" class="w-0 invisible" on:change={loadImage}>
         </div>
         </Label>
-
-        <VideoOrMesh {videoVisibility} {entry} {meshData} {previewFile} />
     </div>
+    <h2 class='md:col-span-2 text-2xl font-semibold'>Metadata</h2>
+    {#each FIELDS as key}
+        <FloatingLabelInput style="filled" type="text" name={key} id={key} label={TEXT_FIELDS_WO_DATE[key]} bind:value={entry[key]}/>
+    {/each}
+
     {#if isLoading}
         <Button class='md:col-span-2 w-[50%] mx-auto h-full text-black bg-amber-500'>
             <Spinner class="mr-2" size="4"/>
