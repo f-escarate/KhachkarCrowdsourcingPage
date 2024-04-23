@@ -47,10 +47,10 @@
     }
 </script>
 
-<div class='m-4 p-4 md:p-8 border-b-2 border-amber-500 md:flex md:justify-between md:max-h-[300px] md:w-[85%]'>
-    <div class='flex flex-col justify-between items-center md:items-start'>
+<div class='m-2 p-4 border-b-2 border-amber-500 md:flex md:justify-between md:max-h-[300px] md:w-[85%]'>
+    <div class='m-2 flex flex-col justify-between items-center md:items-start'>
         <h1 class='text-4xl font-semibold'>{entry_data.location} {entry_data.id}</h1>
-        <img class='max-h-[60vh] md:max-h-full rounded-lg md:rounded-none md:hidden w-full m-4 object-contain' src={image} alt={entry_data.id} />
+        <img class='max-h-[50vh] md:max-h-full rounded-lg md:rounded-none md:hidden w-full m-4 object-contain' src={image} alt={entry_data.id} />
         <p class='m-2'>{entry_data.inscription}</p>
         <p class="m-2 text-xs font-bold">Upload date {entry_data.date}</p>
         <div id='buttons_container' class='flex self-center'>

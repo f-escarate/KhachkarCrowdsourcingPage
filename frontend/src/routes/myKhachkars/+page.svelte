@@ -50,7 +50,7 @@
 
 </script>
 
-<div class='flex flex-col'>
+<div class='flex flex-col items-center'>
     {#if entries.length > 0}
         <h1 class='text-4xl font-bold'>Your Khachkars</h1>
         {#each entries.reverse() as entry}
