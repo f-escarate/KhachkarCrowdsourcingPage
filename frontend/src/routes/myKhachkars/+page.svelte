@@ -50,30 +50,31 @@
 
 </script>
 
+<h1 class='m-4 text-4xl font-bold'>Your Khachkars</h1>
 <div class='flex flex-col items-center'>
     {#if entries.length > 0}
-        <h1 class='text-4xl font-bold'>Your Khachkars</h1>
         {#each entries.reverse() as entry}
-            <Entry entry_data={entry} />
-            <div class='m-4 flex flex-col md:flex-row md:justify-between md:max-h-[300px] md:w-[85%] gap-4'>
-                <Button class='md:col-span-2 w-full md:w-[50%] mx-auto h-full' color="blue" href={`${base}/editEntry/${entry.id}/`}>Edit entry</Button>
-                {#if entry.state === 'meshed'}
-                    <Button class='md:col-span-2 w-full md:w-[50%] mx-auto h-full' color="blue" href={`${base}/viewMesh/${entry.id}/`}>View mesh</Button>
-                {:else if entry.state === 'creating_mesh'}
-                    <h3>Khachkar mesh in progress...</h3>
-                {:else if entry.state === 'not_meshed'}
-                    {#if isLoading}
-                        <Button class='md:col-span-2 w-full md:w-[50%] mx-auto h-full' color="blue">
-                            <Spinner class="mr-2" size="4"/>
-                            Processing mesh
-                        </Button>
-                    {:else}
-                        <Button class='md:col-span-2 w-full md:w-[50%] mx-auto h-full' color="blue" on:click={e => handleProcessMesh(e, entry)}>
-                            Process mesh
-                        </Button>
+            <Entry entry_data={entry}>
+                <div class='m-4 flex flex-col md:flex-row md:justify-between md:max-h-[300px] md:w-[85%] gap-4'>
+                    <Button class='md:col-span-2 w-full md:w-[50%] mx-auto h-full' color="blue" href={`${base}/editEntry/${entry.id}/`}>Edit entry</Button>
+                    {#if entry.state === 'meshed'}
+                        <Button class='md:col-span-2 w-full md:w-[50%] mx-auto h-full' color="blue" href={`${base}/viewMesh/${entry.id}/`}>View mesh</Button>
+                    {:else if entry.state === 'creating_mesh'}
+                        <h3>Khachkar mesh in progress...</h3>
+                    {:else if entry.state === 'not_meshed'}
+                        {#if isLoading}
+                            <Button class='md:col-span-2 w-full md:w-[50%] mx-auto h-full' color="blue">
+                                <Spinner class="mr-2" size="4"/>
+                                Processing mesh
+                            </Button>
+                        {:else}
+                            <Button class='md:col-span-2 w-full md:w-[50%] mx-auto h-full' color="blue" on:click={e => handleProcessMesh(e, entry)}>
+                                Process mesh
+                            </Button>
+                        {/if}
                     {/if}
-                {/if}
-            </div>
+                </div>
+            </Entry>
         {/each}
     {:else}
         <h1 class='text-4xl font-bold'>No entry found :c</h1>
