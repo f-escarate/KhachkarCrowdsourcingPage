@@ -3,6 +3,9 @@
     import { base } from '$app/paths';
     import { HOST, TEXT_FIELDS } from '$lib/constants';
     import { Modal, Button, Table, TableBody, TableHead, TableBodyCell, TableHeadCell, TableBodyRow } from 'flowbite-svelte';
+    import ListIcon from '../components/icons/ListIcon.svelte';
+    import SquareIcon from './icons/SquareIcon.svelte';
+    import VideoIcon from '../components/icons/VideoIcon.svelte';
     export let entry_data;
     const FIELDS = Object.getOwnPropertyNames(TEXT_FIELDS);
     let image;
@@ -44,19 +47,29 @@
     }
 </script>
 
-<div class='m-4 p-4 md:p-8 bg-amber-300 md:flex md:justify-between md:max-h-[300px] md:w-[85%]'>
-    <div class='flex flex-col justify-between items-center'>
+<div class='m-4 p-4 md:p-8 border-b-2 border-amber-500 md:flex md:justify-between md:max-h-[300px] md:w-[85%]'>
+    <div class='flex flex-col justify-between items-center md:items-start'>
         <h1 class='text-4xl font-semibold'>{entry_data.location} {entry_data.id}</h1>
-        <img class='md:hidden w-full m-4 object-contain' src={image} alt={entry_data.id} />
+        <img class='max-h-[60vh] md:max-h-full rounded-lg md:rounded-none md:hidden w-full m-4 object-contain' src={image} alt={entry_data.id} />
         <p class='m-2'>{entry_data.inscription}</p>
-        <div class='flex'>
-            <Button on:click={previewData} size="xs" class='m-2 bg-amber-500'>Preview</Button>
+        <p class="m-2 text-xs font-bold">Upload date {entry_data.date}</p>
+        <div id='buttons_container' class='flex self-center'>
+            <Button on:click={previewData} size="xs" class='m-2 bg-amber-500'>
+                <ListIcon sx='m-0 mr-1 text-white'/>
+                Preview Data
+            </Button>
             {#if entry_data.state === 'processing_video'}
                 <h3>Khachkar video is being processed</h3>
             {:else if entry_data.state === 'meshed'}
-                <Button on:click={window.open(`${base}/viewMesh/${entry_data.id}`,'_blank','noopener')} size="xs" class='m-2 bg-amber-500'>Mesh</Button>
+                <Button on:click={window.open(`${base}/viewMesh/${entry_data.id}`,'_blank','noopener')} size="xs" class='m-2 bg-amber-500'>
+                    <SquareIcon sx='m-0 mr-1 text-white'/>
+                    Preview Mesh
+                </Button>
             {:else}
-                <Button on:click={previewVideo} size="xs" class='m-2 bg-amber-500'>Video</Button>
+                <Button on:click={previewVideo} size="xs" class='m-2 bg-amber-500'>
+                    <VideoIcon sx='m-0 mr-1 text-white'/>
+                    Preview Video
+                </Button>
                 <Modal title="video" bind:open={clickOutsideVideoModal} autoclose outsideclose>
                     <video id="videoElement" controls class="w-full max-h-[100%]">
                         <source type="video/mp4" id='videoDiv'>
@@ -66,8 +79,6 @@
                 </Modal>
             {/if}
         </div>
-        
-        <p class="text-xs font-bold">Upload date {entry_data.date}</p>
     </div>
     <img class='hidden md:block w-1/2 object-contain' src={image} alt={entry_data.id} />
     <Modal title="Khachkar information" bind:open={clickOutsideModal} autoclose outsideclose>
