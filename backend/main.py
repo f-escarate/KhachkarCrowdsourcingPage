@@ -53,7 +53,7 @@ async def post_khachkar(with_mesh: int, background_tasks: BackgroundTasks, token
         video = khachkar.video
         khachkar.video = vid_file_extension
         created_khachkar = create_khachkar(db=db, khachkar=khachkar, user_id=user.id)
-        if image.size == 0:
+        if image.size > 0:
             save_image(image, created_khachkar.id, img_file_extension)
         save_video(video, created_khachkar.id, vid_file_extension)
         background_tasks.add_task(preprocess_video, created_khachkar.id, vid_file_extension, db, n_frames=100, get_thumbnail=image.size == 0)
@@ -106,7 +106,6 @@ async def update_khachkar(token: Annotated[str, Depends(oauth2_scheme)], khachka
         if len(khachkar.mesh_files) <= 3:
             return {"status": "error", "msg": "not enough mesh files"}
         khachkar_mesh_files = KhachkarMeshFiles(obj = khachkar.mesh_files.pop(0), mtl = khachkar.mesh_files.pop(0), images = khachkar.mesh_files)
-        print(khachkar_mesh_files)
         if not mesh_files_validation(khachkar_mesh_files):
             return {"status": "error", "msg": "invalid mesh files"}
         edit_khachkar(db, db_khachkar, khachkar, img_file_extension, 'mp4')
@@ -119,7 +118,7 @@ async def update_khachkar(token: Annotated[str, Depends(oauth2_scheme)], khachka
         video = khachkar.video
         khachkar.video = vid_file_extension
         edit_khachkar(db, db_khachkar, khachkar, img_file_extension, vid_file_extension)
-        if image.size == 0:
+        if image.size > 0:
             save_image(image, db_khachkar.id, img_file_extension)
         save_video(video, db_khachkar.id, vid_file_extension)
         background_tasks.add_task(preprocess_video, db_khachkar.id, vid_file_extension, db, n_frames=100, get_thumbnail=image.size == 0)
