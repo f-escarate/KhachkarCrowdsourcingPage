@@ -2,12 +2,14 @@ import * as THREE from "three";
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
 import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader.js';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { HOST } from './constants.js';
 const FPS = 30;
 
 let scene;
 let camera;
 let renderer;
+let controls;
 let percentComplete;
 
 export function init(width, height, element, id) {
@@ -24,6 +26,10 @@ export function init(width, height, element, id) {
     scene.background = new THREE.Color(0xEEEEEE);
     renderer.setSize(width, height);
     element.appendChild(renderer.domElement);
+    // Controls
+    controls = new OrbitControls(camera, renderer.domElement);
+    controls.enablePan = false;
+    controls.update();
 
     // Axes
     const axesHelper = new THREE.AxesHelper(20);
@@ -61,6 +67,7 @@ const render = () => {
 export const animate = () => {
     setTimeout(function() {
         requestAnimationFrame(animate);
+        controls.update();
     }, 1000 / FPS );
     render()
 }
@@ -87,7 +94,7 @@ export function transform_stone(transformations) {
 }
 var max_distance = 60;
 var min_distance = 0;
-export function transform_camera(angle, norm_zoom, height) {
+function transform_camera(angle, norm_zoom, height) {
     let zoom = max_distance -(max_distance-min_distance)*norm_zoom/100;
     camera.position.x = Math.sin(deg_to_rad(angle)) * zoom;
     camera.position.z = Math.cos(deg_to_rad(angle)) * zoom;
