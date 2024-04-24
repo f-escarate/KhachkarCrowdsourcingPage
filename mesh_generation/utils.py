@@ -15,13 +15,21 @@ def remove_background(in_path, output_path):
             o.write(output)
 
 def handle_error_in_mesh_creation(index: int):
-    print(f"Handling error in mesh creation for Khachkar #{index}")
+    print(f"Handling error in mesh creation for Khachkar #{index}", flush=True)
     response = requests.get(f"{HANDLE_ERROR_ENDPOINT}{index}/")
     if response.status_code != 200:
-        print(f"Error handling error in mesh creation for index {index}")
+        print(f"Error handling error in mesh creation for index {index}", flush=True)
+    if response.json()["status"] == "success":
+        print(f"Mesh ERROR has been sent for Khachkar #{index}", flush=True)
+        # TODO: Remove the files and folders created for this index
+    else:
+        print(f"Error handling mesh ERROR for Khachkar #{index}", flush=True)
+        print(" error:", response.text, flush=True)
+        #handle_error_in_mesh_creation(index)
     # TODO: Remove the files and folders created for this index
 
 def handle_successful_mesh_creation(index: int):
+    print("Sending the textured mesh to backend", flush=True)
     files_in_dir = os.listdir(f"{MESHES_PATH}/{index}")
     textures = list(filter(lambda img: img.endswith(('.png')), files_in_dir))
     files = [
@@ -33,11 +41,11 @@ def handle_successful_mesh_creation(index: int):
 
     response = requests.post(f"{HANDLE_SUCCESS_ENDPOINT}{index}/", files=files)
     if response.status_code != 200:
-        print(f"Error handling successful mesh creation for index {index}")
+        print(f"Error handling successful mesh creation for index {index}", flush=True)
     if response.json()["status"] == "success":
-        print(f"Successfully handled mesh creation for Khachkar #{index}")
+        print(f"Successfully handled mesh creation for Khachkar #{index}", flush=True)
         # TODO: Remove the files and folders created for this index
     else:
-        print(f"Error handling mesh creation for Khachkar #{index}")
-        print(" error:", response.text)
+        print(f"Error handling mesh creation for Khachkar #{index}", flush=True)
+        print(" error:", response.text, flush=True)
         handle_error_in_mesh_creation(index)
