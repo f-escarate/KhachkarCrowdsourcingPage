@@ -44,7 +44,7 @@ def generate_mesh(index: int, colmap_path: str, remove_backgrounds: bool = True)
         handle_error_in_mesh_creation(index)
         return
     # Bind the texture using mvs-texturing
-    mvs_res = os.system(f'cd {MESHES_PATH}/{index} && texrecon ./images ./fused_mesh.ply ./textured_mesh --outlier_removal=gauss_clamping --data_term=area --no_intermediate_results')
+    mvs_res = os.system(f'bash -c "texrecon {MESHES_PATH}/{index}/images {MESHES_PATH}/{index}/fused_mesh.ply {MESHES_PATH}/{index}/textured_mesh --outlier_removal=gauss_clamping --data_term=area --no_intermediate_results"')
     if mvs_res != 0:
         print("MVS Texturing Error")
         handle_error_in_mesh_creation(index)
