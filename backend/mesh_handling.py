@@ -44,6 +44,14 @@ def call_method(method, args):
         return {"status": "error", "msg": "Error in Unity method call"}
     return {"status": "success"}
 
+def send_mesh_to_unity(index: int):
+    """
+        Copies the mesh folder into the Unity project
+    """
+    mesh_path = f"{MESHES_PATH}/{index}"
+    unity_mesh_path = f"{PROJECT_PATH}/Assets/Resources/StonesMeshes/{index}"
+    shutil.copytree(mesh_path, unity_mesh_path)
+
 def transform_mesh(id:int, position: list, rotation: list, scale: float):
     try:
         # Move old mesh to a backup folder

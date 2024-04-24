@@ -19,5 +19,29 @@ public class CallableMethods: MonoBehaviour
             Debug.Log(arguments[i]);
         }
     }
+    
+    static unsafe void createPrefab(){
+        const string ASSETS_PATH = "StonesMeshes/";
+        const string PREFABS_PATH = "Assets/Resources/StonesPrefabs/";
+        string[] arguments = Environment.GetCommandLineArgs();
+        string mesh_id = arguments[13];
+        string mesh_folder_path = ASSETS_PATH+mesh_id;
+        string mesh_path = mesh_folder_path+"/"+mesh_id;
+        string prefab_path = PREFABS_PATH+mesh_id+".prefab";
+
+        
+        Debug.Log("~~~~~~~~~");
+        Debug.Log(arguments[12]);
+        Debug.Log(arguments[13]);
+        Debug.Log(mesh_folder_path);
+
+        // Step 1: Create an empty GameObject
+        Debug.Log(mesh_path);
+        Debug.Log(Resources.Load(mesh_path));
+        GameObject newPrefab = Instantiate(Resources.Load(mesh_path)) as GameObject;
+        // Step 4: Convert to Prefab
+        PrefabUtility.SaveAsPrefabAsset(newPrefab, prefab_path);
+
+    }
 }
 #endif
