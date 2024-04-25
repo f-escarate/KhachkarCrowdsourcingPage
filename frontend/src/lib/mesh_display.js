@@ -12,7 +12,7 @@ let renderer;
 let controls;
 let percentComplete;
 
-export function init(width, height, element, id) {
+export function init(width, height, element, id, set_progress) {
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, width/height, 0.1, 2000);
     transform_camera(10, 75, 1);
@@ -39,7 +39,7 @@ export function init(width, height, element, id) {
     var onProgress = function ( xhr ) {
         if ( xhr.lengthComputable ) {
             percentComplete = xhr.loaded / xhr.total * 100;
-            console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
+            set_progress(Math.round( percentComplete, 2 ), percentComplete == 100)
         }
     };
     var onError = function () { };
