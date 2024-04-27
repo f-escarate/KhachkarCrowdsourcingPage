@@ -20,19 +20,25 @@ public class CallableMethods: MonoBehaviour
         }
     }
     
-    static unsafe void createPrefab(){
+    static unsafe void createPrefabs(){
+        string[] arguments = Environment.GetCommandLineArgs();
+        Debug.Log("===========");
+        Debug.Log(arguments[13]);
+        int meshes_count = int.Parse(arguments[13]);
+        for(int i = 0; i < meshes_count; i++){
+            string mesh_id = arguments[14+i];
+            createPrefab(mesh_id);
+        }
+    }
+
+    static unsafe void createPrefab(string mesh_id){
         const string ASSETS_PATH = "StonesMeshes/";
         const string PREFABS_PATH = "Assets/Resources/StonesPrefabs/";
-        string[] arguments = Environment.GetCommandLineArgs();
-        string mesh_id = arguments[13];
         string mesh_folder_path = ASSETS_PATH+mesh_id;
         string mesh_path = mesh_folder_path+"/"+mesh_id;
         string prefab_path = PREFABS_PATH+mesh_id+".prefab";
 
-        
         Debug.Log("~~~~~~~~~");
-        Debug.Log(arguments[12]);
-        Debug.Log(arguments[13]);
         Debug.Log(mesh_folder_path);
 
         // Step 1: Create an empty GameObject

@@ -200,7 +200,9 @@ async def compile_asset_bundles(token: Annotated[str, Depends(oauth2_scheme)], k
         return {"status": "error", "msg": "You are not authorized to perform this action"}
     for id in khachkar_ids:
         send_mesh_to_unity(id)
-        call_method("CallableMethods.createPrefab", id)
+    args = " ".join([str(id) for id in khachkar_ids])
+    args = f"{len(khachkar_ids)} {args}"
+    call_method("CallableMethods.createPrefabs", args)
     for id in khachkar_ids:
         remove_mesh_from_unity(id)
     return {"status": "success"}
