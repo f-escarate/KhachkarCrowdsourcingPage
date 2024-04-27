@@ -234,6 +234,7 @@ async def post_khachkar_mesh(khachkar_id: int, mesh_files: List[UploadFile] = Fi
     if not mesh_files_validation(khachkar_mesh_files):
         return {"status": "error", "msg": "invalid mesh files"}
     save_mesh(khachkar_mesh_files, db_khachkar, db)
+    transform_mesh(khachkar_id, [0, 0, 0], [180, 0, 0], 3)
     return {"status": "success"}
 
 @app.get("/creating_mesh_error/{khachkar_id}/")
