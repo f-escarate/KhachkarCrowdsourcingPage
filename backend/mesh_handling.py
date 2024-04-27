@@ -50,7 +50,11 @@ def send_mesh_to_unity(index: int):
     """
     mesh_path = f"{MESHES_PATH}/{index}"
     unity_mesh_path = f"{PROJECT_PATH}/Assets/Resources/StonesMeshes/{index}"
-    shutil.copytree(mesh_path, unity_mesh_path)
+    try:
+        shutil.copytree(mesh_path, unity_mesh_path)
+    except FileExistsError as e:
+        shutil.rmtree(unity_mesh_path)
+        shutil.copytree(mesh_path, unity_mesh_path)
 
 def remove_mesh_from_unity(index: int):
     """
