@@ -52,6 +52,13 @@ def send_mesh_to_unity(index: int):
     unity_mesh_path = f"{PROJECT_PATH}/Assets/Resources/StonesMeshes/{index}"
     shutil.copytree(mesh_path, unity_mesh_path)
 
+def remove_mesh_from_unity(index: int):
+    """
+        Removes the mesh folder from the Unity project
+    """
+    unity_mesh_path = f"{PROJECT_PATH}/Assets/Resources/StonesMeshes/{index}"
+    shutil.rmtree(unity_mesh_path)
+
 def transform_mesh(id:int, position: list, rotation: list, scale: float):
     try:
         # Move old mesh to a backup folder

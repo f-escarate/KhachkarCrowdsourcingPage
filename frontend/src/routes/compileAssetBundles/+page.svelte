@@ -24,13 +24,20 @@
     const handleCompilation = async () => {
         if (!confirm("Are you sure you want to compile asset bundles?"))
             return;
-        
+        let khachkar_ids = [];
+        let checkboxes = document.getElementsByName('checkbox');
+        for (let i = 0; i < checkboxes.length; i++) {
+            if (checkboxes[i].checked) {
+                khachkar_ids.push(entries[i]['id']);
+            }
+        }
         const response = await fetch(`${HOST}/compile_asset_bundles/`, {
-            method: 'GET',
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + token || ''
-            }
+            },
+            body: JSON.stringify(khachkar_ids)
         });
         let msg = await response.json();
         if (msg.status === 'success') {
