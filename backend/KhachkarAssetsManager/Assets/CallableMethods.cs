@@ -22,31 +22,38 @@ public class CallableMethods: MonoBehaviour
     
     static unsafe void createPrefabs(){
         string[] arguments = Environment.GetCommandLineArgs();
+        const int ASSETBUNDLE_SIZE = 5;
         Debug.Log("===========");
         Debug.Log(arguments[13]);
-        int meshes_count = int.Parse(arguments[13]);
-        for(int i = 0; i < meshes_count; i++){
-            string mesh_id = arguments[14+i];
-            createPrefab(mesh_id);
+        int meshesCount = int.Parse(arguments[13]);
+        for(int i = 0; i < meshesCount; i++){
+            string meshId = arguments[14+i];
+            Debug.Log((meshesCount-1)/ASSETBUNDLE_SIZE);
+            int assetBundleMinIdx = ((meshesCount-1)/ASSETBUNDLE_SIZE)*ASSETBUNDLE_SIZE + 1;
+            string assetBundleInterval = string.Format("_{0}_{1}", assetBundleMinIdx, assetBundleMinIdx+ASSETBUNDLE_SIZE-1);
+            Debug.Log(assetBundleInterval);
+            createMeshPrefab(meshId, assetBundleInterval);
         }
     }
 
-    static unsafe void createPrefab(string mesh_id){
+    static unsafe void createMeshPrefab(string meshId, string assetBundleInterval){
         const string ASSETS_PATH = "StonesMeshes/";
         const string PREFABS_PATH = "Assets/Resources/StonesPrefabs/";
-        string mesh_folder_path = ASSETS_PATH+mesh_id;
-        string mesh_path = mesh_folder_path+"/"+mesh_id;
-        string prefab_path = PREFABS_PATH+mesh_id+".prefab";
+        string meshFolderPath = ASSETS_PATH+meshId;
+        string meshPath = meshFolderPath+"/"+meshId;
+        string prefabPath = PREFABS_PATH+meshId+".prefab";
 
         Debug.Log("~~~~~~~~~");
-        Debug.Log(mesh_folder_path);
+        Debug.Log(meshFolderPath);
 
         // Step 1: Create an empty GameObject
-        Debug.Log(mesh_path);
-        Debug.Log(Resources.Load(mesh_path));
-        GameObject newPrefab = Instantiate(Resources.Load(mesh_path)) as GameObject;
-        // Step 4: Convert to Prefab
-        PrefabUtility.SaveAsPrefabAsset(newPrefab, prefab_path);
+        Debug.Log(meshPath);
+        Debug.Log(Resources.Load(meshPath));
+        GameObject newPrefab = Instantiate(Resources.Load(meshPath)) as GameObject;
+        // Step 2: Convert to Prefab
+        PrefabUtility.SaveAsPrefabAsset(newPrefab, prefabPath);
+        // Step 3: Set its assetBundleName
+        AssetImporter.GetAtPath(prefabPath).assetBundleName = "stones"+assetBundleInterval;
 
     }
 }
