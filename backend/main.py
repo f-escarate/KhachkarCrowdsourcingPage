@@ -9,7 +9,7 @@ from schemas import ChangePassword, Khachkar, UserRegister, KhachkarMeshFiles, K
 from authentication import authenticate_user, create_access_token, get_password_hash, get_name_by_token, ACCESS_TOKEN_EXPIRE_MINUTES, get_user_by_name, unauthorized_exception, verify_password
 from utils import save_image, save_video, save_mesh, create_khachkar, edit_khachkar, read_image, read_video, read_file, img_validation, video_validation, mesh_files_validation, preprocess_video, MESHES_PATH
 from database import get_db, Base, engine
-from mesh_handling import get_mesh_from_video, call_method, remove_mesh_from_unity, transform_mesh, send_mesh_to_unity
+from mesh_handling import get_mesh_from_video, call_method, remove_mesh_from_unity, transform_mesh, send_mesh_to_unity, generate_text_asset
 import models, os
 
 Base.metadata.create_all(bind=engine)
@@ -200,9 +200,11 @@ async def compile_asset_bundles(token: Annotated[str, Depends(oauth2_scheme)], k
         return {"status": "error", "msg": "You are not authorized to perform this action"}
     for id in khachkar_ids:
         send_mesh_to_unity(id)
+        khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == id).first()
+        generate_text_asset(khachkar, db)
     args = " ".join([str(id) for id in khachkar_ids])
     args = f"{len(khachkar_ids)} {args}"
-    call_method("CallableMethods.createPrefabs", args)
+    call_method("CallableMethods.generateAssetBundles", args)
     for id in khachkar_ids:
         remove_mesh_from_unity(id)
     return {"status": "success"}

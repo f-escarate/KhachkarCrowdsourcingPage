@@ -13,14 +13,7 @@ using UnityEditor;
 [BurstCompile]
 public class CallableMethods: MonoBehaviour
 {
-    static unsafe void GenerateAsset(){
-        string[] arguments = Environment.GetCommandLineArgs();
-        for(int i = 0; i < arguments.Length; i++){
-            Debug.Log(arguments[i]);
-        }
-    }
-    
-    static unsafe void createPrefabs(){
+    static unsafe void generateAssetBundles(){
         string[] arguments = Environment.GetCommandLineArgs();
         const int ASSETBUNDLE_SIZE = 5;
         Debug.Log("===========");
@@ -28,12 +21,13 @@ public class CallableMethods: MonoBehaviour
         int meshesCount = int.Parse(arguments[13]);
         for(int i = 0; i < meshesCount; i++){
             string meshId = arguments[14+i];
-            Debug.Log((meshesCount-1)/ASSETBUNDLE_SIZE);
             int assetBundleMinIdx = ((meshesCount-1)/ASSETBUNDLE_SIZE)*ASSETBUNDLE_SIZE + 1;
             string assetBundleInterval = string.Format("_{0}_{1}", assetBundleMinIdx, assetBundleMinIdx+ASSETBUNDLE_SIZE-1);
-            Debug.Log(assetBundleInterval);
             createMeshPrefab(meshId, assetBundleInterval);
+            createTextAsset(meshId, assetBundleInterval);
         }
+        // Build Asset Bundles
+        BuildPipeline.BuildAssetBundles("Assets/AssetBundles", BuildAssetBundleOptions.None, BuildTarget.StandaloneWindows64);
     }
 
     static unsafe void createMeshPrefab(string meshId, string assetBundleInterval){
@@ -54,7 +48,12 @@ public class CallableMethods: MonoBehaviour
         PrefabUtility.SaveAsPrefabAsset(newPrefab, prefabPath);
         // Step 3: Set its assetBundleName
         AssetImporter.GetAtPath(prefabPath).assetBundleName = "stones"+assetBundleInterval;
+    }
 
+    static unsafe void createTextAsset(string meshId, string assetBundleInterval){
+        const string PREFABS_PATH = "Assets/Resources/StonesMetadata/";
+        string prefabPath = PREFABS_PATH+meshId+".json";
+        AssetImporter.GetAtPath(prefabPath).assetBundleName = "stones_metadata"+assetBundleInterval;
     }
 }
 #endif

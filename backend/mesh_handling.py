@@ -31,10 +31,13 @@ def get_mesh_from_video(khachkar: Khachkar, db: Session):
 def generate_text_asset(khachkar: Khachkar, db: Session):
     data = khachkar.as_dict()
     # Get the mesh transformations
-    mesh_transformations = db.query(MeshTransformations).filter(MeshTransformations.khachkar_id == khachkar.id).first()
-    data["assetProps"] = mesh_transformations.as_dict()
+    #mesh_transformations = db.query(MeshTransformations).filter(MeshTransformations.khachkar_id == khachkar.id).first()
+    #data["assetProps"] = mesh_transformations.as_dict()
     json_data = json.dumps(data)
-    save_file(json_data, f"{PROJECT_PATH}/Assets/StonesMetadata", khachkar.id, "json")
+    path = os.path.join(".", "KhachkarAssetsManager", "Assets", "Resources", "StonesMetadata", f"{khachkar.id}.json")
+    # Save the json file
+    with open(path, "w") as file:
+        file.write(json_data)
 
 def call_method(method, args):
     command = '{0} -quit -batchmode -username "{1}" -password "{2}" -logFile {3} -projectPath {4} -executeMethod {5} {6}'
