@@ -1,5 +1,7 @@
 #if UNITY_EDITOR
 using System;
+using System.Linq;
+using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
 using Unity.Burst;
@@ -42,6 +44,9 @@ public class CallableMethods: MonoBehaviour
         // Step 2: Add Box Collider
         newPrefab.AddComponent<BoxCollider>();
         // Step 3: Add Halo
+        var types = Assembly.Load("UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null").GetTypes();
+        Type haloType = types.First(t => t.Name.Equals("Halo"));
+        newPrefab.AddComponent(haloType);
         // Step 4: Add Conture Rendering
         newPrefab.AddComponent<ContureRendering>();
         // Step 5: Convert to Prefab
