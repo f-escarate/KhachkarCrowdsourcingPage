@@ -27,7 +27,7 @@ public class CallableMethods: MonoBehaviour
             createTextAsset(meshId, assetBundleInterval);
         }
         // Build Asset Bundles
-        BuildPipeline.BuildAssetBundles("Assets/AssetBundles", BuildAssetBundleOptions.None, BuildTarget.StandaloneWindows64);
+        BuildPipeline.BuildAssetBundles("Assets/AssetBundles", BuildAssetBundleOptions.None, BuildTarget.WebGL);
     }
 
     static unsafe void createMeshPrefab(string meshId, string assetBundleInterval){
@@ -35,7 +35,7 @@ public class CallableMethods: MonoBehaviour
         const string PREFABS_PATH = "Assets/Resources/StonesPrefabs/";
         string meshFolderPath = ASSETS_PATH+meshId;
         string meshPath = meshFolderPath+"/"+meshId;
-        string prefabPath = PREFABS_PATH+meshId+".prefab";
+        string prefabPath = PREFABS_PATH+"Stone"+meshId+".prefab";
 
         Debug.Log("~~~~~~~~~");
         Debug.Log(meshFolderPath);
@@ -52,7 +52,7 @@ public class CallableMethods: MonoBehaviour
 
     static unsafe void createTextAsset(string meshId, string assetBundleInterval){
         const string PREFABS_PATH = "Assets/Resources/StonesMetadata/";
-        string prefabPath = PREFABS_PATH+meshId+".json";
+        string prefabPath = PREFABS_PATH+"Stone"+meshId+".json";
         AssetImporter.GetAtPath(prefabPath).assetBundleName = "stones_metadata"+assetBundleInterval;
     }
 }

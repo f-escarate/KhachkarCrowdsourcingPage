@@ -34,7 +34,7 @@ def generate_text_asset(khachkar: Khachkar, db: Session):
     #mesh_transformations = db.query(MeshTransformations).filter(MeshTransformations.khachkar_id == khachkar.id).first()
     #data["assetProps"] = mesh_transformations.as_dict()
     json_data = json.dumps(data)
-    path = os.path.join(".", "KhachkarAssetsManager", "Assets", "Resources", "StonesMetadata", f"{khachkar.id}.json")
+    path = os.path.join(".", "KhachkarAssetsManager", "Assets", "Resources", "StonesMetadata", f"Stone{khachkar.id}.json")
     # Save the json file
     with open(path, "w") as file:
         file.write(json_data)
