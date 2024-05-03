@@ -37,16 +37,16 @@ public class CallableMethods: MonoBehaviour
         string meshPath = meshFolderPath+"/"+meshId;
         string prefabPath = PREFABS_PATH+"Stone"+meshId+".prefab";
 
-        Debug.Log("~~~~~~~~~");
-        Debug.Log(meshFolderPath);
-
         // Step 1: Create an empty GameObject
-        Debug.Log(meshPath);
-        Debug.Log(Resources.Load(meshPath));
         GameObject newPrefab = Instantiate(Resources.Load(meshPath)) as GameObject;
-        // Step 2: Convert to Prefab
+        // Step 2: Add Box Collider
+        newPrefab.AddComponent<BoxCollider>();
+        // Step 3: Add Halo
+        // Step 4: Add Conture Rendering
+        newPrefab.AddComponent<ContureRendering>();
+        // Step 5: Convert to Prefab
         PrefabUtility.SaveAsPrefabAsset(newPrefab, prefabPath);
-        // Step 3: Set its assetBundleName
+        // Step 6: Set its assetBundleName
         AssetImporter.GetAtPath(prefabPath).assetBundleName = "stones"+assetBundleInterval;
     }
 
