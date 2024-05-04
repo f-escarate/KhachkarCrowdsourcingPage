@@ -1,10 +1,37 @@
-[
-    {
-        "text": "Welcome to the Khachkar Virtual Museum's crowdsourcing page! In this is a page you can post information, videos, and meshes of Khachkars, for the Virtual Museum. \n\n The data is reviewed by the administrators, and published into the museum.",
-        "photo": "/images/1.png"
-    },
-    {
-        "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-        "photo": "/images/2.png"
-    }
-]
+{
+    "divs_data": [
+        {
+            "text": "Welcome to the Khachkar Virtual Museum's crowdsourcing page! In this is a page you can post information, videos, and meshes of Khachkars, for the Virtual Museum. \n\n The data is reviewed by the administrators, and published into the museum.",
+            "photo": "/images/1.png"
+        },
+        {
+            "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+            "photo": "/images/2.png"
+        }
+    ],
+    "cards_data": [
+        {
+            "name": "Step 1: Record video",
+            "sections": {
+                "Email": "example@email.com",
+                "Telephone number": "+569 XXX XXX XX"
+            }
+        },
+        {
+            "name": "Step 2: Upload video",
+            "sections": {
+                "Info1": "Sed ut perspiciatis unde omnis iste doloremque",
+                "Info2": " natus error sit voluptatem accusantium",
+                "Info3": "audantium, totam rem aperiam, eaque ipsa quae ab"
+            }
+        },
+        {
+            "name": "Step 3: Transform to mesh",
+            "sections": {
+                "Universidad de Chile": "",
+                "Waseda University": "",
+                "University of Duisburg-Essen": ""
+            }
+        }
+    ]
+}
