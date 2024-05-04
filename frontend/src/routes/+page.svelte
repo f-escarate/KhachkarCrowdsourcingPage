@@ -5,18 +5,18 @@
 
     const text_style = (idx) => {
         let margins = ['md:mt-[-2%]', 'md:mb-[-2%]'];
-        let md_style = `md:w-2/3 lg:w-[60%] xl:w-[52%] md:text-2xl z-10 ${margins[idx%2]}`; 
+        let md_style = `md:w-2/3 lg:w-[60%] xl:w-[52%] md:text-xl z-10 ${margins[idx%2]}`; 
         let sm_style = 'w-full'
-        return `h-full p-5 text-xl bg-amber-500 text-black whitespace-pre-line ${md_style} ${sm_style}`;
+        return `h-full p-5 text-xl border-4 border-amber-500 bg-amber-300 text-black whitespace-pre-line ${md_style} ${sm_style}`;
     }
     const div_style = (idx) => {
         let paddings = ['pb-[2%]', 'pt-[2%]'];
         let directions = ['flex-row', 'flex-row-reverse']
-        return `animated-div opacity-0 flex mx-2 md:m-10 relative h-full ${paddings[idx%2]} ${directions[idx%2]}`;
+        return `animated-div opacity-0 flex w-full md:my-10 relative h-full ${paddings[idx%2]} ${directions[idx%2]}`;
     }
     const img_style = (idx) => {
-        let positions = ['right-10', 'left-10'];
-        return `max-w-[75%] lg:min-w-[52%] max-h-full bottom-0 bg-contain absolute invisible md:visible ${positions[idx%2]}`
+        let positions = ['right-0', 'left-0'];
+        return `max-w-[60%] lg:min-w-[52%] h-full bottom-0 object-cover absolute invisible md:visible ${positions[idx%2]}`
     }
 
     onMount(() => {
@@ -46,7 +46,7 @@
     });
 </script>
 
-<div class='flex flex-col h-full relative md:m-10'>
+<div class='flex flex-col h-full relative md:mx-10'>
     {#each data as element, i}
         <div class={div_style(i)}>
             <div class={text_style(i)}>
