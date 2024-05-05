@@ -3,7 +3,6 @@
     import data from '$lib/home.json';
     import { base } from "$app/paths";
     import { addAnimationStyles } from '$lib/utils';
-    import Cards from '../components/Cards.svelte';
 
     const text_style = (idx) => {
         let margins = ['md:mt-[-2%]', 'md:mb-[-2%]'];
@@ -29,7 +28,7 @@
 </script>
 
 <div class='flex flex-col h-full relative md:mx-10'>
-    {#each data.divs_data as element, i}
+    {#each data as element, i}
         <div class={div_style(i)}>
             <div class={text_style(i)}>
                 {#each element.text as text_segment, i}
@@ -46,5 +45,4 @@
             />
         </div>
     {/each}
-    <Cards cards_data={data.cards_data} />
 </div>

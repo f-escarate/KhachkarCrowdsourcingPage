@@ -22,5 +22,6 @@
             <NavLi href={`${base}/add/`}>Add Khachkar</NavLi>
         {/if}
         <NavLi href={`${base}/searchKhachkars/`}>Search Khachkars</NavLi>
+        <NavLi href={`${base}/tutorial/`}>Tutorial</NavLi>
     </NavUl>
 </Navbar>

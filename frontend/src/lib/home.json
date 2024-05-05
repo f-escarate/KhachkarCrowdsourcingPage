@@ -1,37 +1,11 @@
-{
-    "divs_data": [
-        {
-            "text": ["Welcome to the Khachkar Virtual Museum's crowdsourcing page! In this is a page you can post information, videos, and meshes of Khachkars, for the Virtual Museum. \n\n The data is reviewed by the administrators, and published into the museum."],
-            "photo": "/images/1.png"
-        },
-        {
-            "text": ["You can log in to have a registry of your uploaded Khachkar videos, information and meshes. Also is posible to check information loaded by other users and edit it if is wrong.\n\n If you don't have an account, you can create one by clicking", "."],
-            "links": [{"url": "/login", "label":"here"}],
-            "photo": "/images/2.png"
-        }
-    ],
-    "cards_data": [
-        {
-            "title": "Step 1:",
-            "subtitle": "Record video",
-            "sections": {
-                "Email": "example@email.com",
-                "Telephone number": "+569 XXX XXX XX"
-            }
-        },
-        {
-            "title": "Step 2:",
-            "subtitle": "Upload video",
-            "image": "/images/1.png"
-        },
-        {
-            "title": "Step 3:",
-            "subtitle" : "Transform to mesh",
-            "sections": {
-                "Universidad de Chile": "",
-                "Waseda University": "",
-                "University of Duisburg-Essen": ""
-            }
-        }
-    ]
-}
+[
+    {
+        "text": ["Welcome to the Khachkar Virtual Museum's crowdsourcing page! In this is a page you can post information, videos, and meshes of Khachkars, for the Virtual Museum. \n\n The data is reviewed by the administrators, and published into the museum."],
+        "photo": "/images/1.png"
+    },
+    {
+        "text": ["You can log in to have a registry of your uploaded Khachkar videos, information and meshes. Also is posible to check information loaded by other users and edit it if is wrong.\n\n If you don't have an account, you can create one by clicking", "."],
+        "links": [{"url": "/login", "label":"here"}],
+        "photo": "/images/2.png"
+    }
+]
