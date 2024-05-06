@@ -11,8 +11,9 @@ let camera;
 let renderer;
 let controls;
 let percentComplete;
+let edges;
 
-export function init(width, height, element, id, set_progress) {
+export function init(width, height, element, id, set_progress, set_bounding_box_scales) {
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, width/height, 0.1, 2000);
     transform_camera(10, 75, 1);
@@ -55,8 +56,21 @@ export function init(width, height, element, id, set_progress) {
                 .setPath(`${HOST}/get_obj/`)
                 .load(`${id}`, function (object) {
                     scene.add(object);
+                    let bbox = new THREE.Box3().setFromObject(object);
+                    console.log(bbox);
+                    set_bounding_box_scales({
+                        x: bbox.max.x - bbox.min.x,
+                        y: bbox.max.y - bbox.min.y,
+                        z: bbox.max.z - bbox.min.z
+                    });
                 }, onProgress, onError);
-    });    
+    });
+    // Add a bounding box
+    const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+    const edgesGeometry = new THREE.EdgesGeometry( geometry );
+    const material = new THREE.LineBasicMaterial( { color: 0xff00ff } );
+    edges = new THREE.LineSegments( edgesGeometry, material );
+    scene.add( edges );
 }
 
 const render = () => {
@@ -92,6 +106,13 @@ export function transform_stone(transformations) {
         alert("Stone isn't loaded yet");
     }
 }
+export function transform_bounding_box(scales){
+    edges.position.y = scales.y/2;
+    edges.scale.x = scales.x;
+    edges.scale.y = scales.y;
+    edges.scale.z = scales.z;
+}
+
 var max_distance = 60;
 var min_distance = 0;
 function transform_camera(angle, norm_zoom, height) {

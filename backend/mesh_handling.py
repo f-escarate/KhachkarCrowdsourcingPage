@@ -66,7 +66,7 @@ def remove_mesh_from_unity(index: int):
     unity_mesh_path = f"{PROJECT_PATH}/Assets/Resources/StonesMeshes/{index}"
     shutil.rmtree(unity_mesh_path)
 
-def transform_mesh(id:int, position: list, rotation: list, scale: float):
+def transform_mesh(id:int, position: list, rotation: list, scale: float, bounding_box: list):
     try:
         # Move old mesh to a backup folder
         source_dir = f"{MESHES_PATH}/{id}"
@@ -77,7 +77,7 @@ def transform_mesh(id:int, position: list, rotation: list, scale: float):
         for file_name in file_names:
             shutil.move(os.path.join(source_dir, file_name), backup_dir)
         # Load the mesh
-        mesh = trimesh.load_mesh(f"{backup_dir}/{id}.obj")
+        mesh = trimesh.load(f"{backup_dir}/{id}.obj", force="mesh")
 
         # Translate the mesh
         mesh.apply_translation(np.array(position))
@@ -93,12 +93,18 @@ def transform_mesh(id:int, position: list, rotation: list, scale: float):
         rotation_matrix = trimesh.transformations.rotation_matrix(np.radians(rotation[2]), [0, 0, 1], mesh.centroid)
         mesh.apply_transform(rotation_matrix)
 
+        # Crop using the bounding box
+        #box = trimesh.primitives.Box(np.array(bounding_box))
+        #box.apply_translation(np.array([0, bounding_box[1]/2, 0]))
+        #mesh = mesh.slice_plane(box.facets_origin, -box.facets_normal)
+
         # Save the rotated mesh
         mesh.export(f"{source_dir}/{id}.obj")
         # Remove the backup folder
         shutil.rmtree(backup_dir)
     except Exception as e:
         # Move the old mesh back
+        print(e)
         for file_name in file_names:
             shutil.move(os.path.join(backup_dir, file_name), source_dir)
         return {"status": "error", "msg": str(e)}

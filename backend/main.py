@@ -289,7 +289,7 @@ def get_obj(id: int, db: Session = Depends(get_db)):
 @app.post("/set_mesh_transformations/{khachkar_id}/")
 def set_mesh_transformations(khachkar_id: int, transformations: KhachkarMeshTransformations):
     print("Setting mesh transformations...")
-    return transform_mesh(khachkar_id, transformations.pos, transformations.rot, transformations.scale)
+    return transform_mesh(khachkar_id, transformations.pos, transformations.rot, transformations.scale, transformations.bounding_box)
 
 
 if __name__ == "__main__":

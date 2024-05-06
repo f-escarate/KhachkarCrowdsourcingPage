@@ -2,7 +2,7 @@
     import { browser } from '$app/environment'; 
     import { onMount } from 'svelte';
     import { Tabs, TabItem, Button, Spinner, Progressbar } from 'flowbite-svelte';
-    import { init, animate, transform_stone } from '$lib/mesh_display';
+    import { init, animate, transform_stone, transform_bounding_box } from '$lib/mesh_display';
     import { HOST } from '$lib/constants';
     import RangeInput from '../../../components/RangeInput.svelte';
     /** @type {import('./$types').PageData} */
@@ -16,12 +16,22 @@
     const set_progress = (p, b) => {
         progress_obj.progress = p;
         progress_obj.loaded = b;
-    }
+    };
     let transformations = {
         pos: {x: 0, y: 0, z: 0},
         rot: {x: 0, y: 0, z: 0},
         scale: {value: 1}
-    }
+    };
+    let bounding_box_scales = {
+        current: {x: 0, y: 0, z: 0},
+        max: {x: 0, y: 0, z: 0}   
+    };
+    const set_bounding_box_scales = (max_scales) => {
+        bounding_box_scales.current = {...max_scales};
+        bounding_box_scales.max = {...max_scales};
+        transform_bounding_box(bounding_box_scales.current);
+    };
+    
     onMount(async () => {
         if(browser) {
             var mesh_display = document.getElementById('mesh_display');
@@ -29,7 +39,7 @@
             var tabs_bot = document.getElementById('tabs_bot_limit').getBoundingClientRect().bottom;
             let height = screen.height - tabs_bot;
             let width = mesh_display_rect.right-mesh_display_rect.left;
-            init(width, height, mesh_display, id, set_progress);
+            init(width, height, mesh_display, id, set_progress, set_bounding_box_scales);
             animate()
 	    }
     });
@@ -39,12 +49,18 @@
         transformations[property][axis] = parseFloat(value);
         transform_stone(transformations);
     }
+    const handleBoundingBox = (e) => {
+        const { property, axis, value } = e.detail;
+        bounding_box_scales[property][axis] = parseFloat(value);
+        transform_bounding_box(bounding_box_scales.current);
+    }
     const export_stone = async () => {
         isLoading = true;
         let data = JSON.stringify({
             pos: Object.values(transformations.pos),
             rot: Object.values(transformations.rot),
-            scale: transformations.scale.value
+            scale: transformations.scale.value,
+            bounding_box: Object.values(bounding_box_scales.current)
         })
         const response = await fetch(`${HOST}/set_mesh_transformations/${id}/`, {
             method: 'POST',
@@ -104,6 +120,18 @@
         <TabItem>
             <span slot="title">Scale</span>
             <RangeInput property='scale' axis='value' interval={[0, transformations.scale.value, 180]} step={0.1} on:change={handleTransformations} />
+        </TabItem>
+        <TabItem>
+            <span slot="title">Box x</span>
+            <RangeInput property='current' axis='x' interval={[0, bounding_box_scales.current.x, bounding_box_scales.max.x]} step={0.1} on:change={handleBoundingBox} />
+        </TabItem>
+        <TabItem>
+            <span slot="title">Box y</span>
+            <RangeInput property='current' axis='y' interval={[0, bounding_box_scales.current.y, bounding_box_scales.max.y]} step={0.1} on:change={handleBoundingBox} />
+        </TabItem>
+        <TabItem>
+            <span slot="title">Box z</span>
+            <RangeInput property='current' axis='z' interval={[0, bounding_box_scales.current.z, bounding_box_scales.max.z]} step={0.1} on:change={handleBoundingBox} />
         </TabItem>
     </Tabs>
     <div id='mesh_display' class='flex justify-center w-full'>
