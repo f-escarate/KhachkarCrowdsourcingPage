@@ -54,7 +54,7 @@ class Khachkar(Base):
     mesh_transformations = relationship("MeshTransformations", back_populates="khachkar")
 
     def as_dict(self) -> dict:
-        return {
+        info_dict = {
             "id": self.id,
             "location": self.location,
             "latLong": self.latLong,
@@ -74,6 +74,10 @@ class Khachkar(Base):
             "commemorativeActivities": self.commemorative_activities,
             "references": self.references
         }
+        for key in info_dict:
+            if info_dict[key] is None:
+                info_dict[key] = ""
+        return info_dict
     
 class MeshTransformations(Base):
     __tablename__ = "mesh_transformations"
