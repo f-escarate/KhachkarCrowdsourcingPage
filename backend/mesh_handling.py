@@ -80,8 +80,7 @@ def transform_mesh(id:int, position: list, rotation: list, scale: float):
         mesh = trimesh.load_mesh(f"{backup_dir}/{id}.obj")
 
         # Translate the mesh
-        translation = np.array(position) - mesh.centroid
-        mesh.apply_translation(translation)
+        mesh.apply_translation(np.array(position))
 
         # Scale the mesh
         mesh.apply_scale(scale)
