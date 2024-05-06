@@ -47,6 +47,12 @@ public class CallableMethods: MonoBehaviour
         var types = Assembly.Load("UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null").GetTypes();
         Type haloType = types.First(t => t.Name.Equals("Halo"));
         newPrefab.AddComponent(haloType);
+        // Step 3.1: Set Halo properties
+        SerializedObject halo = new SerializedObject(newPrefab.GetComponent(haloType));
+        halo.FindProperty("m_Size").floatValue = 4.53f;
+        halo.FindProperty("m_Enabled").boolValue = false;
+        halo.FindProperty("m_Color").colorValue = new Color(0.6784f, 0.34117f, 0.12549f, 1.0f);
+        halo.ApplyModifiedProperties();
         // Step 4: Add Conture Rendering
         newPrefab.AddComponent<ContureRendering>();
         // Step 5: Convert to Prefab
