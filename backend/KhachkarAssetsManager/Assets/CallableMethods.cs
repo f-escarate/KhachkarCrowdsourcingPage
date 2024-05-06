@@ -18,8 +18,6 @@ public class CallableMethods: MonoBehaviour
     static unsafe void generateAssetBundles(){
         string[] arguments = Environment.GetCommandLineArgs();
         const int ASSETBUNDLE_SIZE = 5;
-        Debug.Log("===========");
-        Debug.Log(arguments[13]);
         int meshesCount = int.Parse(arguments[13]);
         for(int i = 0; i < meshesCount; i++){
             string meshId = arguments[14+i];
@@ -43,6 +41,11 @@ public class CallableMethods: MonoBehaviour
         GameObject newPrefab = Instantiate(Resources.Load(meshPath)) as GameObject;
         // Step 2: Add Box Collider
         newPrefab.AddComponent<BoxCollider>();
+        // Step 2.1: Set Box Collider properties
+        SerializedObject boxCollider = new SerializedObject(newPrefab.GetComponent<BoxCollider>());
+        boxCollider.FindProperty("m_Size").vector3Value = new Vector3(1.5f, 4.0f, 1.5f);
+        boxCollider.FindProperty("m_Center").vector3Value = new Vector3(0.0f, 2.0f, 0.0f);
+        boxCollider.ApplyModifiedProperties();
         // Step 3: Add Halo
         var types = Assembly.Load("UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null").GetTypes();
         Type haloType = types.First(t => t.Name.Equals("Halo"));
