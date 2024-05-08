@@ -74,9 +74,9 @@ async def get_my_khachkars(token: Annotated[str, Depends(oauth2_scheme)], db: Se
     khachkars = db.query(models.Khachkar).filter(models.Khachkar.owner_id == user.id).all()
     return khachkars
 
-@app.get("/get_khachkars/mesh/")
-async def get_my_khachkars(db: Session = Depends(get_db)):
-    khachkars = db.query(models.Khachkar).filter(models.Khachkar.state == models.KhachkarState.meshed).all()
+@app.get("/get_khachkars/ready/")
+async def get_ready_khachkars(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
+    khachkars = db.query(models.Khachkar).filter(models.Khachkar.state == models.KhachkarState.ready).all()
     return khachkars
 
 @app.get("/get_khachkar/{khachkar_id}/")
@@ -316,6 +316,35 @@ def post_mesh_bounding_box(token: Annotated[str, Depends(oauth2_scheme)], khachk
     print("Setting mesh bounding box...")
     return crop_mesh(khachkar_id, bounding_box)
 
+@app.get("/set_ready/{khachkar_id}/")
+def set_ready(token: Annotated[str, Depends(oauth2_scheme)], khachkar_id: int, db: Session = Depends(get_db)):
+    if not token:
+        return unauthorized_exception("Invalid token")
+    user = get_user_by_name(get_name_by_token(token), db)
+    if user is None:
+        return {"status": "error", "msg": "problem with user authentication"}
+    db_khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == khachkar_id).first()
+    if db_khachkar is None:
+        return {"status": "error", "msg": "khachkar does not exist"}
+    print("Setting khachkar ready...")
+    db_khachkar.state = models.KhachkarState.ready
+    db.commit()
+    return {"status": "success"}
+
+@app.get("/set_unready/{khachkar_id}/")
+def set_unready(token: Annotated[str, Depends(oauth2_scheme)], khachkar_id: int, db: Session = Depends(get_db)):
+    if not token:
+        return unauthorized_exception("Invalid token")
+    user = get_user_by_name(get_name_by_token(token), db)
+    if user is None:
+        return {"status": "error", "msg": "problem with user authentication"}
+    db_khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == khachkar_id).first()
+    if db_khachkar is None:
+        return {"status": "error", "msg": "khachkar does not exist"}
+    print("Setting khachkar unready...")
+    db_khachkar.state = models.KhachkarState.meshed
+    db.commit()
+    return {"status": "success"}
 
 if __name__ == "__main__":
     import uvicorn

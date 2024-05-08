@@ -3,6 +3,7 @@
     import { Table, TableBody, TableHead, TableBodyCell, TableHeadCell, TableBodyRow, Checkbox, Button } from 'flowbite-svelte';
     import { HOST } from '$lib/constants';
     import { base } from '$app/paths';
+    import { auth_get_json } from '$lib/utils';
     import Cookies from 'js-cookie';
     let entries = [];
     let token;
@@ -13,12 +14,7 @@
                 window.location.href = `${base}/login`;
             }
         }
-        const response = await fetch(`${HOST}/get_khachkars/mesh/`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+        const response = await auth_get_json(`${HOST}/get_khachkars/ready/`, token);
         entries = await response.json();
     });
     const handleCompilation = async () => {

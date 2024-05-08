@@ -21,6 +21,7 @@ class KhachkarState(ENUM):
     not_meshed = "not_meshed"
     creating_mesh = "creating_mesh"
     meshed = "meshed"
+    ready = "ready"
 
 class Khachkar(Base):
     __tablename__ = "khachkar"

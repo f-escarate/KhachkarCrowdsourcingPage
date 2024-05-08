@@ -72,7 +72,7 @@
                         <VideoIcon sx='m-0 mr-1 text-white'/>
                         Processing Khachkar video
                     </Button>
-                {:else if entry_data.state === 'meshed'}
+                {:else if entry_data.state === 'meshed' || entry_data.state === 'ready'}
                     <Button on:click={window.open(`${base}/viewMesh/${entry_data.id}`,'_blank','noopener')} size="xs" class='m-2 bg-amber-500'>
                         <SquareIcon sx='m-0 mr-1 text-white'/>
                         Preview Mesh
