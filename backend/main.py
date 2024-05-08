@@ -287,12 +287,32 @@ def get_obj(id: int, db: Session = Depends(get_db)):
     return Response(content=obj)
 
 @app.post("/set_mesh_transformations/{khachkar_id}/")
-def set_mesh_transformations(khachkar_id: int, transformations: KhachkarMeshTransformations):
+def set_mesh_transformations(token: Annotated[str, Depends(oauth2_scheme)], khachkar_id: int, transformations: KhachkarMeshTransformations, db: Session = Depends(get_db)):
+    if not token:
+        return unauthorized_exception("Invalid token")
+    user = get_user_by_name(get_name_by_token(token), db)
+    if user is None:
+        return {"status": "error", "msg": "problem with user authentication"}
+    db_khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == khachkar_id).first()
+    if db_khachkar is None:
+        return {"status": "error", "msg": "khachkar does not exist"}
+    if db_khachkar.state != models.KhachkarState.meshed:
+        return {"status": "error", "msg": "khachkar is not meshed"}
     print("Setting mesh transformations...")
     return transform_mesh(khachkar_id, transformations.pos, transformations.rot, transformations.scale)
 
 @app.post("/crop_mesh/{khachkar_id}/")
-def post_mesh_bounding_box(khachkar_id: int, bounding_box: List[float]):
+def post_mesh_bounding_box(token: Annotated[str, Depends(oauth2_scheme)], khachkar_id: int, bounding_box: List[float], db: Session = Depends(get_db)):
+    if not token:
+        return unauthorized_exception("Invalid token")
+    user = get_user_by_name(get_name_by_token(token), db)
+    if user is None:
+        return {"status": "error", "msg": "problem with user authentication"}
+    db_khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == khachkar_id).first()
+    if db_khachkar is None:
+        return {"status": "error", "msg": "khachkar does not exist"}
+    if db_khachkar.state != models.KhachkarState.meshed:
+        return {"status": "error", "msg": "khachkar is not meshed"}
     print("Setting mesh bounding box...")
     return crop_mesh(khachkar_id, bounding_box)
 
