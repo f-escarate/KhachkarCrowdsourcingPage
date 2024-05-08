@@ -64,4 +64,3 @@ class KhachkarMeshTransformations(BaseModel):
     pos: List[float]
     rot: List[float]
     scale: float
-    bounding_box: List[float]

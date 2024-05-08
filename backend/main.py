@@ -9,7 +9,7 @@ from schemas import ChangePassword, Khachkar, UserRegister, KhachkarMeshFiles, K
 from authentication import authenticate_user, create_access_token, get_password_hash, get_name_by_token, ACCESS_TOKEN_EXPIRE_MINUTES, get_user_by_name, unauthorized_exception, verify_password
 from utils import save_image, save_video, save_mesh, create_khachkar, edit_khachkar, read_image, read_video, read_file, img_validation, video_validation, mesh_files_validation, preprocess_video, MESHES_PATH
 from database import get_db, Base, engine
-from mesh_handling import get_mesh_from_video, call_method, remove_mesh_from_unity, transform_mesh, send_mesh_to_unity, generate_text_asset
+from mesh_handling import get_mesh_from_video, call_method, remove_mesh_from_unity, transform_mesh, crop_mesh, send_mesh_to_unity, generate_text_asset
 import models, os
 
 Base.metadata.create_all(bind=engine)
@@ -289,7 +289,12 @@ def get_obj(id: int, db: Session = Depends(get_db)):
 @app.post("/set_mesh_transformations/{khachkar_id}/")
 def set_mesh_transformations(khachkar_id: int, transformations: KhachkarMeshTransformations):
     print("Setting mesh transformations...")
-    return transform_mesh(khachkar_id, transformations.pos, transformations.rot, transformations.scale, transformations.bounding_box)
+    return transform_mesh(khachkar_id, transformations.pos, transformations.rot, transformations.scale)
+
+@app.post("/crop_mesh/{khachkar_id}/")
+def post_mesh_bounding_box(khachkar_id: int, bounding_box: List[float]):
+    print("Setting mesh bounding box...")
+    return crop_mesh(khachkar_id, bounding_box)
 
 
 if __name__ == "__main__":
