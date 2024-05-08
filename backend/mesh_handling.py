@@ -1,7 +1,7 @@
 import os, json, requests, trimesh, shutil
 import numpy as np
-from utils import save_file, update_khachkar_status
-from models import Khachkar, MeshTransformations
+from utils import update_khachkar_status
+from models import Khachkar
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 
@@ -66,7 +66,7 @@ def remove_mesh_from_unity(index: int):
     unity_mesh_path = f"{PROJECT_PATH}/Assets/Resources/StonesMeshes/{index}"
     shutil.rmtree(unity_mesh_path)
 
-def transform_mesh(id:int, position: list, rotation: list, scale: float, bounding_box: list):
+def transform_mesh(id:int, position: list, rotation: list, scale: float):
     try:
         # Move old mesh to a backup folder
         source_dir = f"{MESHES_PATH}/{id}"
@@ -77,27 +77,16 @@ def transform_mesh(id:int, position: list, rotation: list, scale: float, boundin
         for file_name in file_names:
             shutil.move(os.path.join(source_dir, file_name), backup_dir)
         # Load the mesh
-        mesh = trimesh.load(f"{backup_dir}/{id}.obj", force="mesh")
-
+        mesh = trimesh.load_mesh(f"{backup_dir}/{id}.obj")
+        # Rotate the mesh
+        rot_x_mat = trimesh.transformations.rotation_matrix(np.radians(rotation[0]), [1, 0, 0])
+        rot_y_mat = trimesh.transformations.rotation_matrix(np.radians(rotation[1]), [0, 1, 0])
+        rot_z_mat = trimesh.transformations.rotation_matrix(np.radians(rotation[2]), [0, 0, 1])
+        mesh.apply_transform(trimesh.transformations.concatenate_matrices(rot_x_mat, rot_y_mat, rot_z_mat))
         # Translate the mesh
         mesh.apply_translation(np.array(position))
-
         # Scale the mesh
         mesh.apply_scale(scale)
-
-        # Rotate the mesh
-        rotation_matrix = trimesh.transformations.rotation_matrix(np.radians(rotation[0]), [1, 0, 0], mesh.centroid)
-        mesh.apply_transform(rotation_matrix)
-        rotation_matrix = trimesh.transformations.rotation_matrix(np.radians(rotation[1]), [0, 1, 0], mesh.centroid)
-        mesh.apply_transform(rotation_matrix)
-        rotation_matrix = trimesh.transformations.rotation_matrix(np.radians(rotation[2]), [0, 0, 1], mesh.centroid)
-        mesh.apply_transform(rotation_matrix)
-
-        # Crop using the bounding box
-        #box = trimesh.primitives.Box(np.array(bounding_box))
-        #box.apply_translation(np.array([0, bounding_box[1]/2, 0]))
-        #mesh = mesh.slice_plane(box.facets_origin, -box.facets_normal)
-
         # Save the rotated mesh
         mesh.export(f"{source_dir}/{id}.obj")
         # Remove the backup folder
@@ -108,6 +97,10 @@ def transform_mesh(id:int, position: list, rotation: list, scale: float, boundin
         for file_name in file_names:
             shutil.move(os.path.join(backup_dir, file_name), source_dir)
         return {"status": "error", "msg": str(e)}
+    return {"status": "success"}
+
+def crop_mesh(id: int, bounding_box: list):
+    
     return {"status": "success"}
 
 if __name__ == "__main__":
