@@ -20,3 +20,13 @@ export function addAnimationStyles(targets, styles) {
             observer.observe(target);
     }
 }
+
+export const auth_get_json = (url, token) => {
+    return fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        }
+    });
+}
