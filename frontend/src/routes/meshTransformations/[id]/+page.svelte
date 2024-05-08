@@ -1,10 +1,11 @@
 <script>
     import { browser } from '$app/environment'; 
     import { onMount } from 'svelte';
-    import { Tabs, TabItem, Button, Spinner, Progressbar } from 'flowbite-svelte';
+    import { Tabs, TabItem, Button, Spinner, Progressbar, Popover } from 'flowbite-svelte';
     import { init, animate, transform_stone, transform_bounding_box, clear_scene, load_mesh } from '$lib/mesh_display';
     import { HOST } from '$lib/constants';
     import Cookies from 'js-cookie';
+    import { auth_post_request } from '$lib/utils';
     import RangeInput from '../../../components/RangeInput.svelte';
     /** @type {import('./$types').PageData} */
 	export let data;
@@ -20,19 +21,24 @@
     };
     let transformations = {};
     let bounding_box_scales = {};
-    const reset_values = () => {
+    const reset_transformations= () => {
         transformations = {
             pos: {x: 0, y: 0, z: 0},
             rot: {x: 0, y: 0, z: 0},
             scale: {value: 1}
         };
+    }
+    const reset_bounding_box= () => {
         bounding_box_scales = {
-            current: {x: 0, y: 0, z: 0}
+            current: {x: 0, y: 0, z: 0},
+            max: {x: 0, y: 0, z: 0}
         };
     }
-    reset_values();
+    reset_transformations();
+    reset_bounding_box();
     const set_bounding_box_scales = (max_scales) => {
         bounding_box_scales.current = {...max_scales};
+        bounding_box_scales.max = {...max_scales};
         transform_bounding_box(bounding_box_scales.current);
     };
     
@@ -58,16 +64,22 @@
         bounding_box_scales[property][axis] = parseFloat(value);
         transform_bounding_box(bounding_box_scales.current);
     }
+    const checkNoTransformations = (transforms_data) => {
+        let pos_0 = transforms_data.pos.x == 0 && transforms_data.pos.y == 0 && transforms_data.pos.z == 0;
+        let rot_0 = transforms_data.rot.x == 0 && transforms_data.rot.y == 0 && transforms_data.rot.z == 0;
+        let scale_1 = transforms_data.scale.value == 1;
+        return pos_0 && rot_0 && scale_1;
+    }
+    const checkBoundingBoxChanged = (bounding_box_data) => {
+        for (let key in bounding_box_data.current) {
+            if (bounding_box_data.current[key] != bounding_box_data.max[key])
+                return true;
+        }
+        return false;
+    }
     const send_data = async (data, endpoint) => {
         isLoading = true;
-        const response = await fetch(`${HOST}/${endpoint}/${id}/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${Cookies.get('token')}`
-            },
-            body: data
-        });
+        const response = await auth_post_request(`${HOST}/${endpoint}/${id}/`, Cookies.get('token'), data);
         const res = await response.json();
         isLoading = false;
         if(res.status == 'success') {
@@ -75,21 +87,29 @@
             progress_obj.loaded = false;
             clear_scene();
             load_mesh(id, set_progress, set_bounding_box_scales);
-            reset_values();
+            return true;
         } else if (res.status == 'error') {
             alert('Error: ', res.msg);
         } else {
             alert('Unknown error');
         }
+        return false;
     }
-
     const export_stone = async () => {
         let data = JSON.stringify({
             pos: Object.values(transformations.pos),
             rot: Object.values(transformations.rot),
             scale: transformations.scale.value
         })
-        send_data(data, 'set_mesh_transformations');
+        let ok = await send_data(data, 'set_mesh_transformations');
+        if (ok)
+            reset_transformations();
+    }
+    const send_bounding_box = async () => {
+        let data = JSON.stringify(Object.values(bounding_box_scales.current));
+        let ok = await send_data(data, 'crop_mesh');
+        if (ok)
+            reset_bounding_box();
     }
 
 </script>
@@ -133,17 +153,54 @@
             <span slot="title">Scale</span>
             <RangeInput property='scale' axis='value' interval={[0, transformations.scale.value, 180]} step={0.1} on:change={handleTransformations} />
         </TabItem>
+        <TabItem>
+            <span slot="title">Box x</span>
+            <RangeInput property='current' axis='x' interval={[0, bounding_box_scales.current.x, bounding_box_scales.max.x]} step={0.1} on:change={handleBoundingBox} />
+        </TabItem>
+        <TabItem>
+            <span slot="title">Box y</span>
+            <RangeInput property='current' axis='y' interval={[0, bounding_box_scales.current.y, bounding_box_scales.max.y]} step={0.1} on:change={handleBoundingBox} />
+        </TabItem>
+        <TabItem>
+            <span slot="title">Box z</span>
+            <RangeInput property='current' axis='z' interval={[0, bounding_box_scales.current.z, bounding_box_scales.max.z]} step={0.1} on:change={handleBoundingBox} />
+        </TabItem>
     </Tabs>
-    <div id='mesh_display' class='flex justify-center w-full'>
+    <div id='mesh_display' class='m-1 flex justify-center w-full'>
         <!-- Here goes the Three js display -->
     </div>
     <span id='tabs_bot_limit'></span>
-    {#if isLoading}
-        <Button disabled>
-            <Spinner class="mr-2" size="4"/>
-            Loading...
-        </Button>
-    {:else}
-        <Button on:click={export_stone}>Save stone transformations</Button>
-    {/if}
+    <div class='m-2 flex flex-col md:flex-row gap-4 justify-center'>
+        {#if isLoading}
+            <Button disabled>
+                <Spinner class="mr-2" size="4"/>
+                Loading...
+            </Button>
+            <Button disabled color="purple">
+                <Spinner class="mr-2" size="4"/>
+                Loading...
+            </Button>
+        {:else}
+            {#if checkNoTransformations(transformations)}
+                <Button id="noStoneTransformations" disabled >Save stone transformations</Button>
+                <Popover class="w-64 text-sm font-light " title="No transformations to apply" triggeredBy="#noStoneTransformations">
+                    You must apply some transformations to the stone before saving them (position, rotation or scale).
+                </Popover>
+                {#if checkBoundingBoxChanged(bounding_box_scales)}
+                    <Button color="purple" on:click={send_bounding_box}>Crop mesh and save bounding box</Button>
+                {:else}
+                    <Button id="noBoundingBoxChanges" disabled color="purple">Crop mesh and save bounding box</Button>
+                    <Popover class="w-64 text-sm font-light " title="No changes in bounding box" triggeredBy="#noBoundingBoxChanges">
+                        You must change the bounding box before cropping the mesh.
+                    </Popover>
+                {/if}
+            {:else}
+                <Button on:click={export_stone}>Save stone transformations</Button>
+                <Button id="saveTransformationsBefore"disabled color="purple">Crop mesh and save bounding box</Button>
+                <Popover class="w-64 text-sm font-light " title="You must save transformations before cropping" triggeredBy="#saveTransformationsBefore">
+                    You must save your stones transformations before cropping the mesh.
+                </Popover>
+            {/if}
+        {/if}
+    </div>
 </div>
