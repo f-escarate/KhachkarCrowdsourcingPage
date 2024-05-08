@@ -2,8 +2,9 @@
     import { browser } from '$app/environment'; 
     import { onMount } from 'svelte';
     import { Tabs, TabItem, Button, Spinner, Progressbar } from 'flowbite-svelte';
-    import { init, animate, transform_stone, transform_bounding_box } from '$lib/mesh_display';
+    import { init, animate, transform_stone, transform_bounding_box, clear_scene, load_mesh } from '$lib/mesh_display';
     import { HOST } from '$lib/constants';
+    import Cookies from 'js-cookie';
     import RangeInput from '../../../components/RangeInput.svelte';
     /** @type {import('./$types').PageData} */
 	export let data;
@@ -17,14 +18,19 @@
         progress_obj.progress = p;
         progress_obj.loaded = b;
     };
-    let transformations = {
-        pos: {x: 0, y: 0, z: 0},
-        rot: {x: 0, y: 0, z: 0},
-        scale: {value: 1}
-    };
-    let bounding_box_scales = {
-        current: {x: 0, y: 0, z: 0}
-    };
+    let transformations = {};
+    let bounding_box_scales = {};
+    const reset_values = () => {
+        transformations = {
+            pos: {x: 0, y: 0, z: 0},
+            rot: {x: 0, y: 0, z: 0},
+            scale: {value: 1}
+        };
+        bounding_box_scales = {
+            current: {x: 0, y: 0, z: 0}
+        };
+    }
+    reset_values();
     const set_bounding_box_scales = (max_scales) => {
         bounding_box_scales.current = {...max_scales};
         transform_bounding_box(bounding_box_scales.current);
@@ -57,7 +63,8 @@
         const response = await fetch(`${HOST}/${endpoint}/${id}/`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Cookies.get('token')}`
             },
             body: data
         });
@@ -65,7 +72,10 @@
         isLoading = false;
         if(res.status == 'success') {
             alert('Stone exported');
-            location.reload();
+            progress_obj.loaded = false;
+            clear_scene();
+            load_mesh(id, set_progress, set_bounding_box_scales);
+            reset_values();
         } else if (res.status == 'error') {
             alert('Error: ', res.msg);
         } else {

@@ -35,7 +35,12 @@ export function init(width, height, element, id, set_progress, set_bounding_box_
     // Axes
     const axesHelper = new THREE.AxesHelper(20);
     scene.add( axesHelper );
+    // Mesh
+    load_mesh(id, set_progress, set_bounding_box_scales);
     
+}
+
+export function load_mesh(id, set_progress, set_bounding_box_scales){
     // model
     var onProgress = function ( xhr ) {
         if ( xhr.lengthComputable ) {
@@ -57,7 +62,6 @@ export function init(width, height, element, id, set_progress, set_bounding_box_
                 .load(`${id}`, function (object) {
                     scene.add(object);
                     let bbox = new THREE.Box3().setFromObject(object);
-                    console.log(bbox);
                     set_bounding_box_scales({
                         x: bbox.max.x - bbox.min.x,
                         y: bbox.max.y - bbox.min.y,
@@ -71,6 +75,12 @@ export function init(width, height, element, id, set_progress, set_bounding_box_
     const material = new THREE.LineBasicMaterial( { color: 0xff00ff } );
     edges = new THREE.LineSegments( edgesGeometry, material );
     scene.add( edges );
+}
+
+export function clear_scene() {
+    // remove edges and stone
+    scene.remove(scene.getObjectByProperty('type', 'Group'));
+    scene.remove(edges);
 }
 
 const render = () => {
