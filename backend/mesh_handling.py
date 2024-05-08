@@ -100,7 +100,32 @@ def transform_mesh(id:int, position: list, rotation: list, scale: float):
     return {"status": "success"}
 
 def crop_mesh(id: int, bounding_box: list):
-    
+    try:
+        # Move old mesh to a backup folder
+        source_dir = f"{MESHES_PATH}/{id}"
+        file_names = os.listdir(source_dir)
+        backup_dir = f"{MESHES_PATH}/{id}/backup"
+        os.makedirs(backup_dir, exist_ok=True)
+
+        for file_name in file_names:
+            shutil.move(os.path.join(source_dir, file_name), backup_dir)
+        # Load the mesh
+        mesh = trimesh.load(f"{backup_dir}/{id}.obj", force="mesh")
+
+        box = trimesh.primitives.Box(np.array(bounding_box))
+        box.apply_translation(np.array([0, bounding_box[1]/2, 0]))
+        mesh = mesh.slice_plane(box.facets_origin, -box.facets_normal)
+
+        # Save the rotated mesh
+        mesh.export(f"{source_dir}/{id}.obj")
+        # Remove the backup folder
+        shutil.rmtree(backup_dir)
+    except Exception as e:
+        # Move the old mesh back
+        print(e)
+        for file_name in file_names:
+            shutil.move(os.path.join(backup_dir, file_name), source_dir)
+        return {"status": "error", "msg": str(e)}
     return {"status": "success"}
 
 if __name__ == "__main__":
