@@ -17,18 +17,11 @@
         progress_obj.progress = p;
         progress_obj.loaded = b;
     };
-    let transformations = {
-        pos: {x: 0, y: 0, z: 0},
-        rot: {x: 0, y: 0, z: 0},
-        scale: {value: 1}
-    };
     let bounding_box_scales = {
-        current: {x: 0, y: 0, z: 0},
-        max: {x: 0, y: 0, z: 0}   
+        current: {x: 0, y: 0, z: 0}
     };
     const set_bounding_box_scales = (max_scales) => {
         bounding_box_scales.current = {...max_scales};
-        bounding_box_scales.max = {...max_scales};
         transform_bounding_box(bounding_box_scales.current);
     };
     
@@ -43,43 +36,6 @@
             animate()
 	    }
     });
-
-    const handleTransformations = (e) => {
-        const { property, axis, value } = e.detail;
-        transformations[property][axis] = parseFloat(value);
-        transform_stone(transformations);
-    }
-    const handleBoundingBox = (e) => {
-        const { property, axis, value } = e.detail;
-        bounding_box_scales[property][axis] = parseFloat(value);
-        transform_bounding_box(bounding_box_scales.current);
-    }
-    const export_stone = async () => {
-        isLoading = true;
-        let data = JSON.stringify({
-            pos: Object.values(transformations.pos),
-            rot: Object.values(transformations.rot),
-            scale: transformations.scale.value,
-            bounding_box: Object.values(bounding_box_scales.current)
-        })
-        const response = await fetch(`${HOST}/set_mesh_transformations/${id}/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: data
-        });
-        const res = await response.json();
-        isLoading = false;
-        if(res.status == 'success') {
-            alert('Stone exported');
-        } else if (res.status == 'error') {
-            alert('Error exporting stone', res.msg);
-        } else {
-            alert('Unknown error exporting stone');
-        }
-    }
-
 </script>
 
 <div class={(progress_obj.loaded? 'hidden': 'visible')}>
@@ -94,56 +50,8 @@
 
 <div class={(progress_obj.loaded? 'visible': 'invisible')}>
     <span id='tabs_top_limit' class='w-full'></span>
-    <Tabs style="underline">
-        <TabItem open><span slot="title">Position x</span>
-            <RangeInput property='pos' axis='x' interval={[-10, transformations.pos.x, 10]} step={0.1} on:change={handleTransformations} />
-        </TabItem>
-        <TabItem><span slot="title">Position y</span>
-            <RangeInput property='pos' axis='y' interval={[-10, transformations.pos.y, 10]} step={0.1} on:change={handleTransformations} />
-        </TabItem>
-        <TabItem>
-            <span slot="title">Position z</span>
-            <RangeInput property='pos' axis='z' interval={[-10, transformations.pos.z, 10]} step={0.1} on:change={handleTransformations} />
-        </TabItem>
-        <TabItem>
-            <span slot="title">Rotation x</span>
-            <RangeInput property='rot' axis='x' interval={[-180, transformations.rot.x, 180]} step={0.1} on:change={handleTransformations} />
-        </TabItem>
-        <TabItem>
-            <span slot="title">Rotation y</span>
-            <RangeInput property='rot' axis='y' interval={[-180, transformations.rot.y, 180]} step={0.1} on:change={handleTransformations} />
-        </TabItem>
-        <TabItem>
-            <span slot="title">Rotation z</span>
-            <RangeInput property='rot' axis='z' interval={[-180, transformations.rot.z, 180]} step={0.1} on:change={handleTransformations} />
-        </TabItem>
-        <TabItem>
-            <span slot="title">Scale</span>
-            <RangeInput property='scale' axis='value' interval={[0, transformations.scale.value, 180]} step={0.1} on:change={handleTransformations} />
-        </TabItem>
-        <TabItem>
-            <span slot="title">Box x</span>
-            <RangeInput property='current' axis='x' interval={[0, bounding_box_scales.current.x, bounding_box_scales.max.x]} step={0.1} on:change={handleBoundingBox} />
-        </TabItem>
-        <TabItem>
-            <span slot="title">Box y</span>
-            <RangeInput property='current' axis='y' interval={[0, bounding_box_scales.current.y, bounding_box_scales.max.y]} step={0.1} on:change={handleBoundingBox} />
-        </TabItem>
-        <TabItem>
-            <span slot="title">Box z</span>
-            <RangeInput property='current' axis='z' interval={[0, bounding_box_scales.current.z, bounding_box_scales.max.z]} step={0.1} on:change={handleBoundingBox} />
-        </TabItem>
-    </Tabs>
     <div id='mesh_display' class='flex justify-center w-full'>
         <!-- Here goes the Three js display -->
     </div>
     <span id='tabs_bot_limit'></span>
-    {#if isLoading}
-        <Button disabled>
-            <Spinner class="mr-2" size="4"/>
-            Loading...
-        </Button>
-    {:else}
-        <Button on:click={export_stone}>Save stone transformations</Button>
-    {/if}
 </div>
