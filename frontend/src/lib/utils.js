@@ -30,3 +30,14 @@ export const auth_get_json = (url, token) => {
         }
     });
 }
+
+export const auth_post_request = (url, token, data) => {
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: data
+    });
+}
