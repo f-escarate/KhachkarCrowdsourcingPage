@@ -17,7 +17,15 @@
                 'Content-Type': `image/${entry_data.image}`
             }
         });
-        image = URL.createObjectURL(await response.blob());
+        let img_blob = await response.blob();
+        if (img_blob.size > 0) 
+            image = URL.createObjectURL(img_blob);
+        else
+            image = `${base}/images/no_thumb.jpg`;
+        for (let key in entry_data) {
+            if (entry_data[key] === null)
+                entry_data[key] = "-"
+        }
     });
     const loadVideo = async () => {
         if (entry_data.state === 'not_meshed' || entry_data.state === 'creating_mesh'){
@@ -60,7 +68,10 @@
                     Preview Data
                 </Button>
                 {#if entry_data.state === 'processing_video'}
-                    <h3>Khachkar video is being processed</h3>
+                    <Button disabled size="xs" class='m-2 bg-amber-500'>
+                        <VideoIcon sx='m-0 mr-1 text-white'/>
+                        Processing Khachkar video
+                    </Button>
                 {:else if entry_data.state === 'meshed'}
                     <Button on:click={window.open(`${base}/viewMesh/${entry_data.id}`,'_blank','noopener')} size="xs" class='m-2 bg-amber-500'>
                         <SquareIcon sx='m-0 mr-1 text-white'/>
