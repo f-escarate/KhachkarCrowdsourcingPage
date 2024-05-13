@@ -16,7 +16,7 @@
         if (confirm("Khachkar added successfully, do you want to add another one?")) {
             document.getElementById('add_khach_title').scrollIntoView();
         } else {
-            window.location.href = `${base}/myKhachkars/`;
+            window.location.href = `${base}/viewKhachkars/`;
         }
     }
 </script>

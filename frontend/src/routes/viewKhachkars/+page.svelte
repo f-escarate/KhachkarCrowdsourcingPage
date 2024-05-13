@@ -17,7 +17,7 @@
                 window.location.href = `${base}/login`;
             }
         }
-        const response = await auth_get_json(`${HOST}/get_khachkars/own/`, Cookies.get('token'));
+        const response = await auth_get_json(`${HOST}/get_khachkars/`, Cookies.get('token'));
         entries = await response.json();
         entries.reverse();
     });

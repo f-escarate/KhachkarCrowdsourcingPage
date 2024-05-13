@@ -48,8 +48,8 @@
         videoElement.load();
     });
     const handlePost = () => {
-        alert("Khachkar added successfully, do you want to add another one?");
-        window.location.href = `${base}/myKhachkars/`;
+        alert("Khachkar has been edited successfully");
+        window.location.href = `${base}/viewKhachkars/`;
     }
 </script>
 

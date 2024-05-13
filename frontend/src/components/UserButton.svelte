@@ -53,7 +53,6 @@
             <span class="block text-sm">{data.name}</span>
             <span class="block truncate text-sm font-medium">{data.email}</span>
         </DropdownHeader>
-        <DropdownItem href={`${base}/myKhachkars/`}>My Khachkars</DropdownItem>
         <DropdownItem href={`${base}/account/`}>Account Settings</DropdownItem>
         {#if data.is_admin}
             <DropdownItem href={`${base}/compileAssetBundles/`}>Compile Asset Bundles</DropdownItem>
