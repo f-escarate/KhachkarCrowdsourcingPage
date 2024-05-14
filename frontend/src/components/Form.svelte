@@ -103,7 +103,7 @@
     <h2 class='md:col-span-2 text-2xl font-semibold'>Media</h2>
     <div class="my-2 md:flex md:flex-row gap-4 justify-between align-center md:col-span-2">
         <VideoOrMesh bind:videoVisibility={videoVisibility} {entry} {meshData} />
-        <div class='flex flex-col w-full'>
+        <div class='flex flex-col w-full self-end'>
             Upload image (optional)
             <Label for="image" class="mb-2 w-full md:bottom-0">
             <div class="my-4 p-1 flex border-4 border-amber-300 hover:bg-amber-500 text-center hover:text-white transition-colors duration-400 ease-in-out">
