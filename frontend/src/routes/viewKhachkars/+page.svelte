@@ -3,7 +3,8 @@
     import EditIcon from '../../components/icons/EditIcon.svelte';
     import SquareIcon2 from '../../components/icons/SquareIcon2.svelte';
     import MagicIcon from '../../components/icons/MagicIcon.svelte';
-    import { Button, Spinner, Checkbox } from 'flowbite-svelte'
+    import DownIcon from '../../components/icons/DownIcon.svelte';
+    import { Button, Spinner, Checkbox, Dropdown, Radio } from 'flowbite-svelte'
     import { onMount } from 'svelte';
     import { HOST } from '$lib/constants';
     import { base } from "$app/paths";
@@ -13,6 +14,8 @@
     let filtered_entries = [];
     let user_id = null;
     let only_my_khachkars = false;
+    let khachkars_state = 'all';
+
     onMount(async () => {
         const khachkars_response = await get_json(`${HOST}/get_khachkars/`);
         entries = await khachkars_response.json();
@@ -27,15 +30,19 @@
             }
         }
         
-        filter_khachkars(only_my_khachkars);
+        filter_khachkars();
         
     });
 
-    const filter_khachkars = (own) => {
+    const filter_khachkars = () => {
         filtered_entries = [...entries];
-        if (own && user_id !== null)
+        if (only_my_khachkars && user_id !== null)
             for (let i = entries.length - 1; i >= 0; i--)
                 if (entries[i].owner_id !== user_id)
+                    filtered_entries.splice(i, 1);
+        if (khachkars_state !== 'all')
+            for (let i = filtered_entries.length - 1; i >= 0; i--)
+                if (filtered_entries[i].state !== khachkars_state)
                     filtered_entries.splice(i, 1);
     }
 
@@ -76,15 +83,26 @@
 </script>
 
 <div class='flex flex-col items-center'>
-    <div class='flex self-start'>
+    <div class='flex self-start w-full items-center gap-4'>
         {#if user_id !== null}
-            <Checkbox bind:checked={only_my_khachkars} on:change={e => filter_khachkars(only_my_khachkars)}>
-                Show only my khachkars
+            <Checkbox class='bg-amber-500 hover:bg-amber-700 h-full p-3 rounded-lg' bind:checked={only_my_khachkars} on:change={e => filter_khachkars()} color='orange'>
+                <p class='text-white'>Show my khachkars only</p>
             </Checkbox>
         {:else}
             <a href={`${base}/login`} class='font-semibold underline text-amber-600'>Login to manage your khachkars</a>
         {/if}
-        
+        <Button class='bg-amber-500 hover:bg-amber-700'>
+            Filter by Khachkar state <DownIcon sx='m-0 text-white'/>
+        </Button>
+        <Dropdown class="w-44 p-3 space-y-3 text-sm">
+            <Radio name="khachkars_state" bind:group={khachkars_state} on:change={e=> filter_khachkars()} value={'all'}>All</Radio>
+            <Radio name="khachkars_state" bind:group={khachkars_state} on:change={e=> filter_khachkars()} value={'processing_video'}>Processing video</Radio>
+            <Radio name="khachkars_state" bind:group={khachkars_state} on:change={e=> filter_khachkars()} value={'not_meshed'}>Not meshed</Radio>
+            <Radio name="khachkars_state" bind:group={khachkars_state} on:change={e=> filter_khachkars()} value={'creating_mesh'}>Creating mesh</Radio>
+            <Radio name="khachkars_state" bind:group={khachkars_state} on:change={e=> filter_khachkars()} value={'meshed'}>Meshed</Radio>
+            <Radio name="khachkars_state" bind:group={khachkars_state} on:change={e=> filter_khachkars()} value={'ready'}>Ready</Radio>
+        </Dropdown>
+    
     </div>
     {#if entries === null}
         <Spinner class='m-4' size='10'/> <h1 class='text-2xl font-bold'>Loading khachkars</h1>
