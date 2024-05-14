@@ -84,6 +84,7 @@
 
 <div class='flex flex-col items-center'>
     <div class='flex self-start w-full items-center gap-4'>
+        <p class='font-semibold text-lg'>Filters:</p>
         {#if user_id !== null}
             <Checkbox class='bg-amber-500 hover:bg-amber-700 h-full p-3 rounded-lg' bind:checked={only_my_khachkars} on:change={e => filter_khachkars()} color='orange'>
                 <p class='text-white'>Show my khachkars only</p>

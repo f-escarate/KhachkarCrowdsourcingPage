@@ -55,7 +55,7 @@
     }
 </script>
 
-<div class='m-2 md:w-[85%] flex flex-col border-b-2 border-amber-500 items-center w-auto'>
+<div class='m-2 md:w-full flex flex-col border-b-2 border-amber-500 items-center w-auto'>
     <div class='p-4 md:flex md:justify-between md:max-h-[300px]'>
         <div class='m-2 flex flex-col justify-between items-center md:items-start'>
             <h1 class='text-4xl font-semibold'>{entry_data.location} {entry_data.id}</h1>
