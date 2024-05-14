@@ -146,6 +146,16 @@ async def get_user(token: Annotated[str, Depends(oauth2_scheme)], db: Session = 
         "is_admin": user.is_admin,
     }
 
+@app.get("/get_user_id/")
+async def get_user_id(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
+    user = get_user_by_name(get_name_by_token(token), db)
+    if user is None:
+        raise unauthorized_exception("Could not validate credentials")
+    return {
+        "status": "success",
+        "user_id": user.id
+    }
+
 @app.post("/register/")
 async def register(user: UserRegister = Depends(UserRegister), db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.username == user.username).first()
