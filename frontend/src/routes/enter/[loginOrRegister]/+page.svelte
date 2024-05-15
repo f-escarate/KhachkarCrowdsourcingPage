@@ -1,8 +1,14 @@
 <script>
     import { Tabs, TabItem, FloatingLabelInput , Button, Spinner} from 'flowbite-svelte';
     import { base } from "$app/paths";
+    import { goto } from "$app/navigation";
     import Cookies from 'js-cookie';
     import { HOST } from '$lib/constants';
+
+    /** @type {import('./$types').PageData} */
+	export let data;
+    $: loginOrRegister = data.loginOrRegister;
+    
     let name = '';
     let email = '';
     let pass = '';
@@ -47,7 +53,7 @@
         const json = await response.json();
         if (json.status == 'success') {
             alert('Successfully registered, you can now log in');
-            window.location.href = `${base}/login`;
+            goto(`${base}/enter/login`);
         }
         else if (json.status == 'error') {
             alert(json.msg);
@@ -65,7 +71,7 @@
 
 <div class='md:mx-auto md:max-w-[50%] my-5 h-full md:p-4 space-y-4'>
     <Tabs style="underline">
-        <TabItem open>
+        <TabItem open={loginOrRegister==='login'} on:click={e=> goto(`${base}/enter/login`)}>
             <span slot="title">Log In</span>
             <div class='flex flex-col gap-4'>
                 <FloatingLabelInput style="filled" bind:value={email} on:keydown={(e)=>onEnter(e, handleLogin)} name="email" id="email" type="text" label="Email"/>
@@ -80,7 +86,7 @@
                 {/if}
             </div>
         </TabItem>
-        <TabItem>
+        <TabItem open={loginOrRegister==='register'} on:click={e=> goto(`${base}/enter/register`)}>
             <span slot="title">Register</span>
             <div class='flex flex-col gap-4'>
                 <FloatingLabelInput bind:value={name}  on:keydown={(e)=>onEnter(e, handleRegister)} style="filled" name="name" id="name" type="text" label="Name"/>

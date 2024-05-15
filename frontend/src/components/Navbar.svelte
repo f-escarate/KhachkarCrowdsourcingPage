@@ -1,5 +1,7 @@
 <script>
-    import { Navbar, NavBrand, NavLi, NavUl } from 'flowbite-svelte';
+    import { Navbar, NavBrand, NavLi, NavUl, Button, NavHamburger } from 'flowbite-svelte';
+    import UserIcon from './icons/UserIcon.svelte';
+    import UserAddIcon from './icons/UserAddIcon.svelte';
     import { base } from "$app/paths";
     var nonActiveClass = 'text-xl md:transition-all md:hover:text-amber-400 md:hover:scale-125'
     var activeClass = nonActiveClass+' md:border-amber-400 md:border-b-2 md:rounded-none'

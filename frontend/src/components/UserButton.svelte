@@ -1,6 +1,7 @@
 <script>
     import { Avatar, Dropdown, DropdownHeader, DropdownItem, DropdownDivider, NavHamburger, Button } from 'flowbite-svelte';
     import UserIcon from './icons/UserIcon.svelte';
+    import UserAddIcon from './icons/UserAddIcon.svelte';
     import Cookies from 'js-cookie';
     import { onMount } from 'svelte';
     import { HOST } from '$lib/constants';
@@ -46,7 +47,7 @@
 {#if authenticated}
     <div class="flex items-center md:order-2">
         <Avatar id="avatar-menu" src={data.image} />
-        <NavHamburger class1="w-full md:flex md:w-auto md:order-1" />
+        <NavHamburger />
     </div>
     <Dropdown placement="bottom" triggeredBy="#avatar-menu">
         <DropdownHeader>
@@ -61,11 +62,15 @@
         <DropdownItem on:click={handleLogOut}>Log out</DropdownItem>
     </Dropdown>
 {:else}
-    <div class="flex md:order-2 gap-2">
-        <Button size="sm" href={`${base}/login`} class="bg-amber-500 text-black">
+    <div class="flex md:order-2 gap-1">
+        <Button size="sm" href={`${base}/enter/login`} class="pl-1 pr-2 bg-amber-500 hover:bg-amber-600 text-black relative">
             <UserIcon sx='m-0 text-black'/>
             Log In
         </Button>
-        <NavHamburger class1="w-full md:flex md:w-auto md:order-1" />
+        <Button size="sm" href={`${base}/enter/register`} class="pl-1 pr-2 border-2 border-black bg-amber-100 hover:bg-amber-400 text-black relative">
+            <UserAddIcon sx='m-0 text-black'/>
+            Register
+        </Button>
+        <NavHamburger/>
     </div>
 {/if}

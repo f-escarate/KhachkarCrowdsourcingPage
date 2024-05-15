@@ -5,7 +5,7 @@
     },
     {
         "text": ["You can log in to have a registry of your uploaded Khachkar videos, information and meshes. Also is posible to check information loaded by other users and edit it if is wrong.\n\n If you don't have an account, you can create one by clicking", "."],
-        "links": [{"url": "/login", "label":"here"}],
+        "links": [{"url": "/enter/register", "label":"here"}],
         "photo": "/images/2.png"
     }
 ]

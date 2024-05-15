@@ -11,7 +11,7 @@
         token = Cookies.get('token');
         if (token===undefined) {
             if(!alert("You have to be logged in to access this page")) {
-                window.location.href = `${base}/login`;
+                window.location.href = `${base}/enter/login`;
             }
         }
         const response = await auth_get_json(`${HOST}/get_khachkars/ready/`, token);

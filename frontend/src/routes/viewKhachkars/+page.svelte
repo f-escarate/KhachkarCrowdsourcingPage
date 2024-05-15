@@ -100,7 +100,7 @@
                 <p class='text-white'>Show my khachkars only</p>
             </Checkbox>
         {:else}
-            <a href={`${base}/login`} class='font-semibold underline text-amber-600'>Login to manage your khachkars</a>
+            <a href={`${base}/enter/login`} class='font-semibold underline text-amber-600'>Login to manage your khachkars</a>
         {/if}
     
     </div>

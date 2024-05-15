@@ -13,7 +13,7 @@
     onMount(async () => {
         if(Cookies.get('token') === undefined) {
             alert("You have to be logged in to access this page");
-            window.location.href = `${base}/login`;
+            window.location.href = `${base}/enter/login`;
             return;
         }
         const response = 
