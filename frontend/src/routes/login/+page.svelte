@@ -1,5 +1,5 @@
 <script>
-    import { Tabs, TabItem, FloatingLabelInput , Button} from 'flowbite-svelte';
+    import { Tabs, TabItem, FloatingLabelInput , Button, Spinner} from 'flowbite-svelte';
     import { base } from "$app/paths";
     import Cookies from 'js-cookie';
     import { HOST } from '$lib/constants';
@@ -7,8 +7,10 @@
     let email = '';
     let pass = '';
     let pass2 = '';
+    let isLoading = false;
 
     const handleLogin = async () => {
+        isLoading = true;
         const data = new FormData();
         data.append('username', email);
         data.append('password', pass);
@@ -19,11 +21,12 @@
         const json = await response.json();
         if (json.status == 'success') {
             Cookies.set('token', json.access_token, { sameSite:'strict', secure:true });
-            alert('Successfully logged in');
+            alert('Successfully logged in, redirecting to home page');
             window.location.href = base;
             return;
         }
         alert('Username or password incorrect');
+        isLoading = false;
     }
 
     const handleRegister = async () => {
@@ -31,6 +34,7 @@
             alert('Passwords do not match');
             return;
         }
+        isLoading = true;
         const data = new FormData();
         data.append('username', name);
         data.append('email', email);
@@ -42,12 +46,13 @@
         });
         const json = await response.json();
         if (json.status == 'success') {
-            alert('Successfully registered');
+            alert('Successfully registered, you can now log in');
             window.location.href = `${base}/login`;
         }
         else if (json.status == 'error') {
             alert(json.msg);
         }
+        isLoading = false;
     }
     const onEnter = (e, func) => {
         if (e.key == 'Enter') {
@@ -65,7 +70,14 @@
             <div class='flex flex-col gap-4'>
                 <FloatingLabelInput style="filled" bind:value={email} on:keydown={(e)=>onEnter(e, handleLogin)} name="email" id="email" type="text" label="Email"/>
                 <FloatingLabelInput style="filled" bind:value={pass}  on:keydown={(e)=>onEnter(e, handleLogin)} name="password" id="password" type="password" label="Password"/>
-                <Button class="bg-amber-500 text-black" size="sm" on:click={handleLogin}>Log In</Button>
+                {#if isLoading}
+                    <Button class="bg-amber-500 text-black" size="sm" disabled>
+                        <Spinner class="mr-2" size="4"/>
+                        Logging In
+                    </Button>
+                {:else}
+                    <Button class="bg-amber-500 text-black" size="sm" on:click={handleLogin}>Log In</Button>
+                {/if}
             </div>
         </TabItem>
         <TabItem>
@@ -75,7 +87,14 @@
                 <FloatingLabelInput bind:value={email} on:keydown={(e)=>onEnter(e, handleRegister)} style="filled" name="email" id="register_email" type="text" label="Email"/>
                 <FloatingLabelInput bind:value={pass}  on:keydown={(e)=>onEnter(e, handleRegister)} style="filled" name="password" id="register_password" type="password" label="Password"/>
                 <FloatingLabelInput bind:value={pass2} on:keydown={(e)=>onEnter(e, handleRegister)} style="filled" name="password2" id="register_password2" type="password" label="Repeat your password"/>
-                <Button class="bg-amber-500 text-black" size="sm" on:click={handleRegister}>Register</Button>
+                {#if isLoading}
+                    <Button class="bg-amber-500 text-black" size="sm" disabled>
+                        <Spinner class="mr-2" size="4"/>
+                        Registering
+                    </Button>
+                {:else}
+                    <Button class="bg-amber-500 text-black" size="sm" on:click={handleRegister}>Register</Button>
+                {/if}
             </div>
         </TabItem>
     </Tabs>    
