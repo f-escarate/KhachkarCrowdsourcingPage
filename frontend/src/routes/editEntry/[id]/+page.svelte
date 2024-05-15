@@ -53,4 +53,7 @@
     }
 </script>
 
-<Form bind:this={form} on:post_data={handlePost} token={token} entry={entry} videoVisibility=1 endpoint_url={`/update_khachkar/${id}`} http_method='PATCH'/>
+{#if token}
+    <h1 id='edit_khach_title' class='text-4xl font-bold'>Edit Khachkar #{entry.id}</h1>
+    <Form bind:this={form} on:post_data={handlePost} token={token} entry={entry} videoVisibility=1 endpoint_url={`/update_khachkar/${id}`} http_method='PATCH' button_text='Edit Khachkar'/>
+{/if}
