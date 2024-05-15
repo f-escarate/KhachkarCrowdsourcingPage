@@ -7,6 +7,7 @@
     export let token;
     export let http_method = 'POST';
     export let endpoint_url = '/post_khachkar';
+    export let button_text = 'Add Khachkar'
     export let videoVisibility = 0;
     export let entry = {... BASE_ENTRY};
     let meshData = {... BASE_MESH_DATA};
@@ -125,6 +126,6 @@
             Loading...
         </Button>
     {:else}
-        <Button class='md:col-span-2 w-[50%] mx-auto h-full text-black bg-amber-500' on:click={handleSubmit}>Add</Button>
+        <Button class='md:col-span-2 w-[50%] mx-auto h-full text-black bg-amber-500' on:click={handleSubmit}>{button_text}</Button>
     {/if}
 </div>
