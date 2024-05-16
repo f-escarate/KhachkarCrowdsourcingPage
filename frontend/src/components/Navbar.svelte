@@ -25,5 +25,16 @@
         {/if}
         <NavLi href={`${base}/viewKhachkars/`}>View Khachkars</NavLi>
         <NavLi href={`${base}/tutorial/`}>Tutorial</NavLi>
+        <div class='md:hidden md:m-0 md:w-0 md:p-0'>
+            <NavLi class='flex items-center gap-1 bg-amber-400 md:mb-1' href={`${base}/enter/login`}>
+                <UserIcon sx='m-0 text-black'/>
+                Log in
+            </NavLi>
+            <NavLi class='flex items-center gap-1 bg-amber-300' href={`${base}/enter/register`}>
+                <UserAddIcon sx='m-0 text-black'/>
+                Register
+            </NavLi>
+        </div>
+        
     </NavUl>
 </Navbar>

@@ -62,15 +62,17 @@
         <DropdownItem on:click={handleLogOut}>Log out</DropdownItem>
     </Dropdown>
 {:else}
-    <div class="flex md:order-2 gap-1">
-        <Button size="sm" href={`${base}/enter/login`} class="pl-1 pr-2 bg-amber-500 hover:bg-amber-600 text-black relative">
-            <UserIcon sx='m-0 text-black'/>
-            Log In
-        </Button>
-        <Button size="sm" href={`${base}/enter/register`} class="pl-1 pr-2 border-2 border-black bg-amber-100 hover:bg-amber-400 text-black relative">
-            <UserAddIcon sx='m-0 text-black'/>
-            Register
-        </Button>
+    <div class="md:order-2">
+        <div class='hidden md:block'>
+            <Button size="sm" href={`${base}/enter/login`} class="pl-1 pr-2 bg-amber-500 hover:bg-amber-600 text-black relative">
+                <UserIcon sx='m-0 text-black'/>
+                Log In
+            </Button>
+            <Button size="sm" href={`${base}/enter/register`} class="pl-1 pr-2 border-2 border-black bg-amber-100 hover:bg-amber-400 text-black relative">
+                <UserAddIcon sx='m-0 text-black'/>
+                Register
+            </Button>
+        </div>
         <NavHamburger/>
     </div>
 {/if}
