@@ -5,11 +5,8 @@ export const ONLINE_MUSEUM_URL = 'https://saduewa.dcc.uchile.cl/online-museum/';
 export const TEXT_FIELDS_WO_DATE = {
     'location': 'Location',
     'latLong': 'Latitude',
-    'scenario': 'Scenario',
-    'setting': 'Setting',
     'landscape': 'Landscape',
     'accessibility': 'Accessibility',
-    'category': 'Category',
     'production_period': 'Production Period',
     'condition_of_preservation': 'Condition of Preservation',
     'inscription': 'Inscription',

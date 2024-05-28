@@ -35,11 +35,8 @@ class ChangePassword(BaseModel):
 class Khachkar(BaseModel):
     location: Optional[str] = 'Unknown location'
     latLong: Optional[str] = None
-    scenario: Optional[str] = None
-    setting: Optional[str] = None
     landscape: Optional[str] = None
     accessibility: Optional[str] = None
-    category: Optional[str] = None
     production_period: Optional[str] = None
     condition_of_preservation: Optional[str] = None
     inscription: Optional[str] = None

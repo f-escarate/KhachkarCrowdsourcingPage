@@ -30,11 +30,8 @@ class Khachkar(Base):
 
     location = Column(String)
     latLong = Column(String)
-    scenario = Column(String)
-    setting = Column(String)
     landscape = Column(String)
     accessibility = Column(String)
-    category = Column(String)
     production_period = Column(String)
     condition_of_preservation = Column(String)
     inscription = Column(String)
