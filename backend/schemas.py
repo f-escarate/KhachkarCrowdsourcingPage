@@ -39,16 +39,11 @@ class Khachkar(BaseModel):
     setting: Optional[str] = None
     landscape: Optional[str] = None
     accessibility: Optional[str] = None
-    masters_name: Optional[str] = None
     category: Optional[str] = None
     production_period: Optional[str] = None
-    motive: Optional[str] = None
     condition_of_preservation: Optional[str] = None
     inscription: Optional[str] = None
     important_features: Optional[str] = None
-    backside: Optional[str] = None
-    history_ownership: Optional[str] = None
-    commemorative_activities: Optional[str] = None
     references: Optional[str] = None
     image: Optional[UploadFile] = None
     video: Optional[UploadFile] = None
