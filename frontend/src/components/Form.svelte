@@ -26,7 +26,8 @@
     function post_data_signal(){
         dispatch('post_data');
     }
-    let OPTION_FIELDS_LISTS = {};
+    let OPTION_FIELDS_OPTIONS_NAMES = {};
+    let OPTION_FIELDS_OPTIONS_IDS = {};
     onMount(async () => {
         let response = await auth_get_json(`${HOST}/get_options_list/`, token);
         if (response.status != 200){
@@ -37,7 +38,11 @@
         if (response.status === 'error') {
             alert('Failed to get options list: ' + response.msg);
         } else if (response.status === 'success') {
-            OPTION_FIELDS_LISTS = response.msg;
+            for( var key in OPTION_FIELDS_NAMES ) {
+                let options_list = response.msg[key];
+                OPTION_FIELDS_OPTIONS_NAMES[key] = options_list.map((x) => x[0]);
+                OPTION_FIELDS_OPTIONS_IDS[key] = options_list.map((x) => x[1]);
+            }
         } else {
             alert('Failed to get options list (unknown reason)');
         }
@@ -84,9 +89,9 @@
         }
 		const data = new FormData();
         for ( var field_name in OPTION_FIELDS_NAMES ) {
-            let options_list = OPTION_FIELDS_LISTS[field_name];
+            let options_list = OPTION_FIELDS_OPTIONS_IDS[field_name];
             let option_index = entry[field_name];
-            data.append(field_name, options_list[option_index][1]);
+            data.append(field_name, options_list[option_index]);
         }
         data.append('latitude', entry.latitude);
         data.append('longitude', entry.longitude);
@@ -150,7 +155,7 @@
     </div>
     <h2 class='md:col-span-2 text-2xl font-semibold'>Metadata</h2>
     {#each OPTION_FIELDS as key}
-        <SelectOptions title={OPTION_FIELDS_NAMES[key]} options={OPTION_FIELDS_LISTS[key]} bind:value={entry[key]}/>
+        <SelectOptions title={OPTION_FIELDS_NAMES[key]} options={OPTION_FIELDS_OPTIONS_NAMES[key]} bind:value={entry[key]}/>
     {/each}
     {#each NUM_FIELDS as key}
         <FloatingLabelInput style="filled" type="number" name={key} id={key} label={NUM_FIELDS_NAMES[key]} bind:value={entry[key]}/>
