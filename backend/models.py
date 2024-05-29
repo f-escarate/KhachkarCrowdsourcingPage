@@ -23,17 +23,44 @@ class KhachkarState(ENUM):
     meshed = "meshed"
     ready = "ready"
 
+class AccessibilityLevel(str, ENUM):
+    very_easy = "Very easy"
+    easy = "Easy"
+    normal = "Normal"
+    hard = "Hard"
+    very_hard = "Very hard"
+
+class ConditionOfPreservation(str, ENUM):
+    very_good = "Very good"
+    good = "Good"
+    normal = "Normal"
+    bad = "Bad"
+    very_bad = "Very bad"
+
+class Landscape(str, ENUM):
+    mountain = "Mountain"
+    flat_land = "Flat land"
+    other = "Other"
+
+class Location(str, ENUM):
+    unk = "Unknown"
+    ejmiatsin = "Ejmiatsin/Vagharshapat, Armavir Province, Armenia"
+    amaghu_valley = "Noravank/Amaghu Valley, Vayodz Dzor Province, Armenia"
+    noratus = "Noratus historical village, Gegharkunik Province, Armenia"
+    other = "Other"
+
 class Khachkar(Base):
     __tablename__ = "khachkar"
 
     id = Column(Integer, primary_key=True)
 
-    location = Column(String)
-    latLong = Column(String)
-    landscape = Column(String)
-    accessibility = Column(String)
+    location = Column(Enum(Location))
+    latitude = Column(Float)
+    longitude = Column(Float)
+    landscape = Column(Enum(Landscape))
+    accessibility = Column(Enum(AccessibilityLevel))
     production_period = Column(String)
-    condition_of_preservation = Column(String)
+    condition_of_preservation = Column(Enum(ConditionOfPreservation))
     inscription = Column(String)
     important_features = Column(String)
     references = Column(String)
@@ -50,21 +77,13 @@ class Khachkar(Base):
         info_dict = {
             "id": self.id,
             "location": self.location,
-            "latLong": self.latLong,
-            "scenario": self.scenario,
-            "setting": self.setting,
+            "latLong": f"{self.latitude}, {self.longitude}",
             "landscape": self.landscape,
             "accessibility": self.accessibility,
-            "mastersName": self.masters_name,
-            "category": self.category,
             "productionPeriod": self.production_period,
-            "motive": self.motive,
             "conditionOfPreservation": self.condition_of_preservation,
             "inscription": self.inscription,
             "importantFeatures": self.important_features,
-            "backside": self.backside,
-            "historyOwnership": self.history_ownership,
-            "commemorativeActivities": self.commemorative_activities,
             "references": self.references
         }
         for key in info_dict:

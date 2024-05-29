@@ -18,7 +18,7 @@
                 window.location.href = `${base}/enter/login`;
             }
         }
-        const response = await fetch(`${HOST}/get_khachkar/${id}/`, {
+        const response = await fetch(`${HOST}/get_khachkar/with_enums/${id}/`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

@@ -84,6 +84,29 @@ async def get_khachkar(khachkar_id: int, db: Session = Depends(get_db)):
     khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == khachkar_id).first()
     return khachkar
 
+@app.get("/get_khachkar/with_enums/{khachkar_id}/")
+async def get_khachkar(khachkar_id: int, db: Session = Depends(get_db)):
+    khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == khachkar_id).first()
+    khachkar.accessibility = list(models.AccessibilityLevel).index(khachkar.accessibility)
+    khachkar.condition_of_preservation = list(models.ConditionOfPreservation).index(khachkar.condition_of_preservation)
+    khachkar.landscape = list(models.Landscape).index(khachkar.landscape)
+    khachkar.location = list(models.Location).index(khachkar.location)
+    return khachkar
+
+@app.get("/get_options_list/")
+async def get_options_list(token: Annotated[str, Depends(oauth2_scheme)]):
+    if not token:
+        return {"status": "error", "msg": "You are not authorized to perform this action (login first)"}
+    return {
+        "status": "success",
+        "msg": {
+            "location": [[location.value, location.name] for location in models.Location],
+            "landscape": [[landscape.value, landscape.name] for landscape in models.Landscape],
+            "accessibility": [[accessibility.value, accessibility.name] for accessibility in models.AccessibilityLevel],
+            "condition_of_preservation": [[condition.value, condition.name] for condition in models.ConditionOfPreservation]
+        }
+    }
+
 @app.patch("/update_khachkar/{khachkar_id}/{with_mesh}/")
 async def update_khachkar(token: Annotated[str, Depends(oauth2_scheme)], khachkar_id: int, with_mesh: int, background_tasks: BackgroundTasks, khachkar: Khachkar = Depends(Khachkar), db: Session = Depends(get_db)):
     if not token:

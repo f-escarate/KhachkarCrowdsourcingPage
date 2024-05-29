@@ -1,13 +1,14 @@
 <script>
     import { onMount } from 'svelte';
     import { base } from '$app/paths';
-    import { HOST, TEXT_FIELDS } from '$lib/constants';
+    import { HOST, TEXT_FIELDS_NAMES, OPTION_FIELDS_NAMES } from '$lib/constants';
     import { Modal, Button, Table, TableBody, TableHead, TableBodyCell, TableHeadCell, TableBodyRow } from 'flowbite-svelte';
     import ListIcon from '../components/icons/ListIcon.svelte';
     import SquareIcon from './icons/SquareIcon.svelte';
     import VideoIcon from '../components/icons/VideoIcon.svelte';
     export let entry_data;
-    const FIELDS = Object.getOwnPropertyNames(TEXT_FIELDS);
+    const FIELDS_NAMES = {...OPTION_FIELDS_NAMES, ...TEXT_FIELDS_NAMES, 'date': 'Upload date'};
+    const FIELDS = Object.getOwnPropertyNames(FIELDS_NAMES);
     let image;
 
     onMount(async () => {
@@ -100,7 +101,7 @@
         <TableBody tableBodyClass="divide-y">
             {#each FIELDS as key}
                 <TableBodyRow>
-                    <TableBodyCell>{TEXT_FIELDS[key]}</TableBodyCell>
+                    <TableBodyCell>{FIELDS_NAMES[key]}</TableBodyCell>
                     <TableBodyCell>{entry_data[key]}</TableBodyCell>
                 </TableBodyRow>
             {/each}

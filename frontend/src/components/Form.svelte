@@ -1,8 +1,11 @@
 <script>
     import { createEventDispatcher } from 'svelte';
     import { FloatingLabelInput, Label, Button, Spinner } from 'flowbite-svelte';
-    import { HOST, TEXT_FIELDS_WO_DATE, BASE_ENTRY, BASE_MESH_DATA } from '$lib/constants';
+    import { HOST, TEXT_FIELDS_NAMES, NUM_FIELDS_NAMES, OPTION_FIELDS_NAMES, BASE_ENTRY, BASE_MESH_DATA } from '$lib/constants';
     import VideoOrMesh from './FormComponents/VideoOrMesh.svelte';
+    import SelectOptions from './FormComponents/SelectOptions.svelte';
+    import { onMount } from 'svelte';
+    import { auth_get_json } from '$lib/utils'
     
     export let token;
     export let http_method = 'POST';
@@ -23,8 +26,26 @@
     function post_data_signal(){
         dispatch('post_data');
     }
+    let OPTION_FIELDS_LISTS = {};
+    onMount(async () => {
+        let response = await auth_get_json(`${HOST}/get_options_list/`, token);
+        if (response.status != 200){
+            alert('Failed to get options list, status code: ' + response.status);
+            return;
+        }
+        response = await response.json();
+        if (response.status === 'error') {
+            alert('Failed to get options list: ' + response.msg);
+        } else if (response.status === 'success') {
+            OPTION_FIELDS_LISTS = response.msg;
+        } else {
+            alert('Failed to get options list (unknown reason)');
+        }
+    });
 
-    const FIELDS = Object.getOwnPropertyNames(TEXT_FIELDS_WO_DATE);
+    const TEXT_FIELDS = Object.getOwnPropertyNames(TEXT_FIELDS_NAMES);
+    const NUM_FIELDS = Object.getOwnPropertyNames(NUM_FIELDS_NAMES);
+    const OPTION_FIELDS = Object.getOwnPropertyNames(OPTION_FIELDS_NAMES);
     const restartForm = () => {
         videoVisibility = 0;
         if (!meshData.withMesh){
@@ -62,8 +83,20 @@
             return;
         }
 		const data = new FormData();
-        for ( var key in entry ) 
-            data.append(key, entry[key]);
+        for ( var field_name in OPTION_FIELDS_NAMES ) {
+            let options_list = OPTION_FIELDS_LISTS[field_name];
+            let option_index = entry[field_name];
+            data.append(field_name, options_list[option_index][1]);
+        }
+        data.append('latitude', entry.latitude);
+        data.append('longitude', entry.longitude);
+        data.append('video', entry.video);
+        data.append('image', entry.image);
+        for ( var key in TEXT_FIELDS_NAMES ) {
+            if (entry[key] !== null)
+                data.append(key, entry[key]);
+        }
+            
         if (data.get('image') === "null")
             data.set('image', new File([''], 'fake.jpg', {type: 'image/jpeg'}));
         if (meshData.withMesh) {
@@ -116,9 +149,16 @@
     </div>
     </div>
     <h2 class='md:col-span-2 text-2xl font-semibold'>Metadata</h2>
-    {#each FIELDS as key}
-        <FloatingLabelInput style="filled" type="text" name={key} id={key} label={TEXT_FIELDS_WO_DATE[key]} bind:value={entry[key]}/>
+    {#each OPTION_FIELDS as key}
+        <SelectOptions title={OPTION_FIELDS_NAMES[key]} options={OPTION_FIELDS_LISTS[key]} bind:value={entry[key]}/>
     {/each}
+    {#each NUM_FIELDS as key}
+        <FloatingLabelInput style="filled" type="number" name={key} id={key} label={NUM_FIELDS_NAMES[key]} bind:value={entry[key]}/>
+    {/each}
+    {#each TEXT_FIELDS as key}
+        <FloatingLabelInput style="filled" type="text" name={key} id={key} label={TEXT_FIELDS_NAMES[key]} bind:value={entry[key]}/>
+    {/each}
+    
 
     {#if isLoading}
         <Button class='md:col-span-2 w-[50%] mx-auto h-full text-black bg-amber-500'>
