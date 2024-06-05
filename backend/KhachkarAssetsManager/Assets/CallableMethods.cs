@@ -21,7 +21,7 @@ public class CallableMethods: MonoBehaviour
         int meshesCount = int.Parse(arguments[13]);
         for(int i = 0; i < meshesCount; i++){
             string meshId = arguments[14+i];
-            int assetBundleMinIdx = ((meshesCount-1)/ASSETBUNDLE_SIZE)*ASSETBUNDLE_SIZE + 1;
+            int assetBundleMinIdx = ((Int32.Parse(meshId)-1)/ASSETBUNDLE_SIZE)*ASSETBUNDLE_SIZE + 1;
             string assetBundleInterval = string.Format("_{0}_{1}", assetBundleMinIdx, assetBundleMinIdx+ASSETBUNDLE_SIZE-1);
             createMeshPrefab(meshId, assetBundleInterval);
             createTextAsset(meshId, assetBundleInterval);
