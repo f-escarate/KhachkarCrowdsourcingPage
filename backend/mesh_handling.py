@@ -13,6 +13,7 @@ UNITY_USER = os.getenv("UNITY_USER")
 UNITY_PASSWORD = os.getenv("UNITY_PASSWORD")
 MESH_TO_VIDEO_ENDPOINT = os.getenv("MESH_TO_VIDEO_ENDPOINT")
 MESHES_PATH = os.getenv("MESHES_PATH")
+IMAGES_PATH = os.getenv("IMAGES_PATH")
 
 def get_mesh_from_video(khachkar: Khachkar, db: Session):
     try:
@@ -58,6 +59,14 @@ def send_mesh_to_unity(index: int):
     except FileExistsError as e:
         shutil.rmtree(unity_mesh_path)
         shutil.copytree(mesh_path, unity_mesh_path)
+
+    image_path = f"{IMAGES_PATH}/{index}.jpg"
+    unity_image_path = f"{PROJECT_PATH}/Assets/Resources/StonesThumbs/{index}.jpg"
+    try:
+        shutil.copy(image_path, unity_image_path)
+    except FileExistsError as e:
+        shutil.rmtree(unity_image_path)
+        shutil.copy(image_path, unity_image_path)
 
 def remove_mesh_from_unity(index: int):
     """

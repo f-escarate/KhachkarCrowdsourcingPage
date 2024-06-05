@@ -25,9 +25,20 @@ public class CallableMethods: MonoBehaviour
             string assetBundleInterval = string.Format("_{0}_{1}", assetBundleMinIdx, assetBundleMinIdx+ASSETBUNDLE_SIZE-1);
             createMeshPrefab(meshId, assetBundleInterval);
             createTextAsset(meshId, assetBundleInterval);
+            addThumbToAssetBundle(meshId);
+        }
+
+        string path = "/var/www/museum/StreamingAssets";
+        //string path = "Assets/AssetBundles";
+
+        // Remove previous files
+        System.IO.DirectoryInfo di = new DirectoryInfo(path);
+        foreach (FileInfo file in di.GetFiles())
+        {
+            file.Delete(); 
         }
         // Build Asset Bundles
-        BuildPipeline.BuildAssetBundles("Assets/AssetBundles", BuildAssetBundleOptions.None, BuildTarget.WebGL);
+        BuildPipeline.BuildAssetBundles(path, BuildAssetBundleOptions.None, BuildTarget.WebGL);
     }
 
     static unsafe void createMeshPrefab(string meshId, string assetBundleInterval){
@@ -68,6 +79,11 @@ public class CallableMethods: MonoBehaviour
         const string PREFABS_PATH = "Assets/Resources/StonesMetadata/";
         string prefabPath = PREFABS_PATH+"Stone"+meshId+".json";
         AssetImporter.GetAtPath(prefabPath).assetBundleName = "stones_metadata"+assetBundleInterval;
+    }
+    static unsafe void addThumbToAssetBundle(string meshId){
+        const string PREFABS_PATH = "Assets/Resources/StonesThumbs/";
+        string prefabPath = PREFABS_PATH+meshId+".jpg";
+        AssetImporter.GetAtPath(prefabPath).assetBundleName = "stones_thumbs";
     }
 }
 #endif
