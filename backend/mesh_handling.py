@@ -14,6 +14,7 @@ UNITY_PASSWORD = os.getenv("UNITY_PASSWORD")
 MESH_TO_VIDEO_ENDPOINT = os.getenv("MESH_TO_VIDEO_ENDPOINT")
 MESHES_PATH = os.getenv("MESHES_PATH")
 IMAGES_PATH = os.getenv("IMAGES_PATH")
+METADATA_PATH = os.getenv("METADATA_PATH")
 
 def get_mesh_from_video(khachkar: Khachkar, db: Session):
     try:
@@ -35,7 +36,7 @@ def generate_text_asset(khachkar: Khachkar, db: Session):
     #mesh_transformations = db.query(MeshTransformations).filter(MeshTransformations.khachkar_id == khachkar.id).first()
     #data["assetProps"] = mesh_transformations.as_dict()
     json_data = json.dumps(data)
-    path = os.path.join(".", "KhachkarAssetsManager", "Assets", "Resources", "StonesMetadata", f"Stone{khachkar.id}.json")
+    path = os.path.join(METADATA_PATH, f"Stone{khachkar.id}.json")
     # Save the json file
     with open(path, "w") as file:
         file.write(json_data)
@@ -47,33 +48,6 @@ def call_method(method, args):
     if return_code != 0:
         return {"status": "error", "msg": "Error in Unity method call"}
     return {"status": "success"}
-
-def send_mesh_to_unity(index: int):
-    """
-        Copies the mesh folder into the Unity project
-    """
-    mesh_path = f"{MESHES_PATH}/{index}"
-    unity_mesh_path = f"{PROJECT_PATH}/Assets/Resources/StonesMeshes/{index}"
-    try:
-        shutil.copytree(mesh_path, unity_mesh_path)
-    except FileExistsError as e:
-        shutil.rmtree(unity_mesh_path)
-        shutil.copytree(mesh_path, unity_mesh_path)
-
-    image_path = f"{IMAGES_PATH}/{index}.jpg"
-    unity_image_path = f"{PROJECT_PATH}/Assets/Resources/StonesThumbs/{index}.jpg"
-    try:
-        shutil.copy(image_path, unity_image_path)
-    except FileExistsError as e:
-        shutil.rmtree(unity_image_path)
-        shutil.copy(image_path, unity_image_path)
-
-def remove_mesh_from_unity(index: int):
-    """
-        Removes the mesh folder from the Unity project
-    """
-    unity_mesh_path = f"{PROJECT_PATH}/Assets/Resources/StonesMeshes/{index}"
-    shutil.rmtree(unity_mesh_path)
 
 def transform_mesh(id:int, position: list, rotation: list, scale: float):
     try:
