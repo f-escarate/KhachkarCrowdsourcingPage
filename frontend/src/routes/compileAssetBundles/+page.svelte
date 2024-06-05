@@ -6,6 +6,7 @@
     import { auth_get_json } from '$lib/utils';
     import Cookies from 'js-cookie';
     let entries = [];
+    let khachkars_in_unity = [];
     let token;
     onMount(async () => {
         token = Cookies.get('token');
@@ -16,6 +17,17 @@
         }
         const response = await auth_get_json(`${HOST}/get_khachkars/ready/`, token);
         entries = await response.json();
+        const response2 = await auth_get_json(`${HOST}/get_khachkars_in_unity/`, token);
+        khachkars_in_unity = await response2.json();
+        if (khachkars_in_unity.status !== 'success') {
+            alert('Failed to get the list of khachkars that are currently in the Museum');
+            return;
+        }
+        khachkars_in_unity = khachkars_in_unity.khachkars;
+        let checkboxes = document.getElementsByName('checkbox');
+        for (let i = 0; i < checkboxes.length; i++) {
+            checkboxes[i].checked = khachkars_in_unity.includes(entries[i]['id']);
+        }
     });
     const handleCompilation = async () => {
         if (!confirm("Are you sure you want to compile asset bundles?"))

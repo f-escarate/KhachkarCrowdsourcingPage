@@ -115,3 +115,8 @@ class MeshTransformations(Base):
             "offsetY": self.offset_y,
             "offsetZ": self.offset_z
         }
+    
+class KhachkarInUnity(Base):
+    __tablename__ = "khachkar_in_unity"
+    khachkar_id = Column(Integer, ForeignKey("khachkar.id"), primary_key=True)
+    khachkar = relationship("Khachkar")

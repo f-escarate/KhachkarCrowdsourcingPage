@@ -3,11 +3,12 @@ from datetime import datetime
 from requests import Session
 from schemas import Khachkar, KhachkarMeshFiles
 import models
+from dotenv import load_dotenv
 
-IMG_PATH = "./data/images"
-VID_PATH = "./data/videos"
-FRAMES_PATH = "./data/temp_frames"
-MESHES_PATH = "./data/meshes"
+load_dotenv()
+IMG_PATH = os.getenv("IMAGES_PATH")
+VID_PATH = os.getenv("VIDEOS_PATH")
+MESHES_PATH = os.getenv("MESHES_PATH")
 
 def file_validation(file, extensions) -> str | None:
     """
@@ -160,11 +161,21 @@ def edit_khachkar(db: Session, db_khachkar: models.Khachkar, khachkar: Khachkar,
     db_khachkar.references = khachkar.references
     db.commit()
 
-
-
 def update_khachkar_status(db: Session, db_khachkar: models.Khachkar, status: str):
     """
         Updates the status of the Khackkar in the database.
     """
     db_khachkar.state = status
+    db.commit()
+
+def update_khachkars_in_unity(db: Session, khachkar_ids: list[int]):
+    """
+        Updates the Khackkar in Unity.
+    """
+    # First delete all elements in the table
+    db.query(models.KhachkarInUnity).delete()
+    # Then add the new elements
+    for khachkar_id in khachkar_ids:
+        db_khachkar_in_unity = models.KhachkarInUnity(khachkar_id=khachkar_id)
+        db.add(db_khachkar_in_unity)
     db.commit()
