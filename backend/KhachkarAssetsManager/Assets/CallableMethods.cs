@@ -39,6 +39,7 @@ public class CallableMethods: MonoBehaviour
         }
         // Build Asset Bundles
         BuildPipeline.BuildAssetBundles(path, BuildAssetBundleOptions.None, BuildTarget.WebGL);
+        
     }
 
     static unsafe void createMeshPrefab(string meshId, string assetBundleInterval){
@@ -82,7 +83,10 @@ public class CallableMethods: MonoBehaviour
     }
     static unsafe void addThumbToAssetBundle(string meshId){
         const string PREFABS_PATH = "Assets/Resources/StonesThumbs/";
-        string prefabPath = PREFABS_PATH+meshId+".jpg";
+        // Search for the image file
+        string[] files = Directory.GetFiles(PREFABS_PATH, meshId+".*");
+        string imgExtension = Path.GetExtension(files[0]);
+        string prefabPath = PREFABS_PATH+meshId+imgExtension;
         AssetImporter.GetAtPath(prefabPath).assetBundleName = "stones_thumbs";
     }
 }
