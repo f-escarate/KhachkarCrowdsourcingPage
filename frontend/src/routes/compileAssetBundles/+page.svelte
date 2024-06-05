@@ -1,12 +1,13 @@
 <script>
     import { onMount } from 'svelte';
-    import { Table, TableBody, TableHead, TableBodyCell, TableHeadCell, TableBodyRow, Checkbox, Button } from 'flowbite-svelte';
+    import { Table, TableBody, TableHead, TableBodyCell, TableHeadCell, TableBodyRow, Checkbox, Button, Spinner } from 'flowbite-svelte';
     import { HOST } from '$lib/constants';
     import { base } from '$app/paths';
     import { auth_get_json } from '$lib/utils';
     import Cookies from 'js-cookie';
     let entries = [];
     let khachkars_in_unity = [];
+    let compiling_asset_bundles = false;
     let token;
     onMount(async () => {
         token = Cookies.get('token');
@@ -32,6 +33,7 @@
     const handleCompilation = async () => {
         if (!confirm("Are you sure you want to compile asset bundles?"))
             return;
+        compiling_asset_bundles = true;
         let khachkar_ids = [];
         let checkboxes = document.getElementsByName('checkbox');
         for (let i = 0; i < checkboxes.length; i++) {
@@ -53,6 +55,7 @@
         } else {
             alert(msg.msg);
         }
+        compiling_asset_bundles = false;
     }
     const handleSelectAll = (e) => {
         let checkboxes = document.getElementsByName('checkbox');
@@ -81,7 +84,17 @@
                 {/each}
             </TableBody>
         </Table>
-        <Button on:click={handleCompilation} size="xs" class='m-2 bg-amber-500'>Compile Asset Bundles</Button>
+        {#if compiling_asset_bundles}
+            <p class='m-2 font-bold text-orange-700'>This process could take a few minutes</p>
+            <Button disabled size="xs" class='m-2 bg-amber-500'>
+                <Spinner class="mr-2" size="4"/>
+                Compiling asset bundles...
+            </Button>
+            
+        {:else}
+            <Button on:click={handleCompilation} size="xs" class='m-2 bg-amber-500'>Compile Asset Bundles</Button>
+        {/if}
+        
     {:else}
         <p class='m-4'>No entries found</p>
     {/if}
