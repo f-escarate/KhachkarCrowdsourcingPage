@@ -7,7 +7,12 @@
     import SquareIcon from './icons/SquareIcon.svelte';
     import VideoIcon from '../components/icons/VideoIcon.svelte';
     export let entry_data;
-    const FIELDS_NAMES = {...OPTION_FIELDS_NAMES, ...TEXT_FIELDS_NAMES, 'date': 'Upload date'};
+    const FIELDS_NAMES = {
+        ...OPTION_FIELDS_NAMES,
+        ...TEXT_FIELDS_NAMES,
+        latLong: 'Latitude and Longitude',
+        'date': 'Upload date'
+    };
     const FIELDS = Object.getOwnPropertyNames(FIELDS_NAMES);
     let image;
 
@@ -27,6 +32,7 @@
             if (entry_data[key] === null)
                 entry_data[key] = "-"
         }
+        entry_data.latLong = `${entry_data.latitude}, ${entry_data.longitude}`;
     });
     const loadVideo = async () => {
         if (entry_data.state === 'not_meshed' || entry_data.state === 'creating_mesh'){
