@@ -42,9 +42,10 @@ def generate_text_asset(khachkar: Khachkar, db: Session):
         file.write(json_data)
 
 def call_method(method, args):
+    virtual_display_command =  'xvfb-run --auto-servernum --server-args="-screen 0 640x480x24:32"'
     command = '{0} -quit -batchmode -username "{1}" -password "{2}" -logFile {3} -projectPath {4} -executeMethod {5} {6}'
     command = command.format(UNITY_PATH, UNITY_USER, UNITY_PASSWORD, LOGFILE_PATH, PROJECT_PATH, method, args)
-    return_code = os.system(command)
+    return_code = os.system(f'{virtual_display_command} {command}')
     if return_code != 0:
         return {"status": "error", "msg": "Error in Unity method call"}
     return {"status": "success"}
