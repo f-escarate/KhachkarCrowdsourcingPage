@@ -1,5 +1,5 @@
 <script>
-    import { Navbar, NavBrand, NavLi, NavUl, Button, NavHamburger } from 'flowbite-svelte';
+    import { Navbar, NavBrand, NavLi, NavUl } from 'flowbite-svelte';
     import UserIcon from './icons/UserIcon.svelte';
     import UserAddIcon from './icons/UserAddIcon.svelte';
     import { base } from "$app/paths";
@@ -19,7 +19,7 @@
     </NavBrand>
     <UserButton bind:authenticated/>
     <NavUl {activeUrl} {activeClass} {nonActiveClass}>
-        <NavLi href={base}>Home</NavLi>
+        <NavLi href={base+"/"}>Home</NavLi>
         {#if authenticated}
             <NavLi href={`${base}/add/`}>Add Khachkar</NavLi>
         {/if}
