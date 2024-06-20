@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo apt install libpng-dev libjpeg-dev libtiff-dev libtbb-dev
+sudo apt install libpng-dev libjpeg-dev libtiff-dev libtbb-dev -y
 cd ~/KhachkarCrowdsourcingPage/mesh_generation/submodules/mvs-texturing
 mkdir build && cd build && cmake ..
 make -j

@@ -17,7 +17,7 @@ wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 bash Miniconda3-latest-Linux-x86_64.sh
 
 # For OpenCV
-sudo apt-get install ffmpeg libsm6 libxext6  -y
+sudo apt-get install ffmpeg libsm6 libxext6 -y
 
 # Reload bashrc for the nexts scripts
 LAST_BASH_RC_LINES=$(cat ~/.bashrc | tail -n +$((BASH_RC_LINES+1)))

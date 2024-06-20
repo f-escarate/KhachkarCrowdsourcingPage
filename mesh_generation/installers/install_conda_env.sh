@@ -15,6 +15,8 @@ cd ../../
 python setup.py develop
 
 # Install Gaussian Splatting libraries
+# Install libglm (is used by diff-gaussian-rasterization)
+sudo apt-get -y install libglm-dev
 cd ~/KhachkarCrowdsourcingPage/mesh_generation/submodules/gaussian-splatting/submodules/diff-gaussian-rasterization/
 pip install -e .
 cd ~/KhachkarCrowdsourcingPage/mesh_generation/submodules/gaussian-splatting/submodules/simple-knn/
