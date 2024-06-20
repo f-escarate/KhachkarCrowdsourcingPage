@@ -4,6 +4,7 @@
     import SquareIcon2 from '../../components/icons/SquareIcon2.svelte';
     import MagicIcon from '../../components/icons/MagicIcon.svelte';
     import DownIcon from '../../components/icons/DownIcon.svelte';
+    import ClockIcon from '../../components/icons/ClockIcon.svelte';
     import { Button, Spinner, Checkbox, Dropdown, Radio } from 'flowbite-svelte'
     import { onMount } from 'svelte';
     import { HOST } from '$lib/constants';
@@ -134,6 +135,11 @@
                     <Button disabled class='md:col-span-2 w-full md:w-[50%] mx-auto h-full bg-purple-500 hover:bg-purple-700'>
                         <Spinner class="mr-2" size="5"/>
                         Generating mesh
+                    </Button>
+                    {:else if entry.state === 'queued_for_meshing'}
+                    <Button disabled class='md:col-span-2 w-full md:w-[50%] mx-auto h-full bg-purple-500 hover:bg-purple-700'>
+                        <ClockIcon sx='m-0 mr-1 text-white'/>
+                        Queued for meshing
                     </Button>
                     {:else if entry.state === 'not_meshed'}
                         <Button class='md:col-span-2 w-full md:w-[50%] mx-auto h-full bg-purple-500 hover:bg-purple-700' on:click={e => handleProcessMesh(e, i)}>

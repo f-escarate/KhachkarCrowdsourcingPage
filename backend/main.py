@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from schemas import ChangePassword, Khachkar, UserRegister, KhachkarMeshFiles, KhachkarMeshTransformations
 from authentication import authenticate_user, create_access_token, get_password_hash, get_name_by_token, ACCESS_TOKEN_EXPIRE_MINUTES, get_user_by_name, unauthorized_exception, verify_password
-from utils import save_image, save_video, save_mesh, create_khachkar, edit_khachkar, read_image, read_video, read_file, img_validation, update_khachkars_in_unity, video_validation, mesh_files_validation, preprocess_video, MESHES_PATH, queue_khahckar_for_meshing
+from utils import save_image, save_video, save_mesh, create_khachkar, edit_khachkar, read_image, read_video, read_file, img_validation, update_khachkar_status, update_khachkars_in_unity, video_validation, mesh_files_validation, preprocess_video, MESHES_PATH
 from database import get_db, Base, engine, SessionLocal
 from mesh_handling import get_mesh_from_video, call_method, transform_mesh, crop_mesh, generate_text_asset
 from valdi import ValdiTask
@@ -276,11 +276,10 @@ async def mesh_khachkar(token: Annotated[str, Depends(oauth2_scheme)], khachkar_
     if vm_status is None:
         return {"status": "error", "msg": "Gaussian Splatting server server connection error 2"}
     if vm_status["status"] != "running":
-        queue_khahckar_for_meshing(khachkar_id, db)
+        update_khachkar_status(db, khachkar, "queued_for_meshing")
         print("Gaussian Splatting server is not running, but the khachkar will be meshed when it starts")
         return {"status": "success"}
-    response = get_mesh_from_video(khachkar, db)
-    return response
+    return get_mesh_from_video(khachkar, db)
 
 @app.post("/mesh_khachkar/{khachkar_id}/")
 async def post_khachkar_mesh(khachkar_id: int, mesh_files: List[UploadFile] = File(...), db: Session = Depends(get_db)):

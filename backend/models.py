@@ -19,6 +19,7 @@ class User(Base):
 class KhachkarState(ENUM):
     processing_video = "processing_video"
     not_meshed = "not_meshed"
+    queued_for_meshing = "queued_for_meshing"
     creating_mesh = "creating_mesh"
     meshed = "meshed"
     ready = "ready"
@@ -115,11 +116,6 @@ class MeshTransformations(Base):
             "offsetY": self.offset_y,
             "offsetZ": self.offset_z
         }
-    
-class QueuedKhachkarForMeshing(Base):
-    __tablename__ = "queued_khachkar_for_meshing"
-    khachkar_id = Column(Integer, ForeignKey("khachkar.id"), primary_key=True)
-    khachkar = relationship("Khachkar")
     
 class KhachkarInUnity(Base):
     __tablename__ = "khachkar_in_unity"

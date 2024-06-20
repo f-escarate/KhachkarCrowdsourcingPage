@@ -5,7 +5,7 @@
 import requests, asyncio, os
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
-from models import Khachkar, QueuedKhachkarForMeshing
+from models import Khachkar
 from mesh_handling import get_mesh_from_video
 
 def login(email: str, password: str) -> tuple | None:
@@ -74,20 +74,17 @@ class ValdiTask():
         return token
     
     def mesh_every_khachkar(self, db: Session):
-        queued_khachkars = db.query(QueuedKhachkarForMeshing).all()
-        db.query(QueuedKhachkarForMeshing).delete() # Delete all the queued khachkars
-        db.commit()
-        for queued_khachkar in queued_khachkars:
-            khachkar = db.query(Khachkar).filter(Khachkar.id == queued_khachkar.khachkar_id).first()
+        queued_khachkars = db.query(Khachkar).filter(Khachkar.state == "queued_for_meshing").all()
+        for khachkar in queued_khachkars:
             if khachkar is None:
-                print(f" - Khachkar with id {queued_khachkar.khachkar_id} not found")
+                print(f" - Khachkar with id {khachkar.id} not found")
                 continue
-            print(f" -> Meshing khachkar with id {queued_khachkar.khachkar_id}")
+            print(f" -> Meshing khachkar with id {khachkar.id}")
             res = get_mesh_from_video(khachkar, db)
             print(res)
 
     def get_queued_khachkars_count(self, db: Session) -> int:
-        return db.query(QueuedKhachkarForMeshing).count()
+        return db.query(Khachkar).filter(Khachkar.state == "queued_for_meshing").count()
 
     def get_meshing_khachkars_count(self, db: Session) -> int:
         return db.query(Khachkar).filter(Khachkar.state == "creating_mesh").count()
