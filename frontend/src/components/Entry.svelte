@@ -63,37 +63,37 @@
 </script>
 
 <div class='m-2 md:w-full flex flex-col border-b-2 border-amber-500 items-center w-auto'>
-    <div class='p-4 md:flex md:justify-between md:max-h-[300px]'>
-        <div class='m-2 flex flex-col justify-between items-center md:items-start'>
-            <h1 class='text-4xl font-semibold'>{entry_data.location} {entry_data.id}</h1>
+    <div class='p-4 md:flex md:justify-between md:max-h-[300px] md:gap-2'>
+        <div class='flex flex-col justify-between items-center md:items-start'>
+            <h1 class='text-2xl font-semibold font-italic line-clamp-3 text-ellipsis'>{entry_data.location} {entry_data.id}</h1>
             <img class='max-h-[50vh] md:max-h-full rounded-lg md:rounded-none md:hidden w-full m-4 object-contain' src={image} alt={entry_data.id} />
             <p class='m-2'><b>Current state: </b>{STATES_LABELS[entry_data.state]}</p>
             <p class="m-2 text-xs font-bold">Upload date {entry_data.date}</p>
-            <div id='buttons_container' class='flex self-center'>
-                <Button on:click={previewData} size="xs" class='m-2 bg-amber-500'>
+            <div id='buttons_container' class='w-full flex justify-between md:justify-start gap-2'>
+                <Button on:click={previewData} size="xs" class='w-full md:w-auto bg-amber-500'>
                     <ListIcon sx='m-0 mr-1 text-white'/>
                     Preview Data
                 </Button>
                 {#if entry_data.state === 'processing_video'}
-                    <Button disabled size="xs" class='m-2 bg-amber-500'>
+                    <Button disabled size="xs" class='w-full md:w-auto bg-amber-500'>
                         <VideoIcon sx='m-0 mr-1 text-white'/>
                         Processing Khachkar video
                     </Button>
                 {:else}
-                    <Button on:click={previewVideo} size="xs" class='m-2 bg-amber-500'>
+                    <Button on:click={previewVideo} size="xs" class='w-full md:w-auto bg-amber-500'>
                         <VideoIcon sx='m-0 mr-1 text-white'/>
                         Preview Video
                     </Button>
                 {/if}
                 {#if entry_data.state === 'meshed' || entry_data.state === 'ready'}
-                    <Button on:click={window.open(`${base}/viewMesh/${entry_data.id}`,'_blank','noopener')} size="xs" class='m-2 bg-amber-500'>
+                    <Button on:click={window.open(`${base}/viewMesh/${entry_data.id}`,'_blank','noopener')} size="xs" class='w-full md:w-auto bg-amber-500'>
                         <SquareIcon sx='m-0 mr-1 text-white'/>
                         Preview Mesh
                     </Button>
                 {/if}
             </div>
         </div>
-        <img class='hidden md:block w-1/2 object-contain' src={image} alt={entry_data.id} />
+        <img class='hidden md:block max-w-[40%] object-contain' src={image} alt={entry_data.id} />
     </div>
     <slot class='mx-auto'></slot>
 </div>

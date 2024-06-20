@@ -83,7 +83,7 @@
     }
 </script>
 
-<div class='flex flex-col items-center'>
+<div class='flex flex-col items-center md:max-w-[80%] md:mx-auto self-center'>
     <div class='m-2 flex self-start w-full items-center gap-4'>
         <Button class='bg-amber-500 hover:bg-amber-700'>
             Filter by Khachkar state <DownIcon sx='m-0 text-white'/>
@@ -112,7 +112,7 @@
             {#each filtered_entries as entry, i}
             <Entry entry_data={entry}>
                 {#if entry.owner_id === user_id}
-                <div class='m-4 flex flex-col md:flex-row md:justify-between md:max-h-[300px] md:w-[85%] gap-4'>
+                <div class='md:mt-2 mb-4 px-4 flex flex-col md:flex-row md:justify-between md:max-h-[300px] w-full gap-4'>
                     <Button class='md:col-span-2 w-full md:w-[50%] mx-auto h-full bg-cyan-500 hover:bg-cyan-600' href={`${base}/editEntry/${entry.id}/`}>
                         <EditIcon sx='m-0 mr-1 text-white'/>
                         Edit entry
