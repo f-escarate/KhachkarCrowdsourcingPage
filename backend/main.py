@@ -7,14 +7,23 @@ from sqlalchemy.orm import Session
 
 from schemas import ChangePassword, Khachkar, UserRegister, KhachkarMeshFiles, KhachkarMeshTransformations
 from authentication import authenticate_user, create_access_token, get_password_hash, get_name_by_token, ACCESS_TOKEN_EXPIRE_MINUTES, get_user_by_name, unauthorized_exception, verify_password
-from utils import save_image, save_video, save_mesh, create_khachkar, edit_khachkar, read_image, read_video, read_file, img_validation, update_khachkars_in_unity, video_validation, mesh_files_validation, preprocess_video, MESHES_PATH
-from database import get_db, Base, engine
+from utils import save_image, save_video, save_mesh, create_khachkar, edit_khachkar, read_image, read_video, read_file, img_validation, update_khachkars_in_unity, video_validation, mesh_files_validation, preprocess_video, MESHES_PATH, queue_khahckar_for_meshing
+from database import get_db, Base, engine, SessionLocal
 from mesh_handling import get_mesh_from_video, call_method, transform_mesh, crop_mesh, generate_text_asset
-import models, os
+from valdi import ValdiTask
+from contextlib import asynccontextmanager
+import models, os, asyncio
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(docs_url=None, redoc_url=None)
+# Runs the ValdiTask in the background to check the status of the Gaussian Splatting server and start it when is needed
+valdi_task = ValdiTask()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    asyncio.create_task(valdi_task.try_to_call_gsplatting_server(SessionLocal()))
+    yield
+
+app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -258,6 +267,18 @@ async def mesh_khachkar(token: Annotated[str, Depends(oauth2_scheme)], khachkar_
         return {"status": "error", "msg": "khachkar does not exist"}
     if khachkar.owner_id != user.id and not user.is_admin:
         return {"status": "error", "msg": "you are not the owner of this khachkar"}
+    
+    # Check if the Valdi server is running
+    token = valdi_task.get_access_token()
+    if token is None:
+        return {"status": "error", "msg": "Gaussian Splatting server connection error 1"}
+    vm_status = valdi_task.get_is_vm_status_data(token)
+    if vm_status is None:
+        return {"status": "error", "msg": "Gaussian Splatting server server connection error 2"}
+    if vm_status["status"] != "running":
+        queue_khahckar_for_meshing(khachkar_id, db)
+        print("Gaussian Splatting server is not running, but the khachkar will be meshed when it starts")
+        return {"status": "success"}
     response = get_mesh_from_video(khachkar, db)
     return response
 

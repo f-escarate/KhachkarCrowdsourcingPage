@@ -179,3 +179,7 @@ def update_khachkars_in_unity(db: Session, khachkar_ids: list[int]):
         db_khachkar_in_unity = models.KhachkarInUnity(khachkar_id=khachkar_id)
         db.add(db_khachkar_in_unity)
     db.commit()
+
+def queue_khahckar_for_meshing(khachkar_id: int, db: Session):
+    db.add(models.QueuedKhachkarForMeshing(khachkar_id=khachkar_id))
+    db.commit()

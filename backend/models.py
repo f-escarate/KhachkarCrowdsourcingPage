@@ -116,6 +116,11 @@ class MeshTransformations(Base):
             "offsetZ": self.offset_z
         }
     
+class QueuedKhachkarForMeshing(Base):
+    __tablename__ = "queued_khachkar_for_meshing"
+    khachkar_id = Column(Integer, ForeignKey("khachkar.id"), primary_key=True)
+    khachkar = relationship("Khachkar")
+    
 class KhachkarInUnity(Base):
     __tablename__ = "khachkar_in_unity"
     khachkar_id = Column(Integer, ForeignKey("khachkar.id"), primary_key=True)
