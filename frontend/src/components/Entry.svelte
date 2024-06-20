@@ -1,7 +1,7 @@
 <script>
     import { onMount } from 'svelte';
     import { base } from '$app/paths';
-    import { HOST, TEXT_FIELDS_NAMES, OPTION_FIELDS_NAMES } from '$lib/constants';
+    import { HOST, TEXT_FIELDS_NAMES, OPTION_FIELDS_NAMES, STATES_LABELS } from '$lib/constants';
     import { Modal, Button, Table, TableBody, TableHead, TableBodyCell, TableHeadCell, TableBodyRow } from 'flowbite-svelte';
     import ListIcon from '../components/icons/ListIcon.svelte';
     import SquareIcon from './icons/SquareIcon.svelte';
@@ -67,7 +67,7 @@
         <div class='m-2 flex flex-col justify-between items-center md:items-start'>
             <h1 class='text-4xl font-semibold'>{entry_data.location} {entry_data.id}</h1>
             <img class='max-h-[50vh] md:max-h-full rounded-lg md:rounded-none md:hidden w-full m-4 object-contain' src={image} alt={entry_data.id} />
-            <p class='m-2'>{entry_data.inscription}</p>
+            <p class='m-2'><b>Current state: </b>{STATES_LABELS[entry_data.state]}</p>
             <p class="m-2 text-xs font-bold">Upload date {entry_data.date}</p>
             <div id='buttons_container' class='flex self-center'>
                 <Button on:click={previewData} size="xs" class='m-2 bg-amber-500'>

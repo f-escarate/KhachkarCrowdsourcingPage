@@ -45,3 +45,12 @@ export const BASE_MESH_DATA = {
     material: null,
     images: []
 }
+
+export const STATES_LABELS = {
+    "processing_video": "The uploaded video is being processed",
+    "not_meshed": "That khachkar does not have a 3D model yet",
+    "queued_for_meshing": "That khachkar is queued for meshing",
+    "creating_mesh": "The 3D model of that khachkar is being created",
+    "meshed": "That khachkar already has a 3D model",
+    "ready": "The khachkar is ready to be placed in the museum"
+}
