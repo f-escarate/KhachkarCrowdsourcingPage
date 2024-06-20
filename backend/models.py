@@ -58,6 +58,7 @@ class Khachkar(Base):
     location = Column(Enum(Location))
     latitude = Column(Float)
     longitude = Column(Float)
+    height = Column(Float)
     landscape = Column(Enum(Landscape))
     accessibility = Column(Enum(AccessibilityLevel))
     production_period = Column(String)

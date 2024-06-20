@@ -11,7 +11,8 @@ export const TEXT_FIELDS_NAMES = {
 
 export const NUM_FIELDS_NAMES = {
     'latitude': 'Latitude',
-    'longitude': 'Longitude'
+    'longitude': 'Longitude',
+    'height': 'Height (in meters)',
 }
 
 export const OPTION_FIELDS_NAMES = {
@@ -26,15 +27,17 @@ export const BASE_ENTRY =
         acc[key] = '';
         return acc;
     },   
-    Object.keys(NUM_FIELDS_NAMES).reduce((acc, key) => {
-        acc[key] = 0;
-        return acc;
-    },
     Object.keys(OPTION_FIELDS_NAMES).reduce((acc, key) => {
         acc[key] = 0;
         return acc;
-    }
-,   {date: '', video: null, image: null})));
+    }, {
+        'latitude': 40.0691,
+        'longitude': 45.0382,
+        'height': 3.0,
+        date: '',
+        video: null,
+        image: null
+    }));
 
 export const BASE_MESH_DATA = {
     withMesh: false,

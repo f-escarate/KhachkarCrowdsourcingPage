@@ -34,8 +34,9 @@ class ChangePassword(BaseModel):
 @form_body
 class Khachkar(BaseModel):
     location: Optional[str] = 'Unknown location'
-    latitude: Optional[int] = None
-    longitude: Optional[int] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    height: Optional[float] = None
     landscape: Optional[str] = None
     accessibility: Optional[str] = None
     production_period: Optional[str] = None

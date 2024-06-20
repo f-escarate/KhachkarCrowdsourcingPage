@@ -152,6 +152,7 @@ def edit_khachkar(db: Session, db_khachkar: models.Khachkar, khachkar: Khachkar,
     db_khachkar.location = khachkar.location
     db_khachkar.latitude = khachkar.latitude
     db_khachkar.longitude = khachkar.longitude
+    db_khachkar.height = khachkar.height
     db_khachkar.landscape = khachkar.landscape
     db_khachkar.accessibility = khachkar.accessibility
     db_khachkar.production_period = khachkar.production_period

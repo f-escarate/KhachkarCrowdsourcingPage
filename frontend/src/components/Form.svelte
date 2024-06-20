@@ -95,6 +95,7 @@
         }
         data.append('latitude', entry.latitude);
         data.append('longitude', entry.longitude);
+        data.append('height', entry.height);
         data.append('video', entry.video);
         data.append('image', entry.image);
         for ( var key in TEXT_FIELDS_NAMES ) {
@@ -113,6 +114,7 @@
         } else {
             data.append('mesh_files', new File([''], 'fake.jpg', {type: 'image/jpeg'}));
         }
+        console.log(data);
         const response = await fetch(`${HOST}${endpoint_url}/${+ meshData.withMesh}/`, {
             method: http_method,
             headers: {
