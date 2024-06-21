@@ -25,44 +25,44 @@
             "sections": {
                 "Go to the add Khachkar section": "Once you are logged in, go to the add Khachkar section by clicking its button in the Navigation bar."
             },
-            "image": "/images/tutAddVid1.png"
+            "image": "/images/tutAddVid1.jpg"
         },
         {
             "title": "Step 2:",
             "sections": {
                 "Add the video": "Click the 'Upload video' button and select the video you want to upload."
             },
-            "image": "/images/tutAddVid2.png"
+            "image": "/images/tutAddVid2.jpg"
         },
         {
             "title": "Step 3:",
             "sections": {
-                "Click on the upload button at the bottom of the form": ""
+                "Click on the 'Add Khachkar' at the bottom of the form": ""
             },
-            "image": "/images/tutAddVid4.png"
+            "image": "/images/tutAddVid4.jpg"
         }
     ],
     "update_data_cards": [
         {
             "title": "Step 1:",
             "sections": {
-                "Go to 'My Khachkars' section by clicking the profile button in the Navigation bar": ""
+                "Go to 'View Khachkars' section by clicking the button in the Navigation bar.": "In this section you can view all khachkars and filter those that are your property. Also you can edit the data of the khachkars that you own (or mesh them)."
             },
-            "image": "/images/tutEdit1.png"
+            "image": "/images/tutEdit1.jpg"
         },
         {
             "title": "Step 2:",
             "sections": {
-                "Locate the Khachkar that you want to edit, and click on the 'Edit Khachkar button'": ""
+                "Locate the Khachkar that you want to edit, and click on the 'Edit entry' button": ""
             },
-            "image": "/images/tutEdit2.png"
+            "image": "/images/tutEdit2.jpg"
         },
         {
             "title": "Step 3:",
             "sections": {
-                "Fill the form with the data that you want to edit and click on the add button at the bottom of the form": ""
+                "Fill the form with the data that you want to edit and click on the edit button at the bottom of the form": ""
             },
-            "image": "/images/tutAddVid4.png"
+            "image": "/images/tutEdit3.jpg"
         }
     ]
 }
