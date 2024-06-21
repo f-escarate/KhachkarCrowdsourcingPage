@@ -92,6 +92,7 @@
             <Radio name="khachkars_state" bind:group={khachkars_state} on:change={e=> filter_khachkars()} value={'all'}>All</Radio>
             <Radio name="khachkars_state" bind:group={khachkars_state} on:change={e=> filter_khachkars()} value={'processing_video'}>Processing video</Radio>
             <Radio name="khachkars_state" bind:group={khachkars_state} on:change={e=> filter_khachkars()} value={'not_meshed'}>Not meshed</Radio>
+            <Radio name="khachkars_state" bind:group={khachkars_state} on:change={e=> filter_khachkars()} value={'queued_for_meshing'}>Queued for meshing</Radio>
             <Radio name="khachkars_state" bind:group={khachkars_state} on:change={e=> filter_khachkars()} value={'creating_mesh'}>Creating mesh</Radio>
             <Radio name="khachkars_state" bind:group={khachkars_state} on:change={e=> filter_khachkars()} value={'meshed'}>Meshed</Radio>
             <Radio name="khachkars_state" bind:group={khachkars_state} on:change={e=> filter_khachkars()} value={'ready'}>Ready</Radio>
