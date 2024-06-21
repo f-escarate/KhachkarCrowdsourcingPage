@@ -25,7 +25,6 @@
         transformations = {
             pos: {x: 0, y: 0, z: 0},
             rot: {x: 0, y: 0, z: 0},
-            scale: {value: 1}
         };
     }
     const reset_bounding_box= () => {
@@ -67,8 +66,7 @@
     const checkNoTransformations = (transforms_data) => {
         let pos_0 = transforms_data.pos.x == 0 && transforms_data.pos.y == 0 && transforms_data.pos.z == 0;
         let rot_0 = transforms_data.rot.x == 0 && transforms_data.rot.y == 0 && transforms_data.rot.z == 0;
-        let scale_1 = transforms_data.scale.value == 1;
-        return pos_0 && rot_0 && scale_1;
+        return pos_0 && rot_0;
     }
     const checkBoundingBoxChanged = (bounding_box_data) => {
         for (let key in bounding_box_data.current) {
@@ -98,8 +96,7 @@
     const export_stone = async () => {
         let data = JSON.stringify({
             pos: Object.values(transformations.pos),
-            rot: Object.values(transformations.rot),
-            scale: transformations.scale.value
+            rot: Object.values(transformations.rot)
         })
         let ok = await send_data(data, 'set_mesh_transformations');
         if (ok)
@@ -150,10 +147,6 @@
             <RangeInput property='rot' axis='z' interval={[-180, transformations.rot.z, 180]} step={0.1} on:change={handleTransformations} />
         </TabItem>
         <TabItem>
-            <span slot="title">Scale</span>
-            <RangeInput property='scale' axis='value' interval={[0, transformations.scale.value, 180]} step={0.1} on:change={handleTransformations} />
-        </TabItem>
-        <TabItem>
             <span slot="title">Box x</span>
             <RangeInput property='current' axis='x' interval={[0, bounding_box_scales.current.x, bounding_box_scales.max.x]} step={0.1} on:change={handleBoundingBox} />
         </TabItem>
@@ -184,7 +177,7 @@
             {#if checkNoTransformations(transformations)}
                 <Button id="noStoneTransformations" disabled >Save stone transformations</Button>
                 <Popover class="w-64 text-sm font-light " title="No transformations to apply" triggeredBy="#noStoneTransformations">
-                    You must apply some transformations to the stone before saving them (position, rotation or scale).
+                    You must apply some transformations to the stone before saving them (position or rotation).
                 </Popover>
                 {#if checkBoundingBoxChanged(bounding_box_scales)}
                     <Button color="purple" on:click={send_bounding_box}>Crop mesh and save bounding box</Button>

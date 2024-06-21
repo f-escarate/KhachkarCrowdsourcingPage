@@ -9,7 +9,7 @@ from schemas import ChangePassword, Khachkar, UserRegister, KhachkarMeshFiles, K
 from authentication import authenticate_user, create_access_token, get_password_hash, get_name_by_token, ACCESS_TOKEN_EXPIRE_MINUTES, get_user_by_name, unauthorized_exception, verify_password
 from utils import save_image, save_video, save_mesh, create_khachkar, edit_khachkar, read_image, read_video, read_file, img_validation, update_khachkar_status, update_khachkars_in_unity, video_validation, mesh_files_validation, preprocess_video, MESHES_PATH
 from database import get_db, Base, engine, SessionLocal
-from mesh_handling import get_mesh_from_video, call_method, transform_mesh, crop_mesh, generate_text_asset
+from mesh_handling import get_mesh_from_video, call_method, scale_mesh, transform_mesh, crop_mesh, generate_text_asset
 from valdi import ValdiTask
 from contextlib import asynccontextmanager
 import models, os, asyncio
@@ -55,6 +55,7 @@ async def post_khachkar(with_mesh: int, background_tasks: BackgroundTasks, token
         created_khachkar = create_khachkar(db=db, khachkar=khachkar, user_id=user.id)
         save_image(image, created_khachkar.id, img_file_extension)
         save_mesh(khachkar_mesh_files, created_khachkar, db)
+        scale_mesh(created_khachkar.id, created_khachkar.height)
     else:
         vid_file_extension = video_validation(khachkar.video)
         if vid_file_extension is None:
@@ -304,8 +305,12 @@ async def post_khachkar_mesh(khachkar_id: int, mesh_files: List[UploadFile] = Fi
     if not mesh_files_validation(khachkar_mesh_files):
         return {"status": "error", "msg": "invalid mesh files"}
     save_mesh(khachkar_mesh_files, db_khachkar, db)
-    transform_mesh(khachkar_id, [0, 0, 0], [180, 0, 0], 3)
-    return {"status": "success"}
+    transform_res = transform_mesh(khachkar_id, [0, 0, 0], [180, 0, 0])
+    if transform_res["status"] == "error":
+        return transform_res
+    # Now scale the mesh based on the height of the khachkar
+    height = db_khachkar.height
+    return scale_mesh(khachkar_id, height)
 
 @app.get("/creating_mesh_error/{khachkar_id}/")
 def creating_mesh_error(khachkar_id: int, db: Session = Depends(get_db)):
@@ -365,7 +370,12 @@ def set_mesh_transformations(token: Annotated[str, Depends(oauth2_scheme)], khac
     if db_khachkar.state != models.KhachkarState.meshed:
         return {"status": "error", "msg": "khachkar is not meshed"}
     print("Setting mesh transformations...")
-    return transform_mesh(khachkar_id, transformations.pos, transformations.rot, transformations.scale)
+    transform_res = transform_mesh(khachkar_id, transformations.pos, transformations.rot)
+    if transform_res["status"] == "error":
+        return transform_res
+    # Update the khachkar's scale based on its height
+    height = db.query(models.Khachkar).filter(models.Khachkar.id == khachkar_id).first().height
+    return scale_mesh(khachkar_id, height)
 
 @app.post("/crop_mesh/{khachkar_id}/")
 def post_mesh_bounding_box(token: Annotated[str, Depends(oauth2_scheme)], khachkar_id: int, bounding_box: List[float], db: Session = Depends(get_db)):
@@ -380,7 +390,12 @@ def post_mesh_bounding_box(token: Annotated[str, Depends(oauth2_scheme)], khachk
     if db_khachkar.state != models.KhachkarState.meshed:
         return {"status": "error", "msg": "khachkar is not meshed"}
     print("Setting mesh bounding box...")
-    return crop_mesh(khachkar_id, bounding_box)
+    crop_res = crop_mesh(khachkar_id, bounding_box)
+    if crop_res["status"] == "error":
+        return crop_res
+    # Update the khachkar's scale based on its height
+    height = db.query(models.Khachkar).filter(models.Khachkar.id == khachkar_id).first().height
+    return scale_mesh(khachkar_id, height)
 
 @app.get("/set_ready/{khachkar_id}/")
 def set_ready(token: Annotated[str, Depends(oauth2_scheme)], khachkar_id: int, db: Session = Depends(get_db)):

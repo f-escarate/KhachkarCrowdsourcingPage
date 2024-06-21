@@ -99,7 +99,7 @@ const deg_to_rad = (deg) => {
     return deg * Math.PI / 180;
 }
 export function transform_stone(transformations) {
-    let {pos, rot, scale} = transformations;
+    let {pos, rot} = transformations;
     try {
         let stone = scene.getObjectByProperty('type', 'Group');
         stone.rotation.x = deg_to_rad(rot.x);
@@ -108,9 +108,6 @@ export function transform_stone(transformations) {
         stone.position.x = pos.x;
         stone.position.y = pos.y;
         stone.position.z = pos.z;
-        stone.scale.x = scale.value;
-        stone.scale.y = scale.value;
-        stone.scale.z = scale.value;
     }
     catch (e) {
         alert("Stone isn't loaded yet");

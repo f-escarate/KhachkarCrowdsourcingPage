@@ -57,4 +57,3 @@ class KhachkarMeshFiles(BaseModel):
 class KhachkarMeshTransformations(BaseModel):
     pos: List[float]
     rot: List[float]
-    scale: float

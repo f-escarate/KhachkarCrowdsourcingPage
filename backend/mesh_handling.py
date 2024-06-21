@@ -50,7 +50,7 @@ def call_method(method, args):
         return {"status": "error", "msg": "Error in Unity method call"}
     return {"status": "success"}
 
-def transform_mesh(id:int, position: list, rotation: list, scale: float):
+def transform_mesh(id:int, position: list, rotation: list):
     try:
         # Move old mesh to a backup folder
         source_dir = f"{MESHES_PATH}/{id}"
@@ -69,9 +69,38 @@ def transform_mesh(id:int, position: list, rotation: list, scale: float):
         mesh.apply_transform(trimesh.transformations.concatenate_matrices(rot_x_mat, rot_y_mat, rot_z_mat))
         # Translate the mesh
         mesh.apply_translation(np.array(position))
-        # Scale the mesh
+        # Save the transformed mesh
+        mesh.export(f"{source_dir}/{id}.obj")
+        # Remove the backup folder
+        shutil.rmtree(backup_dir)
+    except Exception as e:
+        # Move the old mesh back
+        print(e)
+        for file_name in file_names:
+            shutil.move(os.path.join(backup_dir, file_name), source_dir)
+        return {"status": "error", "msg": str(e)}
+    return {"status": "success"}
+
+def scale_mesh(id: int, height: float):
+    UNITY_SCALE_RATIO = 2.99 # The ratio of the height of the mesh in Unity to the real height
+    try:
+        # Move old mesh to a backup folder
+        source_dir = f"{MESHES_PATH}/{id}"
+        file_names = os.listdir(source_dir)
+        backup_dir = f"{MESHES_PATH}/{id}/backup"
+        os.makedirs(backup_dir, exist_ok=True)
+
+        for file_name in file_names:
+            shutil.move(os.path.join(source_dir, file_name), backup_dir)
+        # Load the mesh
+        mesh = trimesh.load(f"{backup_dir}/{id}.obj", force="mesh")
+        
+        # Scale the mesh based on the height
+        objective_height = height * UNITY_SCALE_RATIO
+        scale = objective_height / mesh.bounding_box_oriented.primitive.extents[1]
         mesh.apply_scale(scale)
-        # Save the rotated mesh
+
+        # Save the scaled mesh
         mesh.export(f"{source_dir}/{id}.obj")
         # Remove the backup folder
         shutil.rmtree(backup_dir)
@@ -99,8 +128,7 @@ def crop_mesh(id: int, bounding_box: list):
         box = trimesh.primitives.Box(np.array(bounding_box))
         box.apply_translation(np.array([0, bounding_box[1]/2, 0]))
         mesh = mesh.slice_plane(box.facets_origin, -box.facets_normal)
-
-        # Save the rotated mesh
+        # Save the cropped mesh
         mesh.export(f"{source_dir}/{id}.obj")
         # Remove the backup folder
         shutil.rmtree(backup_dir)
