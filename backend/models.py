@@ -24,6 +24,17 @@ class KhachkarState(ENUM):
     meshed = "meshed"
     ready = "ready"
 
+    def get_label(self):
+        labels = {
+            "processing_video": "Processing video",
+            "not_meshed": "Not meshed",
+            "queued_for_meshing": "Queued for meshing",
+            "creating_mesh": "Creating mesh",
+            "meshed": "Meshed",
+            "ready": "Ready to be placed in Unity"
+        }
+        return labels[self.value]
+
 class AccessibilityLevel(str, ENUM):
     very_easy = "Very easy"
     easy = "Easy"

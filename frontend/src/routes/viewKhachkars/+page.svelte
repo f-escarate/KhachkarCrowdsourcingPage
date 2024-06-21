@@ -16,6 +16,11 @@
     let user_id = null;
     let only_my_khachkars = false;
     let khachkars_state = 'all';
+    let khachkars_location = 'All';
+    let options = {
+        "location": ["All"],
+        "state": [['all', "All"]]
+    };
 
     onMount(async () => {
         const khachkars_response = await get_json(`${HOST}/get_khachkars/`);
@@ -30,7 +35,19 @@
                 user_id = await data.user_id;
             }
         }
-        
+        let options_response = await get_json(`${HOST}/get_filters_options/`);
+        if (options_response.status != 200){
+            alert('Failed to load the filters, status code: ' + options_response.status);
+            return;
+        }
+        options_response = await options_response.json();
+        if (options_response.status === 'success') {
+            options.location = options.location.concat(options_response.msg.location);
+            options.state = options.state.concat(options_response.msg.state);
+        } 
+        else {
+            alert('Failed to load the filters (unknown reason)');
+        }
         filter_khachkars();
         
     });
@@ -44,6 +61,10 @@
         if (khachkars_state !== 'all')
             for (let i = filtered_entries.length - 1; i >= 0; i--)
                 if (filtered_entries[i].state !== khachkars_state)
+                    filtered_entries.splice(i, 1);
+        if (khachkars_location !== 'All')
+            for (let i = filtered_entries.length - 1; i >= 0; i--)
+                if (filtered_entries[i].location !== khachkars_location)
                     filtered_entries.splice(i, 1);
     }
 
@@ -84,18 +105,25 @@
 </script>
 
 <div class='flex flex-col items-center md:max-w-[80%] md:mx-auto self-center'>
-    <div class='m-2 flex self-start w-full items-center gap-4'>
+    <div class='m-2 flex flex-col align-left w-full gap-2'>
+    <p class='text-lg font-semibold text-amber-600'>Filters: </p>
+    <div class='flex self-start w-full items-center gap-2 md:gap-4'>
         <Button class='bg-amber-500 hover:bg-amber-700'>
-            Filter by Khachkar state <DownIcon sx='m-0 text-white'/>
+            Khachkar location <DownIcon sx='m-0 text-white'/>
         </Button>
-        <Dropdown class="w-44 p-3 space-y-3 text-sm">
-            <Radio name="khachkars_state" bind:group={khachkars_state} on:change={e=> filter_khachkars()} value={'all'}>All</Radio>
-            <Radio name="khachkars_state" bind:group={khachkars_state} on:change={e=> filter_khachkars()} value={'processing_video'}>Processing video</Radio>
-            <Radio name="khachkars_state" bind:group={khachkars_state} on:change={e=> filter_khachkars()} value={'not_meshed'}>Not meshed</Radio>
-            <Radio name="khachkars_state" bind:group={khachkars_state} on:change={e=> filter_khachkars()} value={'queued_for_meshing'}>Queued for meshing</Radio>
-            <Radio name="khachkars_state" bind:group={khachkars_state} on:change={e=> filter_khachkars()} value={'creating_mesh'}>Creating mesh</Radio>
-            <Radio name="khachkars_state" bind:group={khachkars_state} on:change={e=> filter_khachkars()} value={'meshed'}>Meshed</Radio>
-            <Radio name="khachkars_state" bind:group={khachkars_state} on:change={e=> filter_khachkars()} value={'ready'}>Ready</Radio>
+        <Dropdown class="w-auto p-3 space-y-3 text-sm">
+            {#each options.location as option}
+                <Radio name="khachkars_location" bind:group={khachkars_location} on:change={e=> filter_khachkars()} value={option}>{option}</Radio>
+            {/each}
+        </Dropdown>
+
+        <Button class='bg-amber-500 hover:bg-amber-700'>
+            Khachkar state <DownIcon sx='m-0 text-white'/>
+        </Button>
+        <Dropdown class="w-auto p-3 space-y-3 text-sm">
+            {#each options.state as option}
+                <Radio name="khachkars_state" bind:group={khachkars_state} on:change={e=> filter_khachkars()} value={option[0]}>{option[1]}</Radio>
+            {/each}
         </Dropdown>
         {#if user_id !== null}
             <Checkbox class='bg-amber-500 hover:bg-amber-700 h-full p-3 rounded-lg' bind:checked={only_my_khachkars} on:change={e => filter_khachkars()} color='orange'>
@@ -104,7 +132,7 @@
         {:else}
             <a href={`${base}/enter/login`} class='font-semibold underline text-amber-600'>Login to manage your khachkars</a>
         {/if}
-    
+    </div>
     </div>
     {#if entries === null}
         <Spinner class='m-4' size='10'/> <h1 class='text-2xl font-bold'>Loading khachkars</h1>

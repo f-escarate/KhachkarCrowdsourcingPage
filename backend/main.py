@@ -116,6 +116,16 @@ async def get_options_list(token: Annotated[str, Depends(oauth2_scheme)]):
         }
     }
 
+@app.get("/get_filters_options/")
+async def get_filters_options():
+    return {
+        "status": "success",
+        "msg": {
+            "location": [location.value for location in models.Location],
+            "state": [[state.value, state.get_label()] for state in models.KhachkarState]
+        }
+    }
+
 @app.patch("/update_khachkar/{khachkar_id}/{with_mesh}/")
 async def update_khachkar(token: Annotated[str, Depends(oauth2_scheme)], khachkar_id: int, with_mesh: int, background_tasks: BackgroundTasks, khachkar: Khachkar = Depends(Khachkar), db: Session = Depends(get_db)):
     if not token:
