@@ -1,11 +1,9 @@
 <script>
     import { createEventDispatcher } from 'svelte';
-    import { FloatingLabelInput, Label, Button, Spinner } from 'flowbite-svelte';
-    import { HOST, TEXT_FIELDS_NAMES, NUM_FIELDS_NAMES, OPTION_FIELDS_NAMES, BASE_ENTRY, BASE_MESH_DATA } from '$lib/constants';
+    import { Label, Button, Spinner } from 'flowbite-svelte';
+    import { HOST, BASE_ENTRY, BASE_MESH_DATA } from '$lib/constants';
     import VideoOrMesh from './FormComponents/VideoOrMesh.svelte';
-    import SelectOptions from './FormComponents/SelectOptions.svelte';
-    import { onMount } from 'svelte';
-    import { auth_get_json } from '$lib/utils'
+    import Metadata from './FormComponents/Metadata.svelte';
     
     export let token;
     export let http_method = 'POST';
@@ -13,6 +11,7 @@
     export let button_text = 'Add Khachkar'
     export let videoVisibility = 0;
     export let entry = {... BASE_ENTRY};
+    let metadata_fields_component;
     let meshData = {... BASE_MESH_DATA};
     let isLoading = false;
     export const previewFile = (elementID, file) => {
@@ -26,31 +25,7 @@
     function post_data_signal(){
         dispatch('post_data');
     }
-    let OPTION_FIELDS_OPTIONS_NAMES = {};
-    let OPTION_FIELDS_OPTIONS_IDS = {};
-    onMount(async () => {
-        let response = await auth_get_json(`${HOST}/get_options_list/`, token);
-        if (response.status != 200){
-            alert('Failed to get options list, status code: ' + response.status);
-            return;
-        }
-        response = await response.json();
-        if (response.status === 'error') {
-            alert('Failed to get options list: ' + response.msg);
-        } else if (response.status === 'success') {
-            for( var key in OPTION_FIELDS_NAMES ) {
-                let options_list = response.msg[key];
-                OPTION_FIELDS_OPTIONS_NAMES[key] = options_list.map((x) => x[0]);
-                OPTION_FIELDS_OPTIONS_IDS[key] = options_list.map((x) => x[1]);
-            }
-        } else {
-            alert('Failed to get options list (unknown reason)');
-        }
-    });
 
-    const TEXT_FIELDS = Object.getOwnPropertyNames(TEXT_FIELDS_NAMES);
-    const NUM_FIELDS = Object.getOwnPropertyNames(NUM_FIELDS_NAMES);
-    const OPTION_FIELDS = Object.getOwnPropertyNames(OPTION_FIELDS_NAMES);
     const restartForm = () => {
         videoVisibility = 0;
         if (!meshData.withMesh){
@@ -88,20 +63,12 @@
             return;
         }
 		const data = new FormData();
-        for ( var field_name in OPTION_FIELDS_NAMES ) {
-            let options_list = OPTION_FIELDS_OPTIONS_IDS[field_name];
-            let option_index = entry[field_name];
-            data.append(field_name, options_list[option_index]);
+        if (!metadata_fields_component.addDataToRequest(data, entry)){
+            isLoading = false;
+            return;
         }
-        data.append('latitude', entry.latitude);
-        data.append('longitude', entry.longitude);
-        data.append('height', entry.height);
         data.append('video', entry.video);
         data.append('image', entry.image);
-        for ( var key in TEXT_FIELDS_NAMES ) {
-            if (entry[key] !== null)
-                data.append(key, entry[key]);
-        }
             
         if (data.get('image') === "null")
             data.set('image', new File([''], 'fake.jpg', {type: 'image/jpeg'}));
@@ -114,7 +81,6 @@
         } else {
             data.append('mesh_files', new File([''], 'fake.jpg', {type: 'image/jpeg'}));
         }
-        console.log(data);
         const response = await fetch(`${HOST}${endpoint_url}/${+ meshData.withMesh}/`, {
             method: http_method,
             headers: {
@@ -155,17 +121,7 @@
         </Label>
     </div>
     </div>
-    <h2 class='md:col-span-2 text-2xl font-semibold'>Metadata</h2>
-    {#each OPTION_FIELDS as key}
-        <SelectOptions title={OPTION_FIELDS_NAMES[key]} options={OPTION_FIELDS_OPTIONS_NAMES[key]} bind:value={entry[key]}/>
-    {/each}
-    {#each NUM_FIELDS as key}
-        <FloatingLabelInput style="filled" type="number" name={key} id={key} label={NUM_FIELDS_NAMES[key]} bind:value={entry[key]}/>
-    {/each}
-    {#each TEXT_FIELDS as key}
-        <FloatingLabelInput style="filled" type="text" name={key} id={key} label={TEXT_FIELDS_NAMES[key]} bind:value={entry[key]}/>
-    {/each}
-    
+    <Metadata bind:this={metadata_fields_component} entry={entry}/>
 
     {#if isLoading}
         <Button class='md:col-span-2 w-[50%] mx-auto h-full text-black bg-amber-500'>
