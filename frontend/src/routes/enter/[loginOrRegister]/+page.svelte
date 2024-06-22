@@ -18,15 +18,16 @@
     const handleLogin = async () => {
         isLoading = true;
         const data = new FormData();
-        data.append('username', email);
+        data.append('email', email);
         data.append('password', pass);
-        const response = await fetch(`${HOST}/token`, {
+        const response = await fetch(`${HOST}/login`, {
             method: "POST",
             body: data
         });
         const json = await response.json();
         if (json.status == 'success') {
-            Cookies.set('token', json.access_token, { sameSite:'strict', secure:true });
+            Cookies.set('access_token', json.access_token, { sameSite:'strict', secure:true });
+            Cookies.set('refresh_token', json.refresh_token, { sameSite:'strict', secure:true });
             alert('Successfully logged in, redirecting to home page');
             window.location.href = base;
             return;

@@ -3,10 +3,8 @@
     import { base } from "$app/paths";
     import Cookies from 'js-cookie';
     import { onMount } from 'svelte';
-    let token;
     onMount(() => {
-        token = Cookies.get('token');
-        if (token===undefined) {
+        if (Cookies.get('access_token')===undefined) {
             if(!alert("You have to be logged in to access this page")) {
                 window.location.href = `${base}/enter/login`;
             }
@@ -21,7 +19,5 @@
     }
 </script>
 
-{#if token}
-    <h1 id='add_khach_title' class='text-4xl font-bold'>Add Khachkar</h1>
-    <Form token={token} on:post_data={handlePost}/>
-{/if}
+<h1 id='add_khach_title' class='text-4xl font-bold'>Add Khachkar</h1>
+<Form on:post_data={handlePost}/>

@@ -1,3 +1,6 @@
+import { HOST } from "$lib/constants";
+import Cookies from 'js-cookie';
+
 export function addAnimationStyles(targets, styles) {
     const options = {
         root: null, // use the viewport as the root
@@ -21,14 +24,42 @@ export function addAnimationStyles(targets, styles) {
     }
 }
 
-export const auth_get_json = (url, token) => {
-    return fetch(url, {
+export const auth_get_json = async (url) => {
+    let response = await fetch(url, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${Cookies.get('access_token')}`
         }
     });
+    if (response.status === 401) {
+        response = await fetch(`${HOST}/refresh/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Cookies.get('refresh_token')}`
+            }
+        });
+        if (response.status === 200) {
+            const data = await response.json();
+            let access_token = data.access_token;
+            Cookies.set('access_token', access_token, { sameSite:'strict', secure:true });
+            response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${access_token}`
+                }
+            });
+        }
+        else {
+            Cookies.remove('access_token');
+            Cookies.remove('refresh_token');
+            alert('Session expired. Please login again.');
+            window.location.href = '/login';
+        }
+    }
+    return response;
 }
 
 export const get_json = (url) => {
@@ -40,13 +71,44 @@ export const get_json = (url) => {
     });
 }
 
-export const auth_post_request = (url, token, data) => {
-    return fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
+export const auth_post_request = async (url, data, method='POST', json=false) => {
+    let get_headers = json? (token) => ({
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+    }) : (token) => ({
+        'Authorization': `Bearer ${token}`
+    });
+
+    let response = await fetch(url, {
+        method: method,
+        headers: get_headers(),
         body: data
     });
+
+    if (response.status === 401) {
+        response = await fetch(`${HOST}/refresh/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Cookies.get('refresh_token')}`
+            }
+        });
+        if (response.status === 200) {
+            const access_token_response = await response.json();
+            let access_token = access_token_response.access_token;
+            Cookies.set('access_token', access_token, { sameSite:'strict', secure:true });
+            response = await fetch(url, {
+                method: method,
+                headers: get_headers(access_token),
+                body: data
+            });
+        }
+        else {
+            Cookies.remove('access_token');
+            Cookies.remove('refresh_token');
+            alert('Session expired. Please login again.');
+            window.location.href = '/login';
+        }
+    }
+    return response;
 }

@@ -11,8 +11,7 @@
     export let OPTION_FIELDS_OPTIONS_IDS = {};
     onMount(async () => {
         async function get_options_list() {
-            let token = Cookies.get('token');
-            const response = await auth_get_json(`${HOST}/get_options_list/`, token);
+            const response = await auth_get_json(`${HOST}/get_options_list/`);
             if (response.status != 200){
                 alert('Failed to get options list, status code: ' + response.status);
                 return;

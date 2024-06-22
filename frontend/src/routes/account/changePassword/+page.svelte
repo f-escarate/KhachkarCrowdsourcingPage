@@ -1,7 +1,8 @@
 <script>
     import { HOST } from '$lib/constants';
-    import Cookies from 'js-cookie';
     import { Button, FloatingLabelInput } from 'flowbite-svelte';
+    import { base } from "$app/paths";
+    import { auth_post_request } from '$lib/utils';
     let old_pass = '';
     let new_pass1 = '';
     let new_pass2 = '';
@@ -13,13 +14,7 @@
         let data = new FormData();
         data.append('old_pass', old_pass);
         data.append('new_pass', new_pass1);
-        fetch(`${HOST}/change_password/`, {
-            method: "PATCH",
-            headers: {
-                Authorization: `Bearer ${Cookies.get('token')}`
-            },
-            body: data
-        })
+        auth_post_request(`${HOST}/change_password/`, data, 'PATCH')
         .then(response => response.json())
         .then(json => {
             if (json.status == 'success') {

@@ -77,7 +77,7 @@
     }
     const send_data = async (data, endpoint) => {
         isLoading = true;
-        const response = await auth_post_request(`${HOST}/${endpoint}/${id}/`, Cookies.get('token'), data);
+        const response = await auth_post_request(`${HOST}/${endpoint}/${id}/`, data, 'POST', true);
         const res = await response.json();
         isLoading = false;
         if(res.status == 'success') {

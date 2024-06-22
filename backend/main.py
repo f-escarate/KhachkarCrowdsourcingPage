@@ -1,12 +1,14 @@
-from datetime import timedelta
-from typing import Annotated, List
-from fastapi import Depends, FastAPI, Response, BackgroundTasks, File, UploadFile
+from typing import List
+from fastapi import Depends, FastAPI, Response, BackgroundTasks, File, UploadFile, Request, status
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from fastapi_jwt_auth import AuthJWT
+from fastapi_jwt_auth.exceptions import AuthJWTException
+
 from sqlalchemy.orm import Session
 
-from schemas import ChangePassword, Khachkar, EditKhachkar, UserRegister, KhachkarMeshFiles, KhachkarMeshTransformations
-from authentication import authenticate_user, create_access_token, get_password_hash, get_name_by_token, ACCESS_TOKEN_EXPIRE_MINUTES, get_user_by_name, unauthorized_exception, verify_password
+from schemas import ChangePassword, Khachkar, EditKhachkar, UserLogin, UserRegister, KhachkarMeshFiles, KhachkarMeshTransformations, Settings
+from authentication import authenticate_user, get_password_hash, get_user_by_email, unauthorized_exception, verify_password
 from utils import save_image, save_video, save_mesh, create_khachkar, edit_khachkar, read_image, read_video, read_file, img_validation, update_khachkar_status, update_khachkars_in_unity, video_validation, mesh_files_validation, preprocess_video, MESHES_PATH
 from database import get_db, Base, engine, SessionLocal
 from mesh_handling import get_mesh_from_video, call_method, scale_mesh, transform_mesh, crop_mesh, generate_text_asset
@@ -31,13 +33,27 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+@AuthJWT.load_config
+def get_config():
+    return Settings()
+
+@app.exception_handler(AuthJWTException)
+def authjwt_exception_handler(request: Request, exc: AuthJWTException):
+    return JSONResponse(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        content={
+            "status": "error",
+            "msg": "You are not authorized to perform this action (login first)",
+            "details": exc.message
+        }
+    )
 
 @app.post("/post_khachkar/{with_mesh}/")
-async def post_khachkar(with_mesh: int, background_tasks: BackgroundTasks, token: Annotated[str, Depends(oauth2_scheme)], khachkar: Khachkar = Depends(Khachkar), db: Session = Depends(get_db)):
-    if not token:
-        return unauthorized_exception("Invalid token")
-    user = get_user_by_name(get_name_by_token(token), db)
+async def post_khachkar(with_mesh: int, background_tasks: BackgroundTasks, Authorize: AuthJWT = Depends(), khachkar: Khachkar = Depends(Khachkar), db: Session = Depends(get_db)):
+    Authorize.jwt_required()
+    email = Authorize.get_jwt_subject()
+    user = get_user_by_email(email, db)
     if user is None:
         return {"status": "error", "msg": "problem with user authentication"}
     img_file_extension = img_validation(khachkar.image)
@@ -75,17 +91,20 @@ async def get_khachkars(db: Session = Depends(get_db)):
     return khachkars
 
 @app.get("/get_khachkars/own/")
-async def get_my_khachkars(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
-    if not token:
-        return unauthorized_exception("Invalid token")
-    user = get_user_by_name(get_name_by_token(token), db)
+async def get_my_khachkars(Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    Authorize.jwt_required()
+    email = Authorize.get_jwt_subject()
+    user = get_user_by_email(email, db)
     if user is None:
         return {"status": "error", "msg": "problem with user authentication"}
     khachkars = db.query(models.Khachkar).filter(models.Khachkar.owner_id == user.id).all()
     return khachkars
 
 @app.get("/get_khachkars/ready/")
-async def get_ready_khachkars(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
+async def get_ready_khachkars(Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    Authorize.jwt_required()
+    email = Authorize.get_jwt_subject()
+    get_user_by_email(email, db)
     khachkars = db.query(models.Khachkar).filter(models.Khachkar.state == models.KhachkarState.ready).all()
     return khachkars
 
@@ -104,9 +123,8 @@ async def get_khachkar(khachkar_id: int, db: Session = Depends(get_db)):
     return khachkar
 
 @app.get("/get_options_list/")
-async def get_options_list(token: Annotated[str, Depends(oauth2_scheme)]):
-    if not token:
-        return {"status": "error", "msg": "You are not authorized to perform this action (login first)"}
+async def get_options_list(Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
     return {
         "status": "success",
         "msg": {
@@ -128,10 +146,10 @@ async def get_filters_options():
     }
 
 @app.patch("/update_khachkar/{khachkar_id}/")
-async def update_khachkar(token: Annotated[str, Depends(oauth2_scheme)], khachkar_id: int, khachkar: EditKhachkar = Depends(EditKhachkar), db: Session = Depends(get_db)):
-    if not token:
-        return unauthorized_exception("Invalid token")
-    user = get_user_by_name(get_name_by_token(token), db)
+async def update_khachkar(khachkar_id: int, Authorize: AuthJWT = Depends(), khachkar: EditKhachkar = Depends(EditKhachkar), db: Session = Depends(get_db)):
+    Authorize.jwt_required()
+    email = Authorize.get_jwt_subject()
+    user = get_user_by_email(email, db)
     if user is None:
         return {"status": "error", "msg": "problem with user authentication"}
     db_khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == khachkar_id).first()
@@ -161,8 +179,10 @@ async def get_video(khachkar_id: int):
     return Response(content=video, media_type=f"video/mp4")
 
 @app.get("/me/")
-async def get_user(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
-    user = get_user_by_name(get_name_by_token(token), db)
+async def get_user(Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    Authorize.jwt_required()
+    email = Authorize.get_jwt_subject()
+    user = get_user_by_email(email, db)
     if user is None:
         raise unauthorized_exception("Could not validate credentials")
     return {
@@ -173,8 +193,10 @@ async def get_user(token: Annotated[str, Depends(oauth2_scheme)], db: Session = 
     }
 
 @app.get("/get_user_id/")
-async def get_user_id(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
-    user = get_user_by_name(get_name_by_token(token), db)
+async def get_user_id(Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    Authorize.jwt_required()
+    email = Authorize.get_jwt_subject()
+    user = get_user_by_email(email, db)
     if user is None:
         raise unauthorized_exception("Could not validate credentials")
     return {
@@ -184,10 +206,7 @@ async def get_user_id(token: Annotated[str, Depends(oauth2_scheme)], db: Session
 
 @app.post("/register/")
 async def register(user: UserRegister = Depends(UserRegister), db: Session = Depends(get_db)):
-    db_user = db.query(models.User).filter(models.User.username == user.username).first()
-    if db_user is not None:
-        return {"status": "error", "msg": "username already exists"}
-    db_user = db.query(models.User).filter(models.User.email == user.email).first()
+    db_user = get_user_by_email(user.email, db)
     if db_user is not None:
         return {"status": "error", "msg": "an account with this email already exists"}
     if user.password != user.password2:
@@ -198,26 +217,38 @@ async def register(user: UserRegister = Depends(UserRegister), db: Session = Dep
     db.refresh(new_user)
     return {"status": "success"}
 
-@app.post("/token")
-async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)):
-    user = authenticate_user(form_data.username, form_data.password, db)
+@app.post("/login")
+async def login_for_access_token(user: UserLogin = Depends(UserLogin), Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    user = authenticate_user(user.email, user.password, db)
     if not user:
         raise unauthorized_exception("Incorrect username or password")
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
-    )
+    access_token = Authorize.create_access_token(subject=user.email)
+    refresh_token = Authorize.create_refresh_token(subject=user.email)
     return {
         "status": "success",
         "access_token": access_token,
-        "token_type": "bearer"
+        "refresh_token": refresh_token
     }
 
+@app.post('/refresh/')
+def refresh(Authorize: AuthJWT = Depends()):
+    """
+    The jwt_refresh_token_required() function insures a valid refresh
+    token is present in the request before running any code below that function.
+    we can use the get_jwt_subject() function to get the subject of the refresh
+    token, and use the create_access_token() function again to make a new access token
+    """
+    Authorize.jwt_refresh_token_required()
+
+    current_user = Authorize.get_jwt_subject()
+    new_access_token = Authorize.create_access_token(subject=current_user)
+    return {"status": "success", "access_token": new_access_token}
+
 @app.patch("/change_password/")
-async def change_password(token: Annotated[str, Depends(oauth2_scheme)], change: ChangePassword = Depends(ChangePassword), db: Session = Depends(get_db)):
-    if not token:
-        return unauthorized_exception("Invalid token")
-    user = get_user_by_name(get_name_by_token(token), db)
+async def change_password(Authorize: AuthJWT = Depends(), change: ChangePassword = Depends(ChangePassword), db: Session = Depends(get_db)):
+    Authorize.jwt_required()
+    email = Authorize.get_jwt_subject()
+    user = get_user_by_email(email, db)
     if user is None:
         return {"status": "error", "msg": "Problem with user authentication"}
     if not verify_password(change.old_pass, user.hashed_password):
@@ -227,13 +258,13 @@ async def change_password(token: Annotated[str, Depends(oauth2_scheme)], change:
     return {"status": "success"}
 
 @app.post("/compile_asset_bundles/")
-async def compile_asset_bundles(token: Annotated[str, Depends(oauth2_scheme)], khachkar_ids: List[int], db: Session = Depends(get_db)):
-    print("Compiling asset bundles...")
-    if not token:
-        return unauthorized_exception("Invalid token")
-    user = get_user_by_name(get_name_by_token(token), db)
+async def compile_asset_bundles(khachkar_ids: List[int], Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    Authorize.jwt_required()
+    email = Authorize.get_jwt_subject()
+    user = get_user_by_email(email, db)
     if user is None or not user.is_admin:
         return {"status": "error", "msg": "You are not authorized to perform this action"}
+    print("Compiling asset bundles...")
     for id in khachkar_ids:
         khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == id).first()
         generate_text_asset(khachkar, db)
@@ -249,11 +280,11 @@ async def get_khachkars_in_unity(db: Session = Depends(get_db)):
     return {"status": "success", "khachkars": khachkars}
 
 @app.get("/mesh_khachkar/{khachkar_id}/")
-async def mesh_khachkar(token: Annotated[str, Depends(oauth2_scheme)], khachkar_id: int, db: Session = Depends(get_db)):
+async def mesh_khachkar(khachkar_id: int, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    Authorize.jwt_required()
     print(f"Meshing khachkar {khachkar_id}")
-    if not token:
-        return unauthorized_exception("Invalid token")
-    user = get_user_by_name(get_name_by_token(token), db)
+    email = Authorize.get_jwt_subject()
+    user = get_user_by_email(email, db)
     if user is None:
         return {"status": "error", "msg": "problem with user authentication"}
     khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == khachkar_id).first()
@@ -341,10 +372,10 @@ def get_obj(id: int, db: Session = Depends(get_db)):
     return Response(content=obj)
 
 @app.post("/set_mesh_transformations/{khachkar_id}/")
-def set_mesh_transformations(token: Annotated[str, Depends(oauth2_scheme)], khachkar_id: int, transformations: KhachkarMeshTransformations, db: Session = Depends(get_db)):
-    if not token:
-        return unauthorized_exception("Invalid token")
-    user = get_user_by_name(get_name_by_token(token), db)
+def set_mesh_transformations(khachkar_id: int, transformations: KhachkarMeshTransformations, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    Authorize.jwt_required()
+    email = Authorize.get_jwt_subject()
+    user = get_user_by_email(email, db)
     if user is None:
         return {"status": "error", "msg": "problem with user authentication"}
     db_khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == khachkar_id).first()
@@ -361,10 +392,10 @@ def set_mesh_transformations(token: Annotated[str, Depends(oauth2_scheme)], khac
     return scale_mesh(khachkar_id, height)
 
 @app.post("/crop_mesh/{khachkar_id}/")
-def post_mesh_bounding_box(token: Annotated[str, Depends(oauth2_scheme)], khachkar_id: int, bounding_box: List[float], db: Session = Depends(get_db)):
-    if not token:
-        return unauthorized_exception("Invalid token")
-    user = get_user_by_name(get_name_by_token(token), db)
+def post_mesh_bounding_box(khachkar_id: int, bounding_box: List[float], Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    Authorize.jwt_required()
+    email = Authorize.get_jwt_subject()
+    user = get_user_by_email(email, db)
     if user is None:
         return {"status": "error", "msg": "problem with user authentication"}
     db_khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == khachkar_id).first()
@@ -381,10 +412,10 @@ def post_mesh_bounding_box(token: Annotated[str, Depends(oauth2_scheme)], khachk
     return scale_mesh(khachkar_id, height)
 
 @app.get("/set_ready/{khachkar_id}/")
-def set_ready(token: Annotated[str, Depends(oauth2_scheme)], khachkar_id: int, db: Session = Depends(get_db)):
-    if not token:
-        return unauthorized_exception("Invalid token")
-    user = get_user_by_name(get_name_by_token(token), db)
+def set_ready(khachkar_id: int, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    Authorize.jwt_required()
+    email = Authorize.get_jwt_subject()
+    user = get_user_by_email(email, db)
     if user is None:
         return {"status": "error", "msg": "problem with user authentication"}
     db_khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == khachkar_id).first()
@@ -396,10 +427,10 @@ def set_ready(token: Annotated[str, Depends(oauth2_scheme)], khachkar_id: int, d
     return {"status": "success"}
 
 @app.get("/set_unready/{khachkar_id}/")
-def set_unready(token: Annotated[str, Depends(oauth2_scheme)], khachkar_id: int, db: Session = Depends(get_db)):
-    if not token:
-        return unauthorized_exception("Invalid token")
-    user = get_user_by_name(get_name_by_token(token), db)
+def set_unready(khachkar_id: int, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    Authorize.jwt_required()
+    email = Authorize.get_jwt_subject()
+    user = get_user_by_email(email, db)
     if user is None:
         return {"status": "error", "msg": "problem with user authentication"}
     db_khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == khachkar_id).first()

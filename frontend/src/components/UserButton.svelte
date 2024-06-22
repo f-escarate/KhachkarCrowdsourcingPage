@@ -2,6 +2,7 @@
     import { Avatar, Dropdown, DropdownHeader, DropdownItem, DropdownDivider, NavHamburger, Button } from 'flowbite-svelte';
     import UserIcon from './icons/UserIcon.svelte';
     import UserAddIcon from './icons/UserAddIcon.svelte';
+    import { auth_get_json } from '$lib/utils';
     import Cookies from 'js-cookie';
     import { onMount } from 'svelte';
     import { HOST } from '$lib/constants';
@@ -15,15 +16,8 @@
         is_admin: false,
     };
     onMount(async () => {
-        if(Cookies.get('token') === undefined) return;
-        const response = 
-            await fetch(`${HOST}/me/`, {
-                method: "GET",
-                headers: {
-                    accept: "application/json",
-                    Authorization: `Bearer ${Cookies.get('token')}`
-                }
-            });
+        if(Cookies.get('access_token') === undefined) return;
+        const response = await auth_get_json(`${HOST}/me/`);
         const json = await response.json();
         if (json.status == 'success') {
             data.name = json.username;
@@ -33,11 +27,12 @@
             authenticated = true;
         } else {
             authenticated = false;
-            Cookies.remove('token');
+            Cookies.remove('access_token');
         }
     });
     const handleLogOut = () => {
-        Cookies.remove('token');
+        Cookies.remove('access_token');
+        Cookies.remove('refresh_token');
         data.authenticated = false;
         window.location.href = base;
     }

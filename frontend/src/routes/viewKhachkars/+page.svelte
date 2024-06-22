@@ -27,9 +27,8 @@
         entries = await khachkars_response.json();
         entries.reverse();
 
-        let token = Cookies.get('token');
-        if (token !== undefined) {
-            const user_response = await auth_get_json(`${HOST}/get_user_id/`, token);
+        if (Cookies.get('access_token') !== undefined) {
+            const user_response = await auth_get_json(`${HOST}/get_user_id/`);
             if (user_response.status === 200) {
                 let data = await user_response.json()
                 user_id = await data.user_id;
@@ -71,7 +70,7 @@
     async function handleKhachkarStateChange(e, entry_idx, endpoint, transition_state, final_state, error_state, ok_msg, error_msg) {
         let id = filtered_entries[entry_idx].id;
         filtered_entries[entry_idx].state = transition_state;
-        const response = await auth_get_json(`${HOST}/${endpoint}/${id}/`, Cookies.get('token'));
+        const response = await auth_get_json(`${HOST}/${endpoint}/${id}/`);
         const json = await response.json();
         if (json.status === 'success') {
             filtered_entries[entry_idx].state = final_state;

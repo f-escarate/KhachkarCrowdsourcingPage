@@ -1,6 +1,7 @@
 <script>
     import { HOST } from '$lib/constants';
     import { base } from "$app/paths";
+    import { auth_get_json } from '$lib/utils';
     import Cookies from 'js-cookie';
     import { onMount } from 'svelte';
     import { Button } from 'flowbite-svelte';
@@ -11,19 +12,12 @@
     };
     let authenticated = false;
     onMount(async () => {
-        if(Cookies.get('token') === undefined) {
+        if(Cookies.get('access_token') === undefined) {
             alert("You have to be logged in to access this page");
             window.location.href = `${base}/enter/login`;
             return;
         }
-        const response = 
-            await fetch(`${HOST}/me/`, {
-                method: "GET",
-                headers: {
-                    accept: "application/json",
-                    Authorization: `Bearer ${Cookies.get('token')}`
-                }
-            });
+        const response = await auth_get_json(`${HOST}/me/`);
         const json = await response.json();
         if (json.status == 'success') {
             data.name = json.username;
@@ -32,7 +26,7 @@
             authenticated = true;
         } else {
             authenticated = false;
-            Cookies.remove('token');
+            Cookies.remove('access_token');
         }
     });
 </script>

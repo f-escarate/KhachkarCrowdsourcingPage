@@ -8,12 +8,10 @@
     /** @type {import('./$types').PageData} */
 	export let data;
     let id = data.id
-    let token = null;
     let entry = {};
     let form;
     onMount(async () => {
-        token = Cookies.get('token');
-        if (token===undefined) {
+        if (Cookies.get('access_token')===undefined) {
             if(!alert("You have to be logged in to access this page")) {
                 window.location.href = `${base}/enter/login`;
             }
@@ -42,15 +40,13 @@
     }
 </script>
 
-{#if token}
-    <h1 id='edit_khach_title' class='text-4xl font-bold'>Edit Khachkar #{entry.id}</h1>
-    <Form 
-        bind:this={form}
-        on:post_data={handlePost}
-        token={token} entry={entry}
-        endpoint_url={`/update_khachkar/${id}`}
-        http_method='PATCH'
-        button_text='Edit Khachkar'
-        use_video_or_mesh={false}
-    />
-{/if}
+<h1 id='edit_khach_title' class='text-4xl font-bold'>Edit Khachkar #{entry.id}</h1>
+<Form 
+    bind:this={form}
+    on:post_data={handlePost}
+    entry={entry}
+    endpoint_url={`/update_khachkar/${id}`}
+    http_method='PATCH'
+    button_text='Edit Khachkar'
+    use_video_or_mesh={false}
+/>

@@ -1,6 +1,9 @@
 from fastapi import Form, UploadFile, File
 from pydantic import BaseModel
 from typing import Optional, List
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 def form_body(cls):
     cls.__signature__ = cls.__signature__.replace(
@@ -19,9 +22,16 @@ class UserRegister(BaseModel):
     password: str
     password2: str
 
-class Token(BaseModel):
-    access_token: str
-    token_type: str
+@form_body
+class UserLogin(BaseModel):
+    email: str
+    password: str
+
+class Settings(BaseModel):
+    authjwt_secret_key: str = os.getenv('SECRET_KEY')
+    authjwt_algorithm: str = os.getenv('ALGORITHM')
+    authjwt_access_token_expires: int = int(os.getenv('ACCESS_TOKEN_EXPIRE_MINUTES'))*60
+    authjwt_refresh_token_expires: int = int(os.getenv('REFRESH_TOKEN_EXPIRE_DAYS'))*24*60
     
 @form_body
 class ChangePassword(BaseModel):

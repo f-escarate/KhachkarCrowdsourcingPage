@@ -3,22 +3,20 @@
     import { Table, TableBody, TableHead, TableBodyCell, TableHeadCell, TableBodyRow, Checkbox, Button, Spinner } from 'flowbite-svelte';
     import { HOST } from '$lib/constants';
     import { base } from '$app/paths';
-    import { auth_get_json } from '$lib/utils';
+    import { auth_get_json, auth_post_request } from '$lib/utils';
     import Cookies from 'js-cookie';
     let entries = [];
     let khachkars_in_unity = [];
     let compiling_asset_bundles = false;
-    let token;
     onMount(async () => {
-        token = Cookies.get('token');
-        if (token===undefined) {
+        if (Cookies.get('access_token')===undefined) {
             if(!alert("You have to be logged in to access this page")) {
                 window.location.href = `${base}/enter/login`;
             }
         }
-        const response = await auth_get_json(`${HOST}/get_khachkars/ready/`, token);
+        const response = await auth_get_json(`${HOST}/get_khachkars/ready/`);
         entries = await response.json();
-        const response2 = await auth_get_json(`${HOST}/get_khachkars_in_unity/`, token);
+        const response2 = await auth_get_json(`${HOST}/get_khachkars_in_unity/`);
         khachkars_in_unity = await response2.json();
         if (khachkars_in_unity.status !== 'success') {
             alert('Failed to get the list of khachkars that are currently in the Museum');
@@ -41,14 +39,7 @@
                 khachkar_ids.push(entries[i]['id']);
             }
         }
-        const response = await fetch(`${HOST}/compile_asset_bundles/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token || ''
-            },
-            body: JSON.stringify(khachkar_ids)
-        });
+        const response = await auth_post_request(`${HOST}/compile_asset_bundles/`, JSON.stringify(khachkar_ids), 'POST', true);
         let msg = await response.json();
         if (msg.status === 'success') {
             alert("Asset bundles have been compiled successfully");

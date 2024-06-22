@@ -4,8 +4,8 @@
     import { HOST, BASE_ENTRY } from '$lib/constants';
     import VideoOrMesh from './FormComponents/VideoOrMesh.svelte';
     import Metadata from './FormComponents/Metadata.svelte';
+    import { auth_post_request } from '$lib/utils';
     
-    export let token;
     export let http_method = 'POST';
     export let endpoint_url = '/post_khachkar';
     export let button_text = 'Add Khachkar'
@@ -63,13 +63,7 @@
             let withMesh = videoOrMeshComponent.addMediaToRequest(data, entry);
             formatted_endpoint = `${formatted_endpoint}/${+ withMesh}/`;
         }
-        const response = await fetch(formatted_endpoint, {
-            method: http_method,
-            headers: {
-                Authorization: `Bearer ${token}`
-            },
-            body: data
-        });
+        const response = await auth_post_request(formatted_endpoint, data, http_method);
         const json = await response.json();
         isLoading = false;
         if (json.status == 'success') {

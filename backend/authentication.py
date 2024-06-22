@@ -41,12 +41,6 @@ def get_name_by_token(token):
 def get_user_by_email(email: str, db: Session):
     return db.query(models.User).filter(models.User.email == email).first()
 
-def get_user_by_name(username: str, db: Session):
-    username: str = db.query(models.User).filter(models.User.username == username).first()
-    if username is None:
-        raise unauthorized_exception("Could not validate credentials (user not found)")
-    return username
-
 def authenticate_user(email: str, password: str, db):
     user = get_user_by_email(email, db)
     if not user:
