@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from models import Khachkar
 from mesh_handling import get_mesh_from_video
 
-def login(email: str, password: str) -> tuple | None:
+def login(email: str, password: str) -> tuple:
     payload = {
         "email": email,
         "password": password
@@ -16,7 +16,7 @@ def login(email: str, password: str) -> tuple | None:
     response = requests.post("https://api.valdi.ai/account/login", json=payload)
     if response.status_code == 200:
         return response.json()["access_token"], response.json()["refresh_token"]
-    return None
+    return None, None
 
 def enter_with_refresh_token(refresh_token: str) -> str | None:
     payload = {
