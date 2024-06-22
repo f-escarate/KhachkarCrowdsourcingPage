@@ -4,11 +4,10 @@
     import DownIcon from '../icons/DownIcon.svelte';
     import VideoIcon from '../icons/VideoIcon.svelte';
     import SquareIcon from '../icons/SquareIcon.svelte';
-
-    export let videoVisibility = 0;
     export let entry = {
         video: null
     };
+    let videoVisibility = 0;
     let meshData = {... BASE_MESH_DATA};
     const previewFile = (elementID, file) => {
         let preview = document.getElementById(elementID);

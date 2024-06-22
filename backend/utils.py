@@ -142,13 +142,12 @@ def create_mesh_transformations(db: Session, khachkar_id: int):
     db.refresh(mesh_transformations)
     return mesh_transformations
 
-def edit_khachkar(db: Session, db_khachkar: models.Khachkar, khachkar: Khachkar, img_file_extension: str, vid_file_extension: str):
+def edit_khachkar(db: Session, db_khachkar: models.Khachkar, khachkar: Khachkar, img_file_extension: str):
     """
         Edits a Khackkar in the database.
     """
     db_khachkar.date = datetime.now()
     db_khachkar.image = img_file_extension
-    db_khachkar.video = vid_file_extension
     db_khachkar.location = khachkar.location
     db_khachkar.latitude = khachkar.latitude
     db_khachkar.longitude = khachkar.longitude

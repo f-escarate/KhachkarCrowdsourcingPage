@@ -49,6 +49,23 @@ class Khachkar(BaseModel):
     mesh_files: List[UploadFile] = File(...)
 
 
+
+@form_body
+class EditKhachkar(BaseModel):
+    location: Optional[str] = 'Unknown location'
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    height: Optional[float] = None
+    landscape: Optional[str] = None
+    accessibility: Optional[str] = None
+    production_period: Optional[str] = None
+    condition_of_preservation: Optional[str] = None
+    inscription: Optional[str] = None
+    important_features: Optional[str] = None
+    references: Optional[str] = None
+    image: Optional[UploadFile] = None
+
+
 class KhachkarMeshFiles(BaseModel):
     obj: UploadFile
     mtl: UploadFile

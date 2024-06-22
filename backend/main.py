@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
-from schemas import ChangePassword, Khachkar, UserRegister, KhachkarMeshFiles, KhachkarMeshTransformations
+from schemas import ChangePassword, Khachkar, EditKhachkar, UserRegister, KhachkarMeshFiles, KhachkarMeshTransformations
 from authentication import authenticate_user, create_access_token, get_password_hash, get_name_by_token, ACCESS_TOKEN_EXPIRE_MINUTES, get_user_by_name, unauthorized_exception, verify_password
 from utils import save_image, save_video, save_mesh, create_khachkar, edit_khachkar, read_image, read_video, read_file, img_validation, update_khachkar_status, update_khachkars_in_unity, video_validation, mesh_files_validation, preprocess_video, MESHES_PATH
 from database import get_db, Base, engine, SessionLocal
@@ -127,8 +127,8 @@ async def get_filters_options():
         }
     }
 
-@app.patch("/update_khachkar/{khachkar_id}/{with_mesh}/")
-async def update_khachkar(token: Annotated[str, Depends(oauth2_scheme)], khachkar_id: int, with_mesh: int, background_tasks: BackgroundTasks, khachkar: Khachkar = Depends(Khachkar), db: Session = Depends(get_db)):
+@app.patch("/update_khachkar/{khachkar_id}/")
+async def update_khachkar(token: Annotated[str, Depends(oauth2_scheme)], khachkar_id: int, khachkar: EditKhachkar = Depends(EditKhachkar), db: Session = Depends(get_db)):
     if not token:
         return unauthorized_exception("Invalid token")
     user = get_user_by_name(get_name_by_token(token), db)
@@ -144,26 +144,9 @@ async def update_khachkar(token: Annotated[str, Depends(oauth2_scheme)], khachka
         return {"status": "error", "msg": "invalid image"}
     image = khachkar.image
     
-    if with_mesh:
-        if len(khachkar.mesh_files) <= 3:
-            return {"status": "error", "msg": "not enough mesh files"}
-        khachkar_mesh_files = KhachkarMeshFiles(obj = khachkar.mesh_files.pop(0), mtl = khachkar.mesh_files.pop(0), images = khachkar.mesh_files)
-        if not mesh_files_validation(khachkar_mesh_files):
-            return {"status": "error", "msg": "invalid mesh files"}
-        edit_khachkar(db, db_khachkar, khachkar, img_file_extension, 'mp4')
+    edit_khachkar(db, db_khachkar, khachkar, img_file_extension)
+    if image.size > 0:
         save_image(image, db_khachkar.id, img_file_extension)
-        save_mesh(khachkar_mesh_files, db_khachkar, db)
-    else:
-        vid_file_extension = video_validation(khachkar.video)
-        if vid_file_extension is None:
-            return {"status": "error", "msg": "invalid video"}
-        video = khachkar.video
-        khachkar.video = vid_file_extension
-        edit_khachkar(db, db_khachkar, khachkar, img_file_extension, vid_file_extension)
-        if image.size > 0:
-            save_image(image, db_khachkar.id, img_file_extension)
-        save_video(video, db_khachkar.id, vid_file_extension)
-        background_tasks.add_task(preprocess_video, db_khachkar.id, vid_file_extension, db, n_frames=100, get_thumbnail=image.size == 0)
     return {"status": "success"}
 
 @app.get("/get_image/{khachkar_id}")

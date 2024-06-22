@@ -9,10 +9,10 @@
     export let http_method = 'POST';
     export let endpoint_url = '/post_khachkar';
     export let button_text = 'Add Khachkar'
-    export let videoVisibility = 0;
     export let entry = {... BASE_ENTRY};
-    let metadata_fields_component;
-    let videoOrMeshSlot;
+    export let use_video_or_mesh = true;
+    let metadataFieldsComponent;
+    let videoOrMeshComponent;
     let isLoading = false;
     export const previewFile = (elementID, file) => {
         let preview = document.getElementById(elementID);
@@ -27,13 +27,15 @@
     }
 
     const restartForm = () => {
-        videoOrMeshSlot.restartData();
+        if (use_video_or_mesh)
+            videoOrMeshComponent.restartData();
         for (var key in entry)
             entry[key] = BASE_ENTRY[key];
     }
     const validation = () => {
         let msg = '';
-        msg += videoOrMeshSlot.validation();
+        if (use_video_or_mesh)
+            msg += videoOrMeshComponent.validation();
         if (msg !== '') {
             alert(msg);
             return false;
@@ -48,7 +50,7 @@
             return;
         }
 		const data = new FormData();
-        if (!metadata_fields_component.addDataToRequest(data, entry)){
+        if (!metadataFieldsComponent.addDataToRequest(data, entry)){
             isLoading = false;
             return;
         }
@@ -56,9 +58,12 @@
         if (data.get('image') === "null")
             data.set('image', new File([''], 'fake.jpg', {type: 'image/jpeg'}));
         
-        let withMesh = videoOrMeshSlot.addMediaToRequest(data, entry)
-        
-        const response = await fetch(`${HOST}${endpoint_url}/${+ withMesh}/`, {
+        let formatted_endpoint = `${HOST}${endpoint_url}`;
+        if (use_video_or_mesh){
+            let withMesh = videoOrMeshComponent.addMediaToRequest(data, entry);
+            formatted_endpoint = `${formatted_endpoint}/${+ withMesh}/`;
+        }
+        const response = await fetch(formatted_endpoint, {
             method: http_method,
             headers: {
                 Authorization: `Bearer ${token}`
@@ -86,8 +91,10 @@
 <div class='pt-5 grid gap-4 items-end w-full md:grid-cols-2'>
     <h2 class='md:col-span-2 text-2xl font-semibold'>Media</h2>
     <div class="my-2 md:flex md:flex-row gap-4 justify-between align-center md:col-span-2">
-        <VideoOrMesh bind:this={videoOrMeshSlot} bind:videoVisibility={videoVisibility} {entry} />
-        <div class='flex flex-col w-full self-end'>
+        {#if use_video_or_mesh}
+            <VideoOrMesh bind:this={videoOrMeshComponent} {entry} />
+        {/if}
+        <div class='flex flex-col w-full self-end md:max-w-[50%]'>
             Upload image (optional)
             <Label for="image" class="mb-2 w-full md:bottom-0">
             <div class="my-4 p-1 flex border-4 border-amber-300 hover:bg-amber-500 text-center hover:text-white transition-colors duration-400 ease-in-out">
@@ -98,7 +105,7 @@
         </Label>
     </div>
     </div>
-    <Metadata bind:this={metadata_fields_component} entry={entry}/>
+    <Metadata bind:this={metadataFieldsComponent} entry={entry}/>
 
     {#if isLoading}
         <Button class='md:col-span-2 w-[50%] mx-auto h-full text-black bg-amber-500'>
