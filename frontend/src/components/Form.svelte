@@ -1,7 +1,7 @@
 <script>
     import { createEventDispatcher } from 'svelte';
     import { Label, Button, Spinner } from 'flowbite-svelte';
-    import { HOST, BASE_ENTRY, BASE_MESH_DATA } from '$lib/constants';
+    import { HOST, BASE_ENTRY } from '$lib/constants';
     import VideoOrMesh from './FormComponents/VideoOrMesh.svelte';
     import Metadata from './FormComponents/Metadata.svelte';
     
@@ -12,7 +12,7 @@
     export let videoVisibility = 0;
     export let entry = {... BASE_ENTRY};
     let metadata_fields_component;
-    let meshData = {... BASE_MESH_DATA};
+    let videoOrMeshSlot;
     let isLoading = false;
     export const previewFile = (elementID, file) => {
         let preview = document.getElementById(elementID);
@@ -27,28 +27,13 @@
     }
 
     const restartForm = () => {
-        videoVisibility = 0;
-        if (!meshData.withMesh){
-            previewFile('previewVideo', new File([''], 'default.mp4', {type: 'video/mp4'}));
-            let videoElement = document.getElementById('videoElement');
-            videoElement.load();
-        } else {
-            document.getElementById('mesh').value = '';
-            document.getElementById('material').value = '';
-            document.getElementById('mesh_images').value = '';
-        }
+        videoOrMeshSlot.restartData();
         for (var key in entry)
             entry[key] = BASE_ENTRY[key];
-        for (var key in meshData)
-            meshData[key] = BASE_MESH_DATA[key];
     }
     const validation = () => {
         let msg = '';
-        if (entry.video == null && !meshData.withMesh)
-            msg += 'Video cannot be empty\n';
-        if (meshData.withMesh && (meshData.images.length == 0 || meshData.mesh == null || meshData.material == null))
-            msg += 'Mesh files cannot be empty\n';
-        
+        msg += videoOrMeshSlot.validation();
         if (msg !== '') {
             alert(msg);
             return false;
@@ -67,21 +52,13 @@
             isLoading = false;
             return;
         }
-        data.append('video', entry.video);
         data.append('image', entry.image);
-            
         if (data.get('image') === "null")
             data.set('image', new File([''], 'fake.jpg', {type: 'image/jpeg'}));
-        if (meshData.withMesh) {
-            data.set('video', new File([''], 'fake.mp4', {type: 'video/mp4'}));
-            data.append('mesh_files', meshData.mesh);
-            data.append('mesh_files', meshData.material);
-            for (let i = 0; i < meshData.images.length; i++)
-                data.append('mesh_files', meshData.images[i]);
-        } else {
-            data.append('mesh_files', new File([''], 'fake.jpg', {type: 'image/jpeg'}));
-        }
-        const response = await fetch(`${HOST}${endpoint_url}/${+ meshData.withMesh}/`, {
+        
+        let withMesh = videoOrMeshSlot.addMediaToRequest(data, entry)
+        
+        const response = await fetch(`${HOST}${endpoint_url}/${+ withMesh}/`, {
             method: http_method,
             headers: {
                 Authorization: `Bearer ${token}`
@@ -109,7 +86,7 @@
 <div class='pt-5 grid gap-4 items-end w-full md:grid-cols-2'>
     <h2 class='md:col-span-2 text-2xl font-semibold'>Media</h2>
     <div class="my-2 md:flex md:flex-row gap-4 justify-between align-center md:col-span-2">
-        <VideoOrMesh bind:videoVisibility={videoVisibility} {entry} {meshData} />
+        <VideoOrMesh bind:this={videoOrMeshSlot} bind:videoVisibility={videoVisibility} {entry} />
         <div class='flex flex-col w-full self-end'>
             Upload image (optional)
             <Label for="image" class="mb-2 w-full md:bottom-0">

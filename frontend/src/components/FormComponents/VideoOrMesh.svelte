@@ -1,5 +1,6 @@
 <script>
-    import { Label, Toggle, Button, Radio, Dropdown } from 'flowbite-svelte';
+    import { Label, Button, Radio, Dropdown } from 'flowbite-svelte';
+    import { BASE_MESH_DATA } from '$lib/constants';
     import DownIcon from '../icons/DownIcon.svelte';
     import VideoIcon from '../icons/VideoIcon.svelte';
     import SquareIcon from '../icons/SquareIcon.svelte';
@@ -8,12 +9,7 @@
     export let entry = {
         video: null
     };
-    export let meshData = {
-        withMesh: false,
-        mesh: null,
-        material: null,
-        images: []
-    };
+    let meshData = {... BASE_MESH_DATA};
     const previewFile = (elementID, file) => {
         let preview = document.getElementById(elementID);
         preview.src = URL.createObjectURL(file);
@@ -34,6 +30,42 @@
         if (!meshData.withMesh) 
             previewFile('previewVideo', entry.video);
     };
+
+    export const restartData = () => {
+        videoVisibility = 0;
+        if (!meshData.withMesh){
+            previewFile('previewVideo', new File([''], 'default.mp4', {type: 'video/mp4'}));
+            let videoElement = document.getElementById('videoElement');
+            videoElement.load();
+        } else {
+            document.getElementById('mesh').value = '';
+            document.getElementById('material').value = '';
+            document.getElementById('mesh_images').value = '';
+        }
+        for (var key in meshData)
+            meshData[key] = BASE_MESH_DATA[key];
+    }
+    export const validation = () => {
+        let msg = '';
+        if (entry.video == null && !meshData.withMesh)
+            msg += 'Video cannot be empty\n';
+        if (meshData.withMesh && (meshData.images.length == 0 || meshData.mesh == null || meshData.material == null))
+            msg += 'Mesh files cannot be empty\n';
+        return msg;
+    }
+    export const addMediaToRequest = (data, entry) => {
+        data.append('video', entry.video);
+        if (meshData.withMesh) {
+            data.set('video', new File([''], 'fake.mp4', {type: 'video/mp4'}));
+            data.append('mesh_files', meshData.mesh);
+            data.append('mesh_files', meshData.material);
+            for (let i = 0; i < meshData.images.length; i++)
+                data.append('mesh_files', meshData.images[i]);
+        } else {
+            data.append('mesh_files', new File([''], 'fake.jpg', {type: 'image/jpeg'}));
+        }
+        return meshData.withMesh;
+    }
 </script>
 
 <div class='flex flex-col w-full'>
