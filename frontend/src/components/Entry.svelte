@@ -1,19 +1,13 @@
 <script>
     import { onMount } from 'svelte';
     import { base } from '$app/paths';
-    import { HOST, TEXT_FIELDS_NAMES, OPTION_FIELDS_NAMES, STATES_LABELS } from '$lib/constants';
-    import { Modal, Button, Table, TableBody, TableHead, TableBodyCell, TableHeadCell, TableBodyRow } from 'flowbite-svelte';
+    import { HOST, STATES_LABELS } from '$lib/constants';
+    import { Modal, Button } from 'flowbite-svelte';
     import ListIcon from '../components/icons/ListIcon.svelte';
     import SquareIcon from './icons/SquareIcon.svelte';
     import VideoIcon from '../components/icons/VideoIcon.svelte';
+    import KhachkarInfoModal from './KhachkarInfoModal.svelte';
     export let entry_data;
-    const FIELDS_NAMES = {
-        ...OPTION_FIELDS_NAMES,
-        ...TEXT_FIELDS_NAMES,
-        latLong: 'Latitude and Longitude',
-        'date': 'Upload date'
-    };
-    const FIELDS = Object.getOwnPropertyNames(FIELDS_NAMES);
     let image;
 
     onMount(async () => {
@@ -52,9 +46,7 @@
         }
     }
     let clickOutsideModal = false;
-    const previewData = async () => {
-        clickOutsideModal = true;
-    }
+    
     let clickOutsideVideoModal = false;
     const previewVideo = async () => {
         clickOutsideVideoModal = true;
@@ -70,7 +62,7 @@
             <p class='m-2'><b>Current state: </b>{STATES_LABELS[entry_data.state]}</p>
             <p class="m-2 text-xs font-bold">Upload date {entry_data.date}</p>
             <div id='buttons_container' class='w-full flex justify-between md:justify-start gap-2'>
-                <Button on:click={previewData} size="xs" class='w-full md:w-auto bg-amber-500'>
+                <Button on:click={async () => {clickOutsideModal = true;}} size="xs" class='w-full md:w-auto bg-amber-500'>
                     <ListIcon sx='m-0 mr-1 text-white'/>
                     Preview Data
                 </Button>
@@ -98,25 +90,7 @@
     <slot class='mx-auto'></slot>
 </div>
 
-<Modal title="Khachkar information" bind:open={clickOutsideModal} autoclose outsideclose>
-    <Table striped={true}>
-        <TableHead>
-            <TableHeadCell>Field</TableHeadCell>
-            <TableHeadCell>Value</TableHeadCell>
-        </TableHead>
-        <TableBody tableBodyClass="divide-y">
-            {#each FIELDS as key}
-                <TableBodyRow>
-                    <TableBodyCell>{FIELDS_NAMES[key]}</TableBodyCell>
-                    <TableBodyCell>{entry_data[key]}</TableBodyCell>
-                </TableBodyRow>
-            {/each}
-        </TableBody>
-    </Table>
-    <svelte:fragment slot="footer">
-        <Button color="alternative">Back</Button>
-    </svelte:fragment>
-</Modal>
+<KhachkarInfoModal entry_data={entry_data} bind:clickOutsideModal={clickOutsideModal} />
 
 <Modal title="video" bind:open={clickOutsideVideoModal} autoclose outsideclose>
     <video id="videoElement" controls class="w-full max-h-[100%]">
