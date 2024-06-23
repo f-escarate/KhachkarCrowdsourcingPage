@@ -8,6 +8,9 @@
     import VideoIcon from '../components/icons/VideoIcon.svelte';
     import KhachkarInfoModal from './KhachkarInfoModal.svelte';
     export let entry_data;
+    export let target_id;
+    let entryComponent;
+    let componentID;
     let image;
 
     onMount(async () => {
@@ -27,6 +30,20 @@
                 entry_data[key] = "-"
         }
         entry_data.latLong = `${entry_data.latitude}, ${entry_data.longitude}`;
+
+        // Scroll
+        componentID = `entryComponent${entry_data.id}`;
+        if (target_id !== null && target_id !== undefined && target_id !== '' && target_id === componentID) {
+            setTimeout(() => {
+                entryComponent.scrollIntoView(
+                    {
+                        behavior: 'smooth',
+                        block: 'start',
+                        inline: 'end'
+                    }
+                );
+            }, 250);
+        }
     });
     const loadVideo = async () => {
         if (entry_data.state === 'not_meshed' || entry_data.state === 'creating_mesh'){
@@ -54,7 +71,7 @@
     }
 </script>
 
-<div class='m-2 md:w-full flex flex-col border-b-2 border-amber-500 items-center w-auto'>
+<div bind:this={entryComponent} id={componentID} class='m-2 md:w-full flex flex-col border-b-2 border-amber-500 items-center w-auto scroll-smooth'>
     <div class='p-4 md:flex md:justify-between md:max-h-[300px] md:gap-2'>
         <div class='flex flex-col justify-between items-center md:items-start'>
             <h1 class='text-2xl font-semibold font-italic line-clamp-3 text-ellipsis'>{`${entry_data.id})`} {entry_data.location}</h1>

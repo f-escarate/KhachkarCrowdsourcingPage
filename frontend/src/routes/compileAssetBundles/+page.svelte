@@ -5,6 +5,7 @@
     import EyeIcon from '../../components/icons/EyeIcon.svelte';
     import ListIcon from '../../components/icons/ListIcon.svelte';
     import SquareIcon from '../../components/icons/SquareIcon.svelte';
+    import ForwardIcon from '../../components/icons/ForwardIcon.svelte';
     import { HOST } from '$lib/constants';
     import { base } from '$app/paths';
     import { auth_get_json, auth_post_request } from '$lib/utils';
@@ -83,6 +84,13 @@
                     <TableBodyRow>
                         <TableBodyCell tdClass='px-3 py-4 font-medium'>
                             {`${entry['id']}) ${entry['location']}`}
+                            <a class='inline underline text-amber-700 text-bold italic'
+                                href={`${base}/viewKhachkars#entryComponent${entry.id}`}
+                                target="_blank" rel="noopener"
+                                >
+                                Go
+                                <ForwardIcon sx='text-amber-700 inline'/>
+                            </a>
                         </TableBodyCell>
                         <TableBodyCell tdClass='px-1 py-4'>
                             <Button on:click={async () => {clickOutsideModal = true; entry_data=entry;}} size="xs" class='w-full bg-amber-500'>

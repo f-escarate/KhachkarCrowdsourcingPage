@@ -12,6 +12,7 @@
     import { auth_get_json, get_json } from '$lib/utils';
     import Cookies from 'js-cookie';
     let entries = null;
+    let targetId = null;
     let filtered_entries = [];
     let user_id = null;
     let only_my_khachkars = false;
@@ -48,7 +49,11 @@
             alert('Failed to load the filters (unknown reason)');
         }
         filter_khachkars();
-        
+
+        // Get the element to scroll to (if any)
+        const idIndex = window.location.href.indexOf('#');
+        if(idIndex > -1)
+            targetId = window.location.href.substring(idIndex + 1);
     });
 
     const filter_khachkars = () => {
@@ -138,7 +143,7 @@
     {:else if filtered_entries.length > 0}
         {#if user_id !== null}
             {#each filtered_entries as entry, i}
-            <Entry entry_data={entry}>
+            <Entry entry_data={entry} target_id={targetId}>
                 {#if entry.owner_id === user_id}
                 <div class='md:mt-2 mb-4 px-4 flex flex-col md:flex-row md:justify-between md:max-h-[300px] w-full gap-4'>
                     <Button class='md:col-span-2 w-full md:w-[50%] mx-auto h-full bg-cyan-500 hover:bg-cyan-600' href={`${base}/editEntry/${entry.id}/`}>
@@ -181,7 +186,7 @@
             {/each}
         {:else}
             {#each filtered_entries as entry, i}
-                <Entry entry_data={entry}/>                
+                <Entry entry_data={entry} target_id={targetId}/>                
             {/each}
         {/if}
     {:else}
