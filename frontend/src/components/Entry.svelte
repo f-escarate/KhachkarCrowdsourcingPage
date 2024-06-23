@@ -75,7 +75,7 @@
     <div class='p-4 md:flex md:justify-between md:max-h-[300px] md:gap-2'>
         <div class='flex flex-col justify-between items-center md:items-start'>
             <h1 class='text-2xl font-semibold font-italic line-clamp-3 text-ellipsis'>{`${entry_data.id})`} {entry_data.location}</h1>
-            <img class='max-h-[50vh] md:max-h-full rounded-lg md:rounded-none md:hidden w-full m-4 object-contain' src={image} alt={entry_data.id} />
+            <img class='max-h-[50vh] md:max-h-full rounded-lg md:rounded-none md:hidden m-4 object-contain' src={image} alt={entry_data.id} />
             <p class='m-2'><b>Current state: </b>{STATES_LABELS[entry_data.state]}</p>
             <p class="m-2 text-xs font-bold">Upload date {entry_data.date}</p>
             <div id='buttons_container' class='w-full flex justify-between md:justify-start gap-2'>
@@ -102,7 +102,7 @@
                 {/if}
             </div>
         </div>
-        <img class='hidden md:block max-w-[40%] object-contain' src={image} alt={entry_data.id} />
+        <img class='hidden md:block max-w-[40%] object-contain rounded-lg' src={image} alt={entry_data.id} />
     </div>
     <slot class='mx-auto'></slot>
 </div>
