@@ -51,7 +51,7 @@
         </DropdownHeader>
         <DropdownItem href={`${base}/account/`}>Account Settings</DropdownItem>
         {#if data.is_admin}
-            <DropdownItem href={`${base}/compileAssetBundles/`}>Compile Asset Bundles</DropdownItem>
+            <DropdownItem href={`${base}/compileAssetBundles/`}>Manage museum khachkars</DropdownItem>
         {/if}
         <DropdownDivider />
         <DropdownItem on:click={handleLogOut}>Log out</DropdownItem>
