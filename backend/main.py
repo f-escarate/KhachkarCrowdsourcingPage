@@ -423,6 +423,11 @@ def set_ready(khachkar_id: int, Authorize: AuthJWT = Depends(), db: Session = De
     db_khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == khachkar_id).first()
     if db_khachkar is None:
         return {"status": "error", "msg": "khachkar does not exist"}
+    # Check if has an image
+    try:
+        read_image(khachkar_id, db_khachkar.image)
+    except FileNotFoundError:
+        return {"status": "error", "msg": "khachkar does not have an image"}
     print("Setting khachkar ready...")
     db_khachkar.state = models.KhachkarState.ready
     db.commit()
