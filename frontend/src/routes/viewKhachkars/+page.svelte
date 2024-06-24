@@ -144,12 +144,12 @@
         {#if user_id !== null}
             {#each filtered_entries as entry, i}
             <Entry entry_data={entry} target_id={targetId}>
-                {#if entry.owner_id === user_id}
                 <div class='md:mt-2 mb-4 px-4 flex flex-col md:flex-row md:justify-between md:max-h-[300px] w-full gap-4'>
-                    <Button class='md:col-span-2 w-full md:w-[50%] mx-auto h-full bg-cyan-500 hover:bg-cyan-600' href={`${base}/editEntry/${entry.id}/`}>
-                        <EditIcon sx='m-0 mr-1 text-white'/>
-                        Edit entry
-                    </Button>
+                <Button class='md:col-span-2 w-full md:w-[50%] mx-auto h-full bg-cyan-500 hover:bg-cyan-600' href={`${base}/editEntry/${entry.id}/`}>
+                    <EditIcon sx='m-0 mr-1 text-white'/>
+                    Edit data and image
+                </Button>
+                {#if entry.owner_id === user_id}
                     {#if entry.state === 'ready'}
                         <Button class='md:col-span-2 w-full md:w-[50%] mx-auto h-full bg-red-400 hover:bg-red-500' on:click={e => setUnready(e, i)}>
                             <SquareIcon2 sx='m-0 mr-1 text-white'/>
@@ -180,8 +180,8 @@
                             Process mesh
                         </Button>
                     {/if}
-                </div>
                 {/if}
+                </div> 
             </Entry>
             {/each}
         {:else}

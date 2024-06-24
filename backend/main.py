@@ -155,8 +155,6 @@ async def update_khachkar(khachkar_id: int, Authorize: AuthJWT = Depends(), khac
     db_khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == khachkar_id).first()
     if db_khachkar is None:
         return {"status": "error", "msg": "khachkar does not exist"}
-    if db_khachkar.owner_id != user.id:
-        return {"status": "error", "msg": "you are not the owner of this khachkar"}
     img_file_extension = img_validation(khachkar.image)
     if img_file_extension is None:
         return {"status": "error", "msg": "invalid image"}
