@@ -62,7 +62,7 @@ async def post_khachkar(with_mesh: int, background_tasks: BackgroundTasks, Autho
     image = khachkar.image
     khachkar.image = img_file_extension
     if with_mesh:
-        if len(khachkar.mesh_files) <= 3:
+        if len(khachkar.mesh_files) == 0:
             return {"status": "error", "msg": "not enough mesh files"}
         khachkar_mesh_files = KhachkarMeshFiles(obj = khachkar.mesh_files.pop(0), mtl = khachkar.mesh_files.pop(0), images = khachkar.mesh_files)
         if not mesh_files_validation(khachkar_mesh_files):
