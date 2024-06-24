@@ -69,7 +69,8 @@ async def post_khachkar(with_mesh: int, background_tasks: BackgroundTasks, Autho
             return {"status": "error", "msg": "invalid mesh files"}
         khachkar.video = None
         created_khachkar = create_khachkar(db=db, khachkar=khachkar, user_id=user.id)
-        save_image(image, created_khachkar.id, img_file_extension)
+        if image.size > 0:
+            save_image(image, created_khachkar.id, img_file_extension)
         save_mesh(khachkar_mesh_files, created_khachkar, db)
         scale_mesh(created_khachkar.id, created_khachkar.height)
     else:
@@ -168,8 +169,11 @@ async def update_khachkar(khachkar_id: int, Authorize: AuthJWT = Depends(), khac
 @app.get("/get_image/{khachkar_id}")
 async def get_image(khachkar_id: int, db: Session = Depends(get_db)):
     khachkar = db.query(models.Khachkar).filter(models.Khachkar.id == khachkar_id).first()
-    img = read_image(khachkar_id, khachkar.image)
-    return Response(content=img, media_type=f"image/{khachkar.image}")
+    try:
+        img = read_image(khachkar_id, khachkar.image)
+        return Response(content=img, media_type=f"image/{khachkar.image}")
+    except FileNotFoundError:
+        return Response(content=None, status_code=404)
 
 @app.get("/get_video/{khachkar_id}")
 async def get_video(khachkar_id: int):

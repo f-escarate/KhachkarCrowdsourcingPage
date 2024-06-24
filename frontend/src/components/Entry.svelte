@@ -20,11 +20,16 @@
                 'Content-Type': `image/${entry_data.image}`
             }
         });
-        let img_blob = await response.blob();
-        if (img_blob.size > 0) 
-            image = URL.createObjectURL(img_blob);
-        else
+        if (response.status_code === 404) {
             image = `${base}/images/no_thumb.jpg`;
+        } else {
+            let img_blob = await response.blob();
+            if (img_blob.size > 0) 
+                image = URL.createObjectURL(img_blob);
+            else
+                image = `${base}/images/no_thumb.jpg`;
+        }
+        
         for (let key in entry_data) {
             if (entry_data[key] === null)
                 entry_data[key] = "-"
