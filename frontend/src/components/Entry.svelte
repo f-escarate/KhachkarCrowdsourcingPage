@@ -2,7 +2,7 @@
     import { onMount } from 'svelte';
     import { base } from '$app/paths';
     import { HOST, STATES_LABELS } from '$lib/constants';
-    import { Modal, Button } from 'flowbite-svelte';
+    import { Modal, Button, Popover } from 'flowbite-svelte';
     import ListIcon from '../components/icons/ListIcon.svelte';
     import SquareIcon from './icons/SquareIcon.svelte';
     import VideoIcon from '../components/icons/VideoIcon.svelte';
@@ -88,7 +88,7 @@
                         <VideoIcon sx='m-0 mr-1 text-white'/>
                         Processing Khachkar video
                     </Button>
-                {:else}
+                {:else if entry_data.video !== '-'}
                     <Button on:click={previewVideo} size="xs" class='w-full md:w-auto bg-amber-500'>
                         <VideoIcon sx='m-0 mr-1 text-white'/>
                         Preview Video
@@ -99,6 +99,17 @@
                         <SquareIcon sx='m-0 mr-1 text-white'/>
                         Preview Mesh
                     </Button>
+                {/if}
+                {#if entry_data.video === '-'}
+                    <div id={`NOVIDEO${entry_data.id}`}>
+                        <Button disabled on:click={previewVideo} size="xs" class='w-full md:w-auto bg-red-700'>
+                            <VideoIcon sx='m-0 mr-1 text-white'/>
+                            No video
+                        </Button>
+                        <Popover class="w-64 text-sm font-light" title="That khachkar does not have a video" triggeredBy={`#NOVIDEO${entry_data.id}`}>
+                            The mesh was uploaded directly, so there is no video to preview.
+                        </Popover>
+                    </div>
                 {/if}
             </div>
         </div>

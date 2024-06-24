@@ -67,7 +67,7 @@ async def post_khachkar(with_mesh: int, background_tasks: BackgroundTasks, Autho
         khachkar_mesh_files = KhachkarMeshFiles(obj = khachkar.mesh_files.pop(0), mtl = khachkar.mesh_files.pop(0), images = khachkar.mesh_files)
         if not mesh_files_validation(khachkar_mesh_files):
             return {"status": "error", "msg": "invalid mesh files"}
-        khachkar.video = 'mp4'
+        khachkar.video = None
         created_khachkar = create_khachkar(db=db, khachkar=khachkar, user_id=user.id)
         save_image(image, created_khachkar.id, img_file_extension)
         save_mesh(khachkar_mesh_files, created_khachkar, db)
