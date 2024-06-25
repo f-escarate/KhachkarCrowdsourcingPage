@@ -1,7 +1,7 @@
 <script>
     import { auth_get_json } from '../../lib/utils.js';
     import { base } from "$app/paths.js";
-    import { HOST } from '$lib/constants.js';
+    import { HOST } from '$lib/constants';
     import { onMount } from 'svelte';
     let status = 'loading...'
     let last_restarted = 'Unknown';
@@ -9,7 +9,7 @@
     let gpu = 'Unknown';
     let status_color = 'text-yellow-500';
     onMount(async () => {
-        const response = await auth_get_json(`${HOST}/get_server_status`);
+        const response = await auth_get_json(`${HOST}/get_server_status/`);
         let response_json = await response.json();
         if (response_json.status == 'error') {
             alert(response_json.msg);
