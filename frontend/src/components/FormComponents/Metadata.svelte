@@ -4,7 +4,6 @@
     import SelectOptions from './SelectOptions.svelte';
     import { onMount } from 'svelte';
     import { auth_get_json } from '$lib/utils'
-    import Cookies from 'js-cookie';
     
     export let entry;
     export let OPTION_FIELDS_OPTIONS_NAMES = {};
@@ -61,7 +60,7 @@
 
 </script>
 
-<h2 class='md:col-span-2 text-2xl font-semibold'>Metadata</h2>
+<h2 class='md:col-span-2 text-2xl font-semibold'>Metadata <b class='text-xl'>(All fields are optional)*</b></h2>
 {#each OPTION_FIELDS as key}
     <SelectOptions title={OPTION_FIELDS_NAMES[key]} options={OPTION_FIELDS_OPTIONS_NAMES[key]} bind:value={entry[key]}/>
 {/each}

@@ -1,9 +1,10 @@
 <script>
-    import { Label, Button, Radio, Dropdown } from 'flowbite-svelte';
+    import { Label, Button, Radio, Dropdown, Popover } from 'flowbite-svelte';
     import { BASE_MESH_DATA } from '$lib/constants';
     import DownIcon from '../icons/DownIcon.svelte';
     import VideoIcon from '../icons/VideoIcon.svelte';
     import SquareIcon from '../icons/SquareIcon.svelte';
+    import QuestionIcon from '../icons/QuestionIcon.svelte';
     export let entry = {
         video: null
     };
@@ -69,7 +70,15 @@
 
 <div class='flex flex-col w-full'>
     <div class='flex flex-col justify-start items-start gap-1'>   
-        <p class='font-semibold h-full'>Select between Video or Mesh</p>     
+        <div class='flex gap-1 items-center font-semibold h-full'>
+            Select between Video or Mesh
+            <div id='whatIsAMesh'>
+                <QuestionIcon  sx='w-6 h-6 text-cyan-500'/>
+                <Popover class="w-64 text-sm " title="What is a mesh?" triggeredBy='#whatIsAMesh'>
+                    A mesh is a representation of a 3D object. In this case is a 3D model of the khachkar.
+                </Popover>
+            </div>
+        </div>     
         <Button class='bg-amber-500 hover:bg-amber-700 mb-4'>
             Selected: <p class='font-bold'>{meshData.withMesh? 'Mesh': 'Video'}</p> <DownIcon sx='m-0 text-white'/>
         </Button>
@@ -83,7 +92,16 @@
         </Dropdown>
     </div>
     {#if meshData.withMesh}
-        <p class='flex mb-2'>Upload mesh <SquareIcon sx='mx-1 text-black'/></p>
+        <div class='flex mb-2'>Upload mesh <SquareIcon sx='mx-1 text-black'/>
+            <div id='howToUploadAMesh'>
+                <QuestionIcon  sx='w-6 h-6 text-red-800'/>
+                <Popover class="w-64 text-sm " title="What is a mesh?" triggeredBy='#howToUploadAMesh'>
+                    It requires a .obj file, a .mtl file and one or more texture images. If there are multiple images, they must be uploaded all at once.
+                </Popover>
+            </div>
+        
+        
+        </div>
         <div class="mb-2 w-full flex flex-col gap-2">
             <label for="mesh" class='font-bold text-sm'>Mesh file (.obj)</label>
             <input type="file" class="mx-4 w-full" on:change={e => meshData.mesh=e.target.files[0]} id="mesh" name="mesh" accept=".obj">

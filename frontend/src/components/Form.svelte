@@ -89,7 +89,7 @@
             <VideoOrMesh bind:this={videoOrMeshComponent} {entry} />
         {/if}
         <div class='flex flex-col w-full self-end md:max-w-[50%]'>
-            Upload image (optional)
+            <p>Upload image <b>(optional)</b></p>
             <Label for="image" class="mb-2 w-full md:bottom-0">
             <div class="my-4 p-1 flex border-4 border-amber-300 hover:bg-amber-500 text-center hover:text-white transition-colors duration-400 ease-in-out">
                 <img id="previewImage" class={(entry.image? 'visible': 'hidden') + " md:w-1/2 m-auto p-2"} alt="Thumbnail">
