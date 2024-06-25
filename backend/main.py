@@ -448,6 +448,31 @@ def set_unready(khachkar_id: int, Authorize: AuthJWT = Depends(), db: Session = 
     db.commit()
     return {"status": "success"}
 
+@app.get("/get_server_status/")
+def get_server_status(Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    Authorize.jwt_required()
+    email = Authorize.get_jwt_subject()
+    user = get_user_by_email(email, db)
+    if user is None:
+        return {"status": "error", "msg": "problem with user authentication"}
+    if not user.is_admin:
+        return {"status": "error", "msg": "you are not authorized to perform this action"}
+    
+    token = valdi_task.get_access_token()
+    if token is None:
+        return {"status": "valdi_error", "msg": "Valdi bad authentication error"}
+    vm_status = valdi_task.get_is_vm_status_data(token)
+    if vm_status is None:
+        return {"status": "valdi_error", "msg": "Valdi server error"}
+
+    response_obj = {
+        "server_status": vm_status["status"],
+        "last_restarted": vm_status["last_restarted_time"],
+        "last_stopped": vm_status["last_stopped_time"],
+        "gpu": vm_status["pretty_gpu_name"],
+    }
+    return {"status": "success", "msg": response_obj}
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000, root_path='/crowdsourcing_backend')
