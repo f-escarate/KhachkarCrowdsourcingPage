@@ -83,11 +83,11 @@ class ValdiTask():
             res = get_mesh_from_video(khachkar, db)
             print(res)
 
-    def get_queued_khachkars_count(self, db: Session) -> int:
-        return db.query(Khachkar).filter(Khachkar.state == "queued_for_meshing").count()
+    def no_khachkars_queued(self, db: Session) -> bool:
+        return db.query(Khachkar).filter(Khachkar.state == "queued_for_meshing").count() == 0
 
-    def get_meshing_khachkars_count(self, db: Session) -> int:
-        return db.query(Khachkar).filter(Khachkar.state == "creating_mesh").count()
+    def no_khachkars_meshing(self, db: Session) -> bool:
+        return db.query(Khachkar).filter(Khachkar.state == "creating_mesh").count() == 0
 
     def get_is_vm_status_data(self, token: str) -> bool | None:
         vms_status = get_vms_status(token)
@@ -117,13 +117,14 @@ class ValdiTask():
                 continue
 
             # If there are no queued khachkars, we don't need to do anything
-            if self.get_queued_khachkars_count(db) == 0:
-                if vm_data["status"] == "running" and self.get_meshing_khachkars_count(db) == 0:
-                    print("Server is running and there are no khachkars to mesh... Stopping the server")
-                    if stop_vm(token, vm_data["server"]):
-                        print(" -> Server stopped")
-                    else:
-                        print(" -> Error stopping the server")
+            if self.no_khachkars_queued(db):
+                if vm_data["status"] == "running" and self.no_khachkars_meshing(db):
+                    #print("Server is running and there are no khachkars to mesh... Stopping the server")
+                    #if stop_vm(token, vm_data["server"]):
+                    #    print(" -> Server stopped")
+                    #else:
+                    #    print(" -> Error stopping the server")
+                    pass
                 await asyncio.sleep(self.delay_seconds)
                 continue
 
