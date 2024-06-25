@@ -302,11 +302,13 @@ async def mesh_khachkar(khachkar_id: int, Authorize: AuthJWT = Depends(), db: Se
     vm_status = valdi_task.get_is_vm_status_data(token)
     if vm_status is None:
         return {"status": "error", "msg": "Gaussian Splatting server server connection error 2"}
-    if vm_status["status"] != "running":
-        update_khachkar_status(db, khachkar, "queued_for_meshing")
-        print("Gaussian Splatting server is not running, but the khachkar will be meshed when it starts")
-        return {"status": "success"}
-    return get_mesh_from_video(khachkar, db)
+    if vm_status["status"] == "running" and valdi_task.no_khachkars_meshing(db) and valdi_task.no_khachkars_queued(db):
+        return get_mesh_from_video(khachkar, db)
+
+    update_khachkar_status(db, khachkar, "queued_for_meshing")
+    print("Gaussian Splatting server is not running, or is busy")
+    return {"status": "success"}
+        
 
 @app.post("/mesh_khachkar/{khachkar_id}/")
 async def post_khachkar_mesh(khachkar_id: int, mesh_files: List[UploadFile] = File(...), db: Session = Depends(get_db)):
@@ -321,9 +323,12 @@ async def post_khachkar_mesh(khachkar_id: int, mesh_files: List[UploadFile] = Fi
     if not mesh_files_validation(khachkar_mesh_files):
         return {"status": "error", "msg": "invalid mesh files"}
     save_mesh(khachkar_mesh_files, db_khachkar, db)
+    print("saved")
+    print("transforming")
     transform_res = transform_mesh(khachkar_id, [0, 0, 0], [180, 0, 0])
     if transform_res["status"] == "error":
         return transform_res
+    print("transformed")
     # Now scale the mesh based on the height of the khachkar
     height = db_khachkar.height
     return scale_mesh(khachkar_id, height)
