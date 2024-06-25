@@ -70,9 +70,11 @@ public class CallableMethods: MonoBehaviour
         halo.ApplyModifiedProperties();
         // Step 4: Add Conture Rendering
         newPrefab.AddComponent<ContureRendering>();
-        // Step 5: Convert to Prefab
+        // Step 5: Add to layer
+        newPrefab.layer = 9;
+        // Step 6: Convert to Prefab
         PrefabUtility.SaveAsPrefabAsset(newPrefab, prefabPath);
-        // Step 6: Set its assetBundleName
+        // Step 7: Set its assetBundleName
         AssetImporter.GetAtPath(prefabPath).assetBundleName = "stones"+assetBundleInterval;
     }
 
