@@ -93,7 +93,7 @@ def scale_mesh(id: int, height: float):
         for file_name in file_names:
             shutil.move(os.path.join(source_dir, file_name), backup_dir)
         # Load the mesh
-        mesh = trimesh.load(f"{backup_dir}/{id}.obj", force="mesh")
+        mesh = trimesh.load_mesh(f"{backup_dir}/{id}.obj")
         
         # Scale the mesh based on the height
         objective_height = height * UNITY_SCALE_RATIO
