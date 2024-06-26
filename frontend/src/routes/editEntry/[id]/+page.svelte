@@ -45,7 +45,7 @@
     bind:this={form}
     on:post_data={handlePost}
     entry={entry}
-    endpoint_url={`/update_khachkar/${id}`}
+    endpoint_url={`/update_khachkar/${id}/`}
     http_method='PATCH'
     button_text='Edit Khachkar'
     use_video_or_mesh={false}
