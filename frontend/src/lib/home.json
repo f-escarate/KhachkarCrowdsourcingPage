@@ -1,11 +1,29 @@
-[
-    {
-        "text": ["Welcome to the Khachkar Virtual Museum's crowdsourcing page! In this is a page you can post information, videos, and meshes of Khachkars, for the Virtual Museum. \n\n The data is reviewed by the administrators, and published into the museum."],
-        "photo": "/images/1.png"
-    },
-    {
-        "text": ["You can log in to have a registry of your uploaded Khachkar videos, information and meshes. Also is posible to check information loaded by other users and edit it if is wrong.\n\n If you don't have an account, you can create one by clicking", "."],
-        "links": [{"url": "/enter/register", "label":"here"}],
-        "photo": "/images/2.png"
-    }
-]
+{
+    "logged": [
+        {
+            "text": ["Welcome to the", " Virtual Museum's crowdsourcing page! In this is a page you can", " information, videos, and 3D models of Khachkars, for the Virtual Museum. \n\n The data is reviewed by the administrators, and published into the museum."],
+            "links": [{"url": "https://en.wikipedia.org/wiki/Khachkar", "label":"Khachkar", "external": true},
+                        {"url": "/add/", "label":"post", "external": false}],
+            "photo": "/images/1.png"
+        },
+        {
+            "text": ["You can have a registry of your uploaded Khachkar videos, information and 3D models",".\n\n Also is posible to check information loaded by other users, edit it if is wrong, and arrange the 3D models (so that they are correctly positioned in the museum)."],
+            "links": [{"url": "/viewKhachkars/", "label":"here", "external": false}],
+            "photo": "/images/2.png"
+        }
+    ],
+    "not_logged": [
+        {
+            "text": ["Welcome to the", " Virtual Museum's crowdsourcing page! In this is a page you can post information, videos, and 3D models of Khachkars, for the Virtual Museum. \n\n The data is reviewed by the administrators, and published into the museum."],
+            "links": [{"url": "https://en.wikipedia.org/wiki/Khachkar", "label":"Khachkar", "external": true}],
+            "photo": "/images/1.png",
+            "type": "not_logged"
+        },
+        {
+            "text": ["You can log in to have a registry of your uploaded Khachkar videos, information and 3D models. Also is posible to check information loaded by other users and edit it if is wrong.\n\n If you don't have an account, you can create one by clicking", "."],
+            "links": [{"url": "/enter/register", "label":"here", "external": false}],
+            "photo": "/images/2.png",
+            "type": "not_logged"
+        }
+    ]
+}

@@ -1,8 +1,10 @@
 <script>
     import { onMount } from 'svelte';
-    import data from '$lib/home.json';
+    import json_data from '$lib/home.json';
     import { base } from "$app/paths";
     import { addAnimationStyles } from '$lib/utils';
+    import Cookies from 'js-cookie';
+    let data = json_data.not_logged;
 
     const text_style = (idx) => {
         let margins = ['md:mt-[-2%]', 'md:mb-[-2%]'];
@@ -21,6 +23,9 @@
     }
 
     onMount(() => {
+        if (Cookies.get('access_token') !== undefined) {
+            data = json_data.logged;
+        }
         const targets = document.querySelectorAll('.animated-div');
         const div_anim_styles = ['animate-fade-right', 'animate-duration-500', 'animate-ease-out']
         addAnimationStyles(targets, div_anim_styles);
@@ -34,7 +39,11 @@
                 {#each element.text as text_segment, i}
                     <p class='inline'>{text_segment}</p>
                     {#if element.links && element.links[i]}
-                        <a class='underline italic font-bold' href={base+element.links[i].url}>{element.links[i].label}</a>
+                        <a class='underline italic font-bold'
+                            href={element.links[i].external? element.links[i].url : `${base}${element.links[i].url}`}
+                            target={element.links[i].external? '_blank' : ''}
+                            rel={element.links[i].external? 'noopener noreferer' : ''}
+                            >{element.links[i].label}</a>
                     {/if}
                 {/each}
             </div>
