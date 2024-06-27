@@ -149,6 +149,12 @@
                     <EditIcon sx='m-0 mr-1 text-white'/>
                     Edit data and image
                 </Button>
+                {#if entry.state === 'meshed'}
+                    <Button class='md:col-span-2 w-full md:w-[50%] mx-auto h-full bg-amber-600 hover:bg-amber-700' href={`${base}/meshTransformations/${entry.id}/`}>
+                        <SquareIcon2 sx='m-0 mr-1 text-white'/>
+                        Set mesh transformations
+                    </Button>
+                {/if}
                 {#if entry.owner_id === user_id}
                     {#if entry.state === 'ready'}
                         <Button class='md:col-span-2 w-full md:w-[50%] mx-auto h-full bg-red-400 hover:bg-red-500' on:click={e => setUnready(e, i)}>
@@ -156,10 +162,6 @@
                             Set unready
                         </Button>
                     {:else if entry.state === 'meshed'}
-                        <Button class='md:col-span-2 w-full md:w-[50%] mx-auto h-full bg-amber-600 hover:bg-amber-700' href={`${base}/meshTransformations/${entry.id}/`}>
-                            <SquareIcon2 sx='m-0 mr-1 text-white'/>
-                            Set mesh transformations
-                        </Button>
                         <Button class='md:col-span-2 w-full md:w-[50%] mx-auto h-full bg-green-400 hover:bg-green-500' on:click={e => setReady(e, i)}>
                             <SquareIcon2 sx='m-0 mr-1 text-white'/>
                             Set ready
