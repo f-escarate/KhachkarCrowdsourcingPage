@@ -5,7 +5,7 @@
     import EyeIcon from '../../components/icons/EyeIcon.svelte';
     import ListIcon from '../../components/icons/ListIcon.svelte';
     import SquareIcon from '../../components/icons/SquareIcon.svelte';
-    import ForwardIcon from '../../components/icons/ForwardIcon.svelte';
+    import OpenLinkIcon from '../../components/icons/OpenLinkIcon.svelte';
     import { HOST } from '$lib/constants';
     import { base } from '$app/paths';
     import { auth_get_json, auth_post_request } from '$lib/utils';
@@ -84,12 +84,10 @@
                     <TableBodyRow>
                         <TableBodyCell tdClass='px-3 py-4 font-medium'>
                             {`${entry['id']}) ${entry['location']}`}
-                            <a class='inline underline text-amber-700 text-bold italic'
+                            <a class='inline-flex underline text-amber-700 text-bold italic align-middle'
                                 href={`${base}/viewKhachkars#entryComponent${entry.id}`}
                                 target="_blank" rel="noopener"
-                                >
-                                Go
-                                <ForwardIcon sx='text-amber-700 inline'/>
+                                ><OpenLinkIcon sx='text-amber-500 w-full'/><p class='w-full'>Go</p>
                             </a>
                         </TableBodyCell>
                         <TableBodyCell tdClass='px-1 py-4'>
