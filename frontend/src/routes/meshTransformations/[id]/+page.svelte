@@ -1,16 +1,20 @@
 <script>
     import { browser } from '$app/environment'; 
     import { onMount } from 'svelte';
-    import { Tabs, TabItem, Button, Spinner, Progressbar, Popover } from 'flowbite-svelte';
+    import { Tabs, TabItem, Button, Spinner, Progressbar, Popover, Modal } from 'flowbite-svelte';
     import { init, animate, transform_stone, transform_bounding_box, clear_scene, load_mesh } from '$lib/mesh_display';
+    import { base } from '$app/paths'
     import { HOST } from '$lib/constants';
     import Cookies from 'js-cookie';
     import { auth_post_request } from '$lib/utils';
     import RangeInput from '../../../components/RangeInput.svelte';
+    import QuestionIcon from '../../../components/icons/QuestionIcon.svelte';
     /** @type {import('./$types').PageData} */
 	export let data;
     let id = data.id
     let isLoading = false;
+    let modalTransform = false;
+    let modalBox = false;
     const progress_obj = {
         loaded: false,
         progress: 0
@@ -42,6 +46,9 @@
     };
     
     onMount(async () => {
+        if (Cookies.get('access_token') === undefined) {
+            window.location.href = `${base}/enter/login`;
+        }
         if(browser) {
             var mesh_display = document.getElementById('mesh_display');
             var mesh_display_rect = mesh_display.getBoundingClientRect()
@@ -123,6 +130,36 @@
 
 <div class={(progress_obj.loaded? 'visible': 'invisible')}>
     <span id='tabs_top_limit' class='w-full'></span>
+    <div class='flex items-center justify-end flex-col md:flex-row gap-1'>
+        <h1 class='text-3xl font-bold text-left w-full'>Mesh editor</h1>
+        <Button class='bg-amber-600 hover:bg-amber-500 ml-2 my-auto flex' on:click={e => modalTransform=true}>
+            <QuestionIcon sx='h-full text-white'/>
+            <p class='font-bold max-w-[250px]'>How set mesh transformations?</p>
+        </Button>
+        <Button class='bg-orange-600 hover:bg-orange-500 ml-2 my-auto flex' on:click={e => modalBox=true}>
+            <QuestionIcon sx='h-full text-white'/>
+            <p class='font-bold max-w-[250px]'>How edit mesh bounding box?</p>
+        </Button>
+    </div>
+    <Modal bind:open={modalTransform} title='How to upload a mesh?' width='w-1/2' autoclose outsideclose>
+        <p class='font-semibold'>You can change the mesh transformations by sliding the bars that correspond to each property (rotations and translations).</p>
+        <p class='text-amber-600'>Example:</p>
+        <video class='w-full' controls>
+            <source src={`${base}/videos/videoMeshTransformations.mp4`} type="video/mp4">
+            <track kind="captions">
+            Your browser does not support the video tag.
+        </video>
+    </Modal>
+    <Modal bind:open={modalBox} title='How to upload a mesh?' width='w-1/2' autoclose outsideclose>
+        <p class='font-semibold'>You can change the size of the bounding box by sliding the bars that correspond to the size of each axis.</p>
+        <p class='text-amber-500 font-bold'>Important: The mesh looks a little different after cropping, but it looks better in the museum.</p>
+        <p class='text-amber-600'>Example:</p>
+        <video class='w-full' controls>
+            <source src={`${base}/videos/videoMeshBox.mp4`} type="video/mp4">
+            <track kind="captions">
+            Your browser does not support the video tag.
+        </video>
+    </Modal>
     <Tabs style="underline">
         <TabItem open><span slot="title">Position x</span>
             <RangeInput property='pos' axis='x' interval={[-10, transformations.pos.x, 10]} step={0.1} on:change={handleTransformations} />
@@ -163,7 +200,7 @@
         <!-- Here goes the Three js display -->
     </div>
     <span id='tabs_bot_limit'></span>
-    <div class='m-2 flex flex-col md:flex-row gap-4 justify-center'>
+    <div class='m-2 flex flex-col md:flex-row gap-4 justify-center items-center'>
         {#if isLoading}
             <Button disabled>
                 <Spinner class="mr-2" size="4"/>
@@ -173,6 +210,7 @@
                 <Spinner class="mr-2" size="4"/>
                 Loading...
             </Button>
+            <p class='font-bold text-amber-600'>That process could take a while...</p>
         {:else}
             {#if checkNoTransformations(transformations)}
                 <Button id="noStoneTransformations" disabled >Save stone transformations</Button>
