@@ -5,6 +5,9 @@
     import VideoOrMesh from './FormComponents/VideoOrMesh.svelte';
     import Metadata from './FormComponents/Metadata.svelte';
     import { auth_post_request } from '$lib/utils';
+    import ImageFileIcon from './icons/ImageFileIcon.svelte';
+    import ClipIcon from './icons/ClipIcon.svelte';
+    import UploadCloudIcon from './icons/UploadCloudIcon.svelte';
     
     export let http_method = 'POST';
     export let endpoint_url = '/post_khachkar';
@@ -89,11 +92,14 @@
             <VideoOrMesh bind:this={videoOrMeshComponent} {entry} />
         {/if}
         <div class='flex flex-col w-full self-end md:max-w-[50%]'>
-            <p>Upload image <b>(optional)</b></p>
+            <p class='inline-flex'><ImageFileIcon/> Upload image <b>(optional)</b> </p>
             <Label for="image" class="mb-2 w-full md:bottom-0">
-            <div class="my-4 p-1 flex border-4 border-amber-300 hover:bg-amber-500 text-center hover:text-white transition-colors duration-400 ease-in-out">
+            <div class="rounded-xl my-4 p-1 flex border-4 border-amber-300 hover:bg-amber-500 hover:cursor-pointer text-center hover:text-white transition-colors duration-400 ease-in-out">
                 <img id="previewImage" class={(entry.image? 'visible': 'hidden') + " md:w-1/2 m-auto p-2"} alt="Thumbnail">
-                <p class={(entry.image? 'hidden': 'visible') + ' self-center mx-auto'}>Upload Thumbnail</p>
+                <p class={(entry.image? 'hidden': 'visible') + ' self-center mx-auto inline-flex'}>
+                    <ClipIcon sx='w-6 h-6 text-black'/>
+                    Click to select a thumbnail...
+                </p>
                 <input type="file" id="image" name="image" class="w-0 invisible" on:change={loadImage} accept="image/*">
             </div>
         </Label>
@@ -107,6 +113,9 @@
             Loading...
         </Button>
     {:else}
-        <Button class='md:col-span-2 w-[50%] mx-auto h-full text-black bg-amber-500' on:click={handleSubmit}>{button_text}</Button>
+        <Button class='md:col-span-2 w-[50%] mx-auto h-full text-black bg-amber-500 hover:text-white' on:click={handleSubmit}>
+            <UploadCloudIcon sx='w-6 h-6 text-black mr-1'/>
+            {button_text}
+        </Button>
     {/if}
 </div>
