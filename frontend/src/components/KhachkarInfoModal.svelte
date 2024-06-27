@@ -1,6 +1,8 @@
 <script>
     import { Modal, Button, Table, TableBody, TableHead, TableBodyCell, TableHeadCell, TableBodyRow } from 'flowbite-svelte';
     import { TEXT_FIELDS_NAMES, OPTION_FIELDS_NAMES } from '$lib/constants';
+    import EditIcon from './icons/EditIcon.svelte';
+    import CloseIcon from './icons/CloseIcon.svelte';
     export let entry_data;
     export let clickOutsideModal = false;
     
@@ -29,6 +31,13 @@
         </TableBody>
     </Table>
     <svelte:fragment slot="footer">
-        <Button color="alternative">Back</Button>
+        <Button class='bg-red-500 hover:bg-red-700'>
+            <CloseIcon sx='m-0 mr-1 text-white'/>
+            Back
+        </Button>
+        <Button class="bg-cyan-500 hover:bg-cyan-700">
+            <EditIcon sx='m-0 mr-1 text-white'/>
+            Edit data or image
+        </Button>
     </svelte:fragment>
 </Modal>
