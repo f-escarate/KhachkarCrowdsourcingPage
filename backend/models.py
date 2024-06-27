@@ -36,6 +36,7 @@ class KhachkarState(ENUM):
         return labels[self.value]
 
 class AccessibilityLevel(str, ENUM):
+    unknown = "Unknown"
     very_easy = "Very easy"
     easy = "Easy"
     normal = "Normal"
@@ -43,6 +44,7 @@ class AccessibilityLevel(str, ENUM):
     very_hard = "Very hard"
 
 class ConditionOfPreservation(str, ENUM):
+    unknown = "Unknown"
     very_good = "Very good"
     good = "Good"
     normal = "Normal"
@@ -50,6 +52,7 @@ class ConditionOfPreservation(str, ENUM):
     very_bad = "Very bad"
 
 class Landscape(str, ENUM):
+    unknown = "Unknown"
     mountain = "Mountain"
     flat_land = "Flat land"
     other = "Other"
