@@ -1,9 +1,10 @@
 <script>
-    import { Tabs, TabItem, FloatingLabelInput , Button, Spinner} from 'flowbite-svelte';
+    import { Tabs, TabItem, FloatingLabelInput , Button, Spinner, A} from 'flowbite-svelte';
     import { base } from "$app/paths";
     import { goto } from "$app/navigation";
     import Cookies from 'js-cookie';
     import { HOST } from '$lib/constants';
+    import AlertModal from '../../../components/AlertModal.svelte';
 
     /** @type {import('./$types').PageData} */
 	export let data;
@@ -14,6 +15,7 @@
     let pass = '';
     let pass2 = '';
     let isLoading = false;
+    let alertComponent;
 
     const handleLogin = async () => {
         isLoading = true;
@@ -28,17 +30,16 @@
         if (json.status == 'success') {
             Cookies.set('access_token', json.access_token, { sameSite:'strict', secure:true });
             Cookies.set('refresh_token', json.refresh_token, { sameSite:'strict', secure:true });
-            alert('Successfully logged in, redirecting to home page');
-            window.location.href = base;
+            alertComponent.prepareAlert('Successfully logged in', 'Redirecting to home page', true, () => window.location.href = base);
             return;
         }
-        alert('Username or password incorrect');
+        alertComponent.prepareAlert('Failed to log in', 'Username or password incorrect', false);
         isLoading = false;
     }
 
     const handleRegister = async () => {
         if (pass != pass2) {
-            alert('Passwords do not match');
+            alertComponent.prepareAlert('Problem with passwords', 'The passwords do not match', false);
             return;
         }
         isLoading = true;
@@ -53,11 +54,10 @@
         });
         const json = await response.json();
         if (json.status == 'success') {
-            alert('Successfully registered, you can now log in');
-            goto(`${base}/enter/login`);
+            alertComponent.prepareAlert('Successfully registered', 'You can now log in', true, () => goto(`${base}/enter/login`) );
         }
         else if (json.status == 'error') {
-            alert(json.msg);
+            alertComponent.prepareAlert('Failed to register', json.msg, false);
         }
         isLoading = false;
     }
@@ -70,6 +70,7 @@
 
 </script>
 
+<AlertModal bind:this={alertComponent}/>
 <div class='md:mx-auto md:max-w-[50%] my-5 h-full md:p-4 space-y-4'>
     <Tabs style="underline">
         <TabItem open={loginOrRegister==='login'} on:click={e=> goto(`${base}/enter/login`)}>
