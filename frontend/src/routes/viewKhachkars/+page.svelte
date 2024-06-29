@@ -1,5 +1,6 @@
 <script>
     import Entry from '../../components/Entry.svelte';
+    import AlertModal from '../../components/AlertModal.svelte';
     import EditIcon from '../../components/icons/EditIcon.svelte';
     import SquareIcon2 from '../../components/icons/SquareIcon2.svelte';
     import MagicIcon from '../../components/icons/MagicIcon.svelte';
@@ -11,6 +12,7 @@
     import { base } from "$app/paths";
     import { auth_get_json, get_json } from '$lib/utils';
     import Cookies from 'js-cookie';
+    let alertComponent;
     let entries = null;
     let targetId = null;
     let filtered_entries = [];
@@ -79,13 +81,13 @@
         const json = await response.json();
         if (json.status === 'success') {
             filtered_entries[entry_idx].state = final_state;
-            alert(ok_msg);
+            alertComponent.prepareAlert('Success', ok_msg, true);
         } else if (json.status === 'error') {
             filtered_entries[entry_idx].state = error_state;
-            alert(json.msg);
+            alertComponent.prepareAlert('Error', json.msg, false);
         } else {
             filtered_entries[entry_idx].state = error_state;
-            alert(error_msg);
+            alertComponent.prepareAlert('Error', error_msg, false);
         }
     }
     const handleProcessMesh = async (e, entry_idx) => {
@@ -109,6 +111,7 @@
 </script>
 
 <div class='flex flex-col items-center md:max-w-[80%] md:mx-auto self-center'>
+    <AlertModal bind:this={alertComponent}/>
     <div class='m-2 flex flex-col align-left w-full gap-2'>
     <p class='text-lg font-semibold text-amber-600'>Filters: </p>
     <div class='flex self-start w-full items-center gap-2 md:gap-4'>
