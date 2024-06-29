@@ -1,9 +1,10 @@
 <script>
     import { createEventDispatcher } from 'svelte';
-    import { Label, Button, Spinner } from 'flowbite-svelte';
+    import { Label, Button, Spinner, A } from 'flowbite-svelte';
     import { HOST, BASE_ENTRY } from '$lib/constants';
     import VideoOrMesh from './FormComponents/VideoOrMesh.svelte';
     import Metadata from './FormComponents/Metadata.svelte';
+    import AlertModal from './AlertModal.svelte';
     import { auth_post_request } from '$lib/utils';
     import ImageFileIcon from './icons/ImageFileIcon.svelte';
     import ClipIcon from './icons/ClipIcon.svelte';
@@ -16,6 +17,7 @@
     export let use_video_or_mesh = true;
     let metadataFieldsComponent;
     let videoOrMeshComponent;
+    let alertComponent;
     let isLoading = false;
     export const previewFile = (elementID, file) => {
         let preview = document.getElementById(elementID);
@@ -27,6 +29,12 @@
     const dispatch = createEventDispatcher();
     function post_data_signal(){
         dispatch('post_data');
+    }
+    export const confirmationModal = (title, msg, yes_action, no_action, isGood) => {
+        alertComponent.prepareConfirmation(title, msg, yes_action, no_action, isGood);
+    }
+    export const alertModal = (title, msg, isGood, ok_action) => {
+        alertComponent.prepareAlert(title, msg, isGood, ok_action);
     }
 
     const restartForm = () => {
@@ -40,7 +48,7 @@
         if (use_video_or_mesh)
             msg += videoOrMeshComponent.validation();
         if (msg !== '') {
-            alert(msg);
+            alertComponent.prepareAlert('Invalid form', msg, false);
             return false;
         }
         return true;
@@ -73,9 +81,9 @@
             restartForm();
             post_data_signal();
         } else if (json.status == 'error'){
-            alert('Failed to add: ' + json.msg);
+            alertComponent.prepareAlert('Failed to add', json.msg, false);
         } else {
-            alert('Failed to add (unknown reason)');
+            alertComponent.prepareAlert('Failed to add', 'Unknown error', false);
         }
     }
     const loadImage = (event) => {
@@ -86,6 +94,7 @@
 </script>
 
 <div class='pt-5 grid gap-4 items-end w-full md:grid-cols-2'>
+    <AlertModal bind:this={alertComponent}/>
     <h2 class='md:col-span-2 text-2xl font-semibold'>Media</h2>
     <div class="my-2 md:flex md:flex-row gap-4 justify-between align-center md:col-span-2">
         {#if use_video_or_mesh}

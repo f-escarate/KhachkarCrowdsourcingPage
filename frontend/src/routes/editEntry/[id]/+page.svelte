@@ -35,8 +35,12 @@
         form.previewFile('previewImage', entry.image);
     });
     const handlePost = () => {
-        alert("Khachkar has been edited successfully");
-        window.location.href = `${base}/viewKhachkars/`;
+        form.alertModal(
+            'Khachkar edited successfully',
+            'You will be redirected to the view khachkars page',
+            true,
+            () => {window.location.href = `${base}/viewKhachkars/`;}
+        );
     }
 </script>
 
