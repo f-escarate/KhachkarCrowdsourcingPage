@@ -4,7 +4,7 @@
 </script>
 
 <div>
-    <h1 class='my-8 text-3xl font-bold'>How to record a (good) video</h1>
+    <h1 id='recordAGoodVideo' class='my-8 text-3xl font-bold'>How to record a (good) video</h1>
     <Cards cards_data={data.record_video_cards} />
     <h1 class='my-8 text-3xl font-bold'>How to upload a video (or mesh)</h1>
     <Cards cards_data={data.upload_video_cards} />

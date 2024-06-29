@@ -123,7 +123,13 @@
             <img src={`${base}/gifs/gifUploadMesh.gif`} alt='Upload mesh example' class='w-full'/>
         </Modal>
     {:else}
-        <p class='flex'><VideoFileIcon sx='w-6 h-6 text-black'/> Upload a video</p>
+        <p class='inline-block mb-2 align-middle'>
+            <VideoFileIcon sx='w-6 h-6 text-black inline'/>
+            Upload a video
+            <Button size="xs" class='bg-cyan-400 hover:bg-cyan-600 ml-2 my-auto' on:click={e => window.open(`${base}/tutorial/#recordAGoodVideo`,'_blank','noopener')}>
+                <p class='font-bold'>How to RECORD a good video?</p>
+            </Button>
+        </p>
         <Label for="video" class="mb-2 w-full">
             <div class="rounded-xl my-4 p-1 flex border-4 border-amber-300 hover:bg-amber-500 hover:cursor-pointer text-center hover:text-white transition-colors duration-400 ease-in-out">
                 <video class={(videoVisibility? 'visible': 'hidden') + ' md:w-1/2 m-auto p-2'} id='videoElement' controls>
