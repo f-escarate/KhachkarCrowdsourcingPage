@@ -1,5 +1,6 @@
 <script>
     import { onMount } from 'svelte';
+    import { Button } from 'flowbite-svelte';
     import json_data from '$lib/home.json';
     import { base } from "$app/paths";
     import { addAnimationStyles } from '$lib/utils';
@@ -86,5 +87,8 @@
                 <h2 class='font-semibold mb-2 text-center'>A mesh is created from the video</h2>
             </div>
         </div>
+        <Button href={`${base}/tutorial/`} class='absolute bottom-[-50px] left-0 bg-amber-500 w-full'>
+            Go to the tutorial
+        </Button>
     </div>
 </div>
