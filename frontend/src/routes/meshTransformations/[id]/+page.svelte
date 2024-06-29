@@ -9,8 +9,10 @@
     import { auth_post_request } from '$lib/utils';
     import RangeInput from '../../../components/RangeInput.svelte';
     import QuestionIcon from '../../../components/icons/QuestionIcon.svelte';
+    import AlertModal from '../../../components/AlertModal.svelte';
     /** @type {import('./$types').PageData} */
 	export let data;
+    let alertComponent;
     let id = data.id
     let isLoading = false;
     let modalTransform = false;
@@ -88,15 +90,15 @@
         const res = await response.json();
         isLoading = false;
         if(res.status == 'success') {
-            alert('Stone exported');
+            alertComponent.prepareAlert('Success', 'Stone exported successfully', true);
             progress_obj.loaded = false;
             clear_scene();
             load_mesh(id, set_progress, set_bounding_box_scales);
             return true;
         } else if (res.status == 'error') {
-            alert('Error: ', res.msg);
+            alertComponent.prepareAlert('Error', res.msg, false);
         } else {
-            alert('Unknown error');
+            alertComponent.prepareAlert('Error', 'An error occurred', false);
         }
         return false;
     }
@@ -141,6 +143,7 @@
             <p class='font-bold max-w-[250px]'>How edit mesh bounding box?</p>
         </Button>
     </div>
+    <AlertModal bind:this={alertComponent}/>
     <Modal bind:open={modalTransform} title='How to upload a mesh?' width='w-1/2' autoclose outsideclose>
         <p class='font-semibold'>You can change the mesh transformations by sliding the bars that correspond to each property (rotations and translations).</p>
         <p class='text-amber-600'>Example:</p>
