@@ -3,12 +3,14 @@
     import { Button, FloatingLabelInput } from 'flowbite-svelte';
     import { base } from "$app/paths";
     import { auth_post_request } from '$lib/utils';
+    import AlertModal from '../../../components/AlertModal.svelte';
+    let alertComponent;
     let old_pass = '';
     let new_pass1 = '';
     let new_pass2 = '';
     const handleChangePass = () => {
         if (new_pass1 !== new_pass2) {
-            alert("The new passwords do not match");
+            alertComponent.prepareAlert('Passwords do not match', 'The new passwords do not match', false);
             return;
         }
         let data = new FormData();
@@ -18,10 +20,11 @@
         .then(response => response.json())
         .then(json => {
             if (json.status == 'success') {
-                alert("Password changed successfully");
-                window.location.href = `${base}/account/`;
+                alertComponent.prepareAlert(
+                    'Password changed', 'Your password has been changed successfully', true,
+                    () => window.location.href = `${base}/account/`);
             } else {
-                alert(json.msg);
+                alertComponent.prepareAlert('Failed to change password', json.msg, false);
             }
         });
     
@@ -30,6 +33,8 @@
         if (e.key === 'Enter') handleChangePass();
     }
 </script>
+
+<AlertModal bind:this={alertComponent}/>
 
 <div class='mx-auto my-4 md:w-1/2 flex flex-col gap-4'>
     <h1 class='text-4xl font-bold'>Change password</h1>
