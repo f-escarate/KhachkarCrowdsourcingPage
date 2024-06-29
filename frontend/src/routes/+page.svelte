@@ -4,6 +4,8 @@
     import { base } from "$app/paths";
     import { addAnimationStyles } from '$lib/utils';
     import Cookies from 'js-cookie';
+    import RightArrowIcon from '../components/icons/RightArrowIcon.svelte';
+    import UploadCloudIcon from '../components/icons/UploadCloudIcon.svelte';
     let data = json_data.not_logged;
 
     const text_style = (idx) => {
@@ -54,4 +56,35 @@
             />
         </div>
     {/each}
+    <div class='flex flex-col gap-2 animated-div opacity-0'>
+        <h1 class='font-bold text-3xl my-8'>How does the automatic 3D model generation work?</h1>
+        <div class='my-2 flex w-full h-full justify-center overflow-x-auto'>
+            <div class='flex flex-col justify-between'>
+                <img 
+                    src={`${base}/gifs/videoForMeshing.gif`}
+                    alt='Video for meshing'
+                    class='h-full object-cover rounded-lg'
+                />
+                <h2 class='font-semibold mb-2 text-center'>Record a video</h2>
+            </div>
+            <div class='min-h-max w-1/2'>
+                <RightArrowIcon sx='w-full h-full text-gray-800' />
+            </div>
+            <div class='min-h-max min-w-[20%] max-w-[80%] flex flex-col'>
+                <UploadCloudIcon sx='w-full h-full text-cyan-600' />
+                <h2 class='font-semibold mb-2 text-center'>Upload it to the website</h2>
+            </div>
+            <div class='min-h-max w-1/2'>
+                <RightArrowIcon sx='w-full h-full text-gray-800' />
+            </div>
+            <div class='flex flex-col justify-between'>
+                <img
+                    src={`${base}/gifs/3DModelGif.gif`}
+                    alt='3D model generated'
+                    class='h-full object-cover rounded-lg'
+                />
+                <h2 class='font-semibold mb-2 text-center'>A mesh is created from the video</h2>
+            </div>
+        </div>
+    </div>
 </div>
