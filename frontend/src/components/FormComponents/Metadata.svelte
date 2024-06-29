@@ -6,6 +6,7 @@
     import { auth_get_json } from '$lib/utils'
     
     export let entry;
+    export let alertComponent;
     export let OPTION_FIELDS_OPTIONS_NAMES = {};
     export let OPTION_FIELDS_OPTIONS_IDS = {};
     onMount(async () => {
@@ -39,7 +40,7 @@
     export const addDataToRequest = (req_form_data, entry) => {
         // Validate the data
         if (entry.height < 0.1) {
-            alert('Height must be greater than 0.1 meters');
+            alertComponent.prepareAlert('Invalid height', 'Height must be greater than 0.1 meters', false);
             return false;
         }
         // Add the data to the request

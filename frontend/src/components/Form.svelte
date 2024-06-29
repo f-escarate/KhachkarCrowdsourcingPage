@@ -114,7 +114,7 @@
         </Label>
     </div>
     </div>
-    <Metadata bind:this={metadataFieldsComponent} entry={entry}/>
+    <Metadata bind:this={metadataFieldsComponent} bind:alertComponent={alertComponent} entry={entry}/>
 
     {#if isLoading}
         <Button class='md:col-span-2 w-[50%] mx-auto h-full text-black bg-amber-500'>
