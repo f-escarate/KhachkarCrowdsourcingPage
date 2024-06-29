@@ -6,10 +6,12 @@
     import ListIcon from '../../components/icons/ListIcon.svelte';
     import SquareIcon from '../../components/icons/SquareIcon.svelte';
     import OpenLinkIcon from '../../components/icons/OpenLinkIcon.svelte';
+    import AlertModal from '../../components/AlertModal.svelte';
     import { HOST } from '$lib/constants';
     import { base } from '$app/paths';
     import { auth_get_json, auth_post_request } from '$lib/utils';
     import Cookies from 'js-cookie';
+    let alertComponent;
     let entries = [];
     let khachkars_in_unity = [];
     let compiling_asset_bundles = false;
@@ -34,24 +36,39 @@
         }
     });
     const handleCompilation = async () => {
-        if (!confirm("Are you sure you want to compile asset bundles?"))
-            return;
-        compiling_asset_bundles = true;
-        let khachkar_ids = [];
-        let checkboxes = document.getElementsByName('checkbox');
-        for (let i = 0; i < checkboxes.length; i++) {
-            if (checkboxes[i].checked) {
-                khachkar_ids.push(entries[i]['id']);
+        const compilation = async () => {
+            compiling_asset_bundles = true;
+            let khachkar_ids = [];
+            let checkboxes = document.getElementsByName('checkbox');
+            for (let i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i].checked) {
+                    khachkar_ids.push(entries[i]['id']);
+                }
             }
+            const response = await auth_post_request(`${HOST}/compile_asset_bundles/`, JSON.stringify(khachkar_ids), 'POST', true);
+            let msg = await response.json();
+            if (msg.status === 'success') {
+                alertComponent.prepareAlert(
+                    'Asset bundles have been compiled successfully',
+                    'You can now view the khachkars in the museum',
+                    true
+                )
+            } else {
+                alertComponent.prepareAlert(
+                    'Failed to compile asset bundles',
+                    msg.msg,
+                    false
+                )
+            }
+            compiling_asset_bundles = false;
         }
-        const response = await auth_post_request(`${HOST}/compile_asset_bundles/`, JSON.stringify(khachkar_ids), 'POST', true);
-        let msg = await response.json();
-        if (msg.status === 'success') {
-            alert("Asset bundles have been compiled successfully");
-        } else {
-            alert(msg.msg);
-        }
-        compiling_asset_bundles = false;
+        alertComponent.prepareConfirmation(
+            'Compiling asset bundles',
+            'This process could take a few minutes',
+            ()=>{compilation()},
+            ()=>{},
+            true
+        );
     }
     const handleSelectAll = (e) => {
         let checkboxes = document.getElementsByName('checkbox');
@@ -64,6 +81,7 @@
 </script>
 
 <KhachkarInfoModal entry_data={entry_data} bind:clickOutsideModal={clickOutsideModal} />
+<AlertModal bind:this={alertComponent} title="Loading.." message="-" />
 <h1 class='text-4xl font-bold'>Manage khachkars in the museum</h1>
 <div class='flex flex-col'>
     {#if entries.length > 0}
