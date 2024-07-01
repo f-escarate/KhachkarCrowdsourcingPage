@@ -1,6 +1,7 @@
 <script>
     import { Modal, Button } from 'flowbite-svelte';
     import CloseIcon from './icons/CloseIcon.svelte';
+    import CheckIcon from './icons/CheckIcon.svelte';
     export let title = '';
     export let message = '';
     export let show = false;
@@ -43,6 +44,7 @@
                 No
             </Button>
             <Button class="bg-cyan-500 hover:bg-cyan-700" on:click={e => handleYesButton()}>
+                <CheckIcon sx='m-0 mr-1 text-white'/>
                 Yes
             </Button>
         {:else}
